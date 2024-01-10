@@ -1,1 +1,3 @@
-# INF2705-Exemples-chosson
+# Exemples du cours INF2705
+
+À venir...
