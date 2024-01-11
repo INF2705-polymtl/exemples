@@ -16,6 +16,6 @@ out vec4 fragColor;
 
 
 void main() {
-	// Appliquer un facteur multiplicatif sur la couleur.
+	// Appliquer un facteur multiplicatif sur la couleur (mais pas sur le alpha).
 	fragColor = vec4(color.rgb * brightness, color.a);
 }

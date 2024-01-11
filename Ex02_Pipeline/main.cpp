@@ -35,6 +35,9 @@ struct App : public OpenGLApplication
 	void init() override {
 		// Config de contexte OpenGL assez de base.
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_POINT_SMOOTH);
 		glPointSize(5.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
