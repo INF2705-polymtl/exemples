@@ -1,4 +1,4 @@
-#version 460
+#version 410
 
 
 // Dans le code principal, on a manuellement configuré les attributs 0 et 1 pour être la position et la couleur des sommets.

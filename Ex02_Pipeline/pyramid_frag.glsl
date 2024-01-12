@@ -1,4 +1,4 @@
-#version 460
+#version 410
 
 
 // Les variables d'entrée du nuanceur de fragments sont les variables de sortie du nuanceur de sommets.
