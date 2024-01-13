@@ -15,6 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <inf2705/OpenGLApplication.hpp>
+#include <inf2705/utils.hpp>
 
 
 using namespace gl;
@@ -63,30 +64,38 @@ struct App : public OpenGLApplication
 		glGenVertexArrays(1, &pyramidVao);
 		glBindVertexArray(pyramidVao);
 
-		// Créer le VBO des positions de sommet.
+		// Créer le VBO des positions.
 		glGenBuffers(1, &pyramidPositionVbo);
 		// Les glBindBuffers sont enregistrés dans le contexte du VAO.
 		glBindBuffer(GL_ARRAY_BUFFER, pyramidPositionVbo);
 		// Charger les données dans le tampon.
-		glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertices), pyramidVertices, GL_STATIC_DRAW);
+		if (usingElements)
+			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertices), pyramidVertices, GL_STATIC_DRAW);
+		else
+			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidFullPositions), pyramidFullPositions, GL_STATIC_DRAW);
 		// Configurer l'attribut à la position 0 avec 3 float (vec3, donc xyz) par élément.
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(0);
 
-		// Créer le VBO des couleurs de sommet.
+		// Créer le VBO des couleurs.
 		glGenBuffers(1, &pyramidColorVbo);
 		glBindBuffer(GL_ARRAY_BUFFER, pyramidColorVbo);
 		// Charger les données dans le tampon.
-		glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertexColors), pyramidVertexColors, GL_STATIC_DRAW);
+		if (usingElements)
+			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertexColors), pyramidVertexColors, GL_STATIC_DRAW);
+		else
+			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidFullColors), pyramidFullColors, GL_STATIC_DRAW);
 		// Configurer l'attribut à la position 1 avec 4 float (vec4, donc rgba) par élément.
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 
-		// Créer le VBO des indices de sommet.
-		glGenBuffers(1, &pyramidEbo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramidEbo);
-		// Charger les données dans le tampon.
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pyramidIndices), pyramidIndices, GL_STATIC_DRAW);
+		if (usingElements) {
+			// Créer le VBO des indices de sommet.
+			glGenBuffers(1, &pyramidEbo);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramidEbo);
+			// Charger les données dans le tampon.
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pyramidIndices), pyramidIndices, GL_STATIC_DRAW);
+		}
 	}
 
 	void loadShaders() {
@@ -96,15 +105,15 @@ struct App : public OpenGLApplication
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 		// Lire et envoyer la source du nuanceur de sommets.
-		std::string vertexShaderSource = readSource("pyramid_vert.glsl");
+		std::string vertexShaderSource = readFile("pyramid_vert.glsl");
 		auto src = vertexShaderSource.c_str();
 		glShaderSource(vertexShader, 1, &src, nullptr);
-		// Compiler et attacherle nuanceur de sommets.
+		// Compiler et attacher le nuanceur de sommets.
 		glCompileShader(vertexShader);
 		glAttachShader(shaderProgram, vertexShader);
 
 		// Lire et envoyer la source du nuanceur de fragments.
-		std::string fragmentShaderSource = readSource("pyramid_frag.glsl");
+		std::string fragmentShaderSource = readFile("pyramid_frag.glsl");
 		src = fragmentShaderSource.c_str();
 		glShaderSource(fragmentShader, 1, &src, nullptr);
 		// Compiler et attacher le nuanceur de fragments.
@@ -113,14 +122,6 @@ struct App : public OpenGLApplication
 
 		// Lier les deux nuanceurs au pipeline du programme.
 		glLinkProgram(shaderProgram);
-	}
-
-	// Charger en mémoire le contenu du fichier
-	std::string readSource(std::string_view filename) {
-		// Ouvrir le fichier
-		std::ifstream file(filename.data());
-		// Lire et retourner le contenu du fichier
-		return (std::stringstream() << file.rdbuf()).str();
 	}
 
 	void initCamera() {
@@ -151,10 +152,17 @@ struct App : public OpenGLApplication
 
 	void drawPyramid() {
 		glBindVertexArray(pyramidVao);
-		// Comme mentionné ci dessus, les glBindBuffers sont enregistrés dans le contexte du VAO.
-		// En faisant glBindVertexArray, ça restaure les glBindBuffer, on n'a donc pas besoin de les refaire.
-		glDrawElements(GL_TRIANGLES, std::size(pyramidIndices), GL_UNSIGNED_INT, 0);
+		// Comme mentionné ci dessus, les glBindBuffers sont enregistrés dans le contexte du VAO. En faisant glBindVertexArray, ça restaure les glBindBuffer, on n'a donc pas besoin de les refaire.
+
+		if (usingElements)
+			// glDrawElements utilise un tableau d'indices pour prendre les données des array buffers. Chaque sommet de la pyramide est partagé par 3 faces. On met donc les données de chaque sommet une seule fois en mémoire et on y fait référence à travers un tableau de connectivité.
+			glDrawElements(GL_TRIANGLES, (GLint)std::size(pyramidIndices), GL_UNSIGNED_INT, 0);
+		else
+			glDrawArrays(GL_TRIANGLES, 0, (GLint)std::size(pyramidFullPositions));
 	}
+
+	// Détermine si on utilise l'exemple avec glDrawArrays ou glDrawElements.
+	bool usingElements = true;
 
 	// Les données de la pyramide
 	vec3 top =     { 0.0f,  0.2f,  0.0f};
@@ -183,7 +191,7 @@ struct App : public OpenGLApplication
 		// Face arrière
 		2, 1, 0,
 	};
-	vec3 pyramidFullVertices[4 * 3] = {
+	vec3 pyramidFullPositions[4 * 3] = {
 		// Dessous
 		bottomR, bottomL, bottomF,
 		// Face "tribord"
@@ -193,13 +201,22 @@ struct App : public OpenGLApplication
 		// Face arrière
 		bottomL, bottomR, top,
 	};
+	vec4 pyramidFullColors[4 * 3] = {
+		// Dessous
+		brightGreen, brightRed, brightBlue,
+		// Face "tribord"
+		brightGreen, brightBlue, brightYellow,
+		// Face "babord"
+		brightBlue, brightRed, brightYellow,
+		// Face arrière
+		brightRed, brightGreen, brightYellow,
+	};
 
 	// Les ID d'objets OpenGL
 	GLuint pyramidVao = 0;
 	GLuint pyramidPositionVbo = 0;
-	GLuint pyramidEbo = 0;
 	GLuint pyramidColorVbo = 0;
-	GLuint pyramidFullVbo = 0;
+	GLuint pyramidEbo = 0;
 
 	// Les nuanceurs
 	GLuint shaderProgram = 0;

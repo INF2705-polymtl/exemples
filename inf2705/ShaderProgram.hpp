@@ -17,6 +17,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <inf2705/utils.hpp>
+
 #include "TransformStack.hpp"
 
 
@@ -46,7 +48,7 @@ public:
 
 	// Associer le contenu du fichier au nuanceur spécifié.
 	bool attachSourceFile(GLenum type, std::string_view filename) {
-		std::string source = readSource(filename);
+		std::string source = readFile(filename);
 		if (source.empty())
 			return false;
 
@@ -152,14 +154,6 @@ public:
 	GLuint getUniformLocation(std::string_view name) { return glGetUniformLocation(programObject_, name.data()); }
 
 private:
-	// Charger en mémoire le contenu du fichier
-	static std::string readSource(std::string_view filename) {
-		// Ouvrir le fichier
-		std::ifstream file(filename.data());
-		// Lire et retourner le contenu du fichier
-		return (std::stringstream() << file.rdbuf()).str();
-	}
-
 	GLuint programObject_ = 0; // Le ID de programme nuanceur.
 	std::unordered_map<GLenum, std::vector<GLuint>> shadersByType_; // Les nuanceurs.
 };
