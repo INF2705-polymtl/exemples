@@ -18,6 +18,7 @@
     </Filter>
     <Filter Include="Shader Source Files">
       <UniqueIdentifier>{6e79003b-e1d3-45e1-a872-875f5748de59}</UniqueIdentifier>
+      <Extensions>glsl</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +37,12 @@
       <Filter>Header Files\inf2705</Filter>
     </ClInclude>
     <ClInclude Include="..\inf2705\TransformStack.hpp">
+      <Filter>Header Files\inf2705</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inf2705\utils.hpp">
+      <Filter>Header Files\inf2705</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inf2705\sfml_utils.hpp">
       <Filter>Header Files\inf2705</Filter>
     </ClInclude>
   </ItemGroup>

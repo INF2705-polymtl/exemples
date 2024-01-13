@@ -17,18 +17,19 @@ using namespace gl;
 using namespace glm;
 
 
-#define CONFIGURE_VERTEX_ATTRIB(index, elemType, member)	\
-	glVertexAttribPointer(									\
-		index,												\
-		decltype(elemType::member)::length(),				\
-		GL_FLOAT,											\
-		GL_FALSE,											\
-		sizeof(elemType),									\
-		(void*)offsetof(elemType, member)					\
-	);														\
-	glEnableVertexAttribArray(index);						\
+#define SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
+	glVertexAttribPointer(											\
+		index,														\
+		(GLint)decltype(elemType::member)::length(),				\
+		GL_FLOAT,													\
+		GL_FALSE,													\
+		(GLint)sizeof(elemType),									\
+		(const void*)offsetof(elemType, member)						\
+	);																\
+	glEnableVertexAttribArray(index);								\
 
 
+// Informations de base d'un sommet
 struct VertexData
 {
 	vec3 position;
@@ -36,12 +37,14 @@ struct VertexData
 	vec2 texCoords;
 };
 
+// Informations de base d'une texture chargée
 struct Texture
 {
 	GLuint id;
 	std::string type;
 };
 
+// Un mesh représente la géométrie d'une forme d'une façon traçable par OpenGL.
 struct Mesh
 {
 	std::vector<VertexData> vertices;
@@ -52,6 +55,7 @@ struct Mesh
 	GLuint ebo = 0;
 
 	void setup() {
+		// Créer les buffer objects.
 		if (vao == 0)
 			glGenVertexArrays(1, &vao);
 		if (vbo == 0)
@@ -64,44 +68,56 @@ struct Mesh
 	}
 
 	void draw(GLenum drawMode = GL_TRIANGLES) {
-		glBindVertexArray(vao);
+		bindVao();
 
-		if (not indices.empty())
-			glDrawElements(drawMode, indices.size(), GL_UNSIGNED_INT, nullptr);
-		else
-			glDrawArrays(drawMode, 0, vertices.size());
+		// Avoir un tableau d'incices vide indique qu'on veut dessiner avec le tableau directement.
+		if (not indices.empty()) {
+			// Techniquement, on n'a pas besoin de refaire les glBindBuffer, mais ça ne coûte pas cher et c'est plus fiable de les refaire.
+			bindEbo();
+			// Tracer selon le tampon d'indices.
+			glDrawElements(drawMode, (GLint)indices.size(), GL_UNSIGNED_INT, nullptr);
+		} else {
+			bindVbo();
+			// Tracer selon le tampon de données.
+			glDrawArrays(drawMode, 0, (GLint)vertices.size());
+		}
 
-		glBindVertexArray(0);
+		unbindVao();
 	}
 
 	void updateBuffers() {
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		bindVao();
+		bindVbo();
+		bindEbo();
 
 		if (not vertices.empty()) {
-			int verticesNumBytes = vertices.size() * sizeof(VertexData);
-			glBufferData(GL_ARRAY_BUFFER, verticesNumBytes, vertices.data(), GL_STATIC_DRAW);
+			auto numBytes = vertices.size() * sizeof(VertexData);
+			glBufferData(GL_ARRAY_BUFFER, (GLint)numBytes, vertices.data(), GL_STATIC_DRAW);
 		}
-
 		if (not indices.empty()) {
-			int indicesNumBytes = indices.size() * sizeof(GLuint);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesNumBytes, indices.data(), GL_STATIC_DRAW);
+			auto numBytes = indices.size() * sizeof(GLuint);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLint)numBytes, indices.data(), GL_STATIC_DRAW);
 		}
 
-		glBindVertexArray(0);
+		unbindVao();
 	}
 
 	void setupAttribs() {
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		bindVao();
+		bindVbo();
 
-		CONFIGURE_VERTEX_ATTRIB(0, VertexData, position);
-		CONFIGURE_VERTEX_ATTRIB(1, VertexData, normal);
-		CONFIGURE_VERTEX_ATTRIB(2, VertexData, texCoords);
+		// Les données des sommets (positions, normales, coords de textures) sont placées ensembles dans le même tampon, de façon contigües. Les attributs sont configurés pour accéder à une position dans chaque élément
+		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(0, VertexData, position);
+		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(1, VertexData, normal);
+		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(2, VertexData, texCoords);
 
-		glBindVertexArray(0);
+		unbindVao();
 	}
+
+	void bindVao() { glBindVertexArray(vao); }
+	void unbindVao() { glBindVertexArray(0); }
+	void bindVbo() { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
+	void bindEbo() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
 
 	void importDataFromWavefrontFile(std::string_view filename) {
 		std::ifstream file(filename.data());

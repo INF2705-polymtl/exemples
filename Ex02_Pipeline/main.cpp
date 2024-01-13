@@ -40,6 +40,7 @@ struct App : public OpenGLApplication
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_POINT_SMOOTH);
 		glPointSize(5.0f);
+		glLineWidth(2.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
 		loadShaders();

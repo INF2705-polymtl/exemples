@@ -1,10 +1,5 @@
 #pragma once
 
-#ifdef _WIN32
-	// Juste pour s'assurer de traiter le code source en UTF-8 sur Windows avec Visual Studio.
-	#pragma execution_character_set("utf-8")
-#endif
-
 
 #include <cstddef>
 #include <cstdint>
@@ -16,6 +11,7 @@
 #include <string>
 
 #ifdef _WIN32
+	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 #endif
 
@@ -23,19 +19,10 @@
 #include <glbinding/gl/gl.h>
 #include <SFML/Window.hpp>
 
+#include "sfml_utils.hpp"
+
 
 using namespace gl;
-
-
-// Fonction utilitaire pour convertir une string UTF-8 en sf::String (pas mal juste utilisé pour le titre de fenêtre).
-inline sf::String sfStr(std::string_view s) {
-	return sf::String::fromUtf8(s.begin(), s.end());
-}
-
-// Fonction utilitaire pour obtenir le nom d'une touche. Ce nom va dépendre de la langue de l'OS.
-inline void printKeyName(sf::Event::KeyEvent key) {
-	std::cout << std::string(sf::Keyboard::getDescription(key.scancode)) << std::endl;
-}
 
 
 // Classe de base pour les application OpenGL. Fait pour nous la création de fenêtre et la gestion des événements.
@@ -79,7 +66,7 @@ public:
 	virtual void onClose() { }
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	virtual void onResize(const sf::Event::SizeEvent& size) { }
+	virtual void onResize(const sf::Event::SizeEvent& event, const sf::Vector2u& oldSize) { }
 
 	// Appelée sur un évènement autre que Closed, Resized ou KeyPressed.
 	virtual void onEvent(const sf::Event& event) { }
@@ -97,10 +84,12 @@ protected:
 				window_.close();
 				break;
 			// Redimensionnement de la fenêtre.
-			case Resized:
+			case Resized: {
+				auto oldSize = window_.getSize();
 				glViewport(0, 0, event.size.width, event.size.height);
-				onResize(event.size); // À surcharger
+				onResize(event.size, oldSize); // À surcharger
 				break;
+			}
 			// Touche appuyée.
 			case KeyPressed:
 				onKeyEvent(event.key); // À surcharger
