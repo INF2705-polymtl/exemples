@@ -9,6 +9,8 @@ project(INF2705_Ex02_Pipeline)
 set(ALL_FILES
     "main.cpp"
     "../inf2705/OpenGLApplication.hpp"
+    "../inf2705/sfml_utils.hpp"
+    "../inf2705/utils.hpp"
 )
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 

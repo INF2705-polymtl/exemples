@@ -20,6 +20,9 @@
       <UniqueIdentifier>{6e79003b-e1d3-45e1-a872-875f5748de59}</UniqueIdentifier>
       <Extensions>glsl</Extensions>
     </Filter>
+    <Filter Include="VSCode Files">
+      <UniqueIdentifier>{2454d832-51d2-4081-bad2-591ba3680c60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -47,10 +50,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="pyramid_frag.glsl">
+    <None Include="pyramid_brightness_frag.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
     <None Include="pyramid_vert.glsl">
+      <Filter>Shader Source Files</Filter>
+    </None>
+    <None Include=".vscode\settings.json">
+      <Filter>VSCode Files</Filter>
+    </None>
+    <None Include="CMakeLists.txt">
+      <Filter>VSCode Files</Filter>
+    </None>
+    <None Include="pyramid_frag.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
   </ItemGroup>

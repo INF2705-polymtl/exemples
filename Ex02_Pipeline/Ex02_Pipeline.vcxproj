@@ -159,7 +159,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="pyramid_frag.glsl" />
+    <None Include="pyramid_brightness_frag.glsl" />
     <None Include="pyramid_vert.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CMakeLists.txt" />
+    <None Include=".vscode\settings.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
