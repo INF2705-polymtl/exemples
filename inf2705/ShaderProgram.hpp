@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include <vector>
+#include <unordered_set>
 
 #include <glbinding/gl/gl.h>
 #include <glm/glm.hpp>
@@ -30,14 +30,24 @@ class ShaderProgram
 {
 public:
 	~ShaderProgram() {
-		for (auto&& [type, shaderObjects] : shadersByType_)
-			for (auto&& obj : shaderObjects)
-				glDeleteShader(obj);
+		for (auto&& [type, shaderObjects] : shadersByType_) {
+			for (auto&& shader : shaderObjects) {
+				glDetachShader(programObject_, shader);
+				glDeleteShader(shader);
+			}
+		}
 		glDeleteProgram(programObject_);
+		unuse();
 	}
 
 	// Le code donné par OpenGL
 	GLuint getObject() const { return programObject_; }
+
+	const std::unordered_set<GLuint>& getShaderObjects(GLenum type) const {
+		static const std::unordered_set<GLuint> emptyValue;
+		auto it = shadersByType_.find(type);
+		return it != shadersByType_.end() ? it->second : emptyValue;
+	}
 
 	// Demander à OpenGL de créer un programme de nuanceur
 	void create() {
@@ -47,15 +57,15 @@ public:
 	}
 
 	// Associer le contenu du fichier au nuanceur spécifié.
-	bool attachSourceFile(GLenum type, std::string_view filename) {
+	GLuint attachSourceFile(GLenum type, std::string_view filename) {
 		std::string source = readFile(filename);
 		if (source.empty())
-			return false;
+			return 0;
 
 		// Créer le nuanceur.
 		GLuint shaderObject = glCreateShader(type);
 		if (shaderObject == 0)
-			return false;
+			return 0;
 
 		// Charger la source et compiler.
 		auto src = source.c_str();
@@ -69,15 +79,15 @@ public:
 			std::string infoLog(infologLength, '\0');
 			glGetShaderInfoLog(shaderObject, infologLength, nullptr, infoLog.data());
 			std::cout << std::format("Compilation Error in '{}':\n{}", filename, infoLog) << std::endl;
-			return false;
+			return 0;
 		}
 
-		// Attacher au programme et l'ajouter au map des nuanceurs.
+		// Attacher au programme.
 		glAttachShader(programObject_, shaderObject);
 		// Avoir un dictionnaire des nuanceurs de chaque type n'est pas nécessaire mais peut aider au débogage.
-		shadersByType_[type].push_back(shaderObject);
+		shadersByType_[type].insert(shaderObject);
 
-		return shaderObject != 0;
+		return shaderObject;
 	}
 
 	// Faire l'édition des liens du programme
@@ -99,6 +109,10 @@ public:
 	// Utiliser ce programme comme pipeline graphique
 	void use() {
 		glUseProgram(programObject_);
+	}
+
+	void unuse() {
+		glUseProgram(0);
 	}
 
 	// Assigner des variables uniformes
@@ -155,6 +169,6 @@ public:
 
 private:
 	GLuint programObject_ = 0; // Le ID de programme nuanceur.
-	std::unordered_map<GLenum, std::vector<GLuint>> shadersByType_; // Les nuanceurs.
+	std::unordered_map<GLenum, std::unordered_set<GLuint>> shadersByType_; // Les nuanceurs.
 };
 

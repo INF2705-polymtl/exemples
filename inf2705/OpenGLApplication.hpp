@@ -25,6 +25,13 @@
 using namespace gl;
 
 
+struct WindowSettings
+{
+	sf::VideoMode videoMode = {600, 600};
+	int fps = 30;
+	sf::ContextSettings context = sf::ContextSettings(24, 8);
+};
+
 // Classe de base pour les application OpenGL. Fait pour nous la création de fenêtre et la gestion des événements.
 // On doit en hériter et on peut surcharger init() et drawFrame() pour créer un programme de base.
 // Les autres méthodes à surcharcher sont pour la gestion d'événements.
@@ -35,11 +42,12 @@ public:
 
 	const sf::Window& getWindow() const { return window_; }
 
-	void run(int& argc, char* argv[], std::string_view title = "OpenGL Application", sf::VideoMode videoMode = {800, 800}, int fps = 30) {
+	void run(int& argc, char* argv[], std::string_view title = "OpenGL Application", const WindowSettings& settings = {}) {
 		argc_ = argc;
 		argv_ = argv;
+		settings_ = settings;
 
-		createWindowAndContext(title, videoMode, fps);
+		createWindowAndContext(title);
 		printGLInfo();
 		std::cout << std::endl;
 
@@ -102,7 +110,7 @@ protected:
 		}
 	}
 
-	void createWindowAndContext(std::string_view title, sf::VideoMode videoMode, int fps) {
+	void createWindowAndContext(std::string_view title) {
 		#ifdef _WIN32
 			// Juste pour s'assurer d'avoir le codepage UTF-8 sur Windows avec Visual Studio.
 			SetConsoleOutputCP(65001);
@@ -110,12 +118,12 @@ protected:
 		#endif
 
 		window_.create(
-			videoMode, // Dimensions de fenêtre.
+			settings_.videoMode, // Dimensions de fenêtre.
 			sfStr(title), // Titre.
 			sf::Style::Default, // Style de fenêtre (bordure, boutons X, etc.).
-			sf::ContextSettings(24, 8) // 24bit de depth buffer, 8bit de stencil buffer.
+			settings_.context
 		);
-		window_.setFramerateLimit(fps);
+		window_.setFramerateLimit(settings_.fps);
 		window_.setActive(true);
 
 		// On peut donner une « GetProcAddress » venant d'une autre librairie à glbinding.
@@ -137,5 +145,6 @@ protected:
 	sf::Window window_;
 	int argc_ = 0;
 	char** argv_ = nullptr;
+	WindowSettings settings_;
 };
 

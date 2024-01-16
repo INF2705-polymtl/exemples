@@ -46,7 +46,7 @@ struct App : public OpenGLApplication
 
 		loadShaders();
 		initBuffers();
-		initCamera();
+		initSquareCamera();
 	}
 
 	void drawFrame() override {
@@ -64,19 +64,33 @@ struct App : public OpenGLApplication
 		glGenVertexArrays(1, &pyramidVao);
 		glBindVertexArray(pyramidVao);
 
+		if (usingSingleDataBuffer) {
+			initCombinedBuffer();
+		} else {
+			initPositionBuffer();
+			initColorBuffer();
+		}
+
+		if (usingElements)
+			initElementBuffer();
+	}
+
+	void initPositionBuffer() {
 		// Créer le VBO des positions.
 		glGenBuffers(1, &pyramidPositionVbo);
 		// Les glBindBuffers sont enregistrés dans le contexte du VAO.
 		glBindBuffer(GL_ARRAY_BUFFER, pyramidPositionVbo);
 		// Charger les données dans le tampon.
 		if (usingElements)
-			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertices), pyramidVertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertexPositions), pyramidVertexPositions, GL_STATIC_DRAW);
 		else
 			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidFullPositions), pyramidFullPositions, GL_STATIC_DRAW);
 		// Configurer l'attribut à la position 0 avec 3 float (vec3, donc xyz) par élément.
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(0);
+	}
 
+	void initColorBuffer() {
 		// Créer le VBO des couleurs.
 		glGenBuffers(1, &pyramidColorVbo);
 		glBindBuffer(GL_ARRAY_BUFFER, pyramidColorVbo);
@@ -88,14 +102,28 @@ struct App : public OpenGLApplication
 		// Configurer l'attribut à la position 1 avec 4 float (vec4, donc rgba) par élément.
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
+	}
 
-		if (usingElements) {
-			// Créer le VBO des indices de sommet.
-			glGenBuffers(1, &pyramidEbo);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramidEbo);
-			// Charger les données dans le tampon.
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pyramidIndices), pyramidIndices, GL_STATIC_DRAW);
-		}
+	void initElementBuffer() {
+		// Créer le VBO des indices de sommet.
+		glGenBuffers(1, &pyramidEbo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramidEbo);
+		// Charger les données dans le tampon.
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pyramidIndices), pyramidIndices, GL_STATIC_DRAW);
+	}
+
+	void initCombinedBuffer() {
+		// Créer le VBO de données combinées.
+		glGenBuffers(1, &pyramidDataVbo);
+		glBindBuffer(GL_ARRAY_BUFFER, pyramidDataVbo);
+		// Charger les données combinées dans un seul tableau.
+		glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertices), pyramidVertices, GL_STATIC_DRAW);
+		// Configurer l'attribut 0 (la position) avec l'index 0 avec 3 float (vec3), un stride de sizeof(Data) et un offset de 0.
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Data), (void*)offsetof(Data, position));
+		glEnableVertexAttribArray(0);
+		// Configurer l'attribut 1 (la couleur) avec l'index 0 avec 4 float (vec4), un stride de sizeof(Data) et un offset de 3*4=12.
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Data), (void*)offsetof(Data, color));
+		glEnableVertexAttribArray(1);
 	}
 
 	void loadShaders() {
@@ -124,7 +152,7 @@ struct App : public OpenGLApplication
 		glLinkProgram(shaderProgram);
 	}
 
-	void initCamera() {
+	void initSquareCamera() {
 		// Configuration de caméra qui donne une projection perspective où le plan z=0 a une boîte -1 à 1 en x, y.
 		// Ça ressemble donc à la projection par défaut (orthogonale dans une boîte -1 à 1) mais avec une perspective.
 
@@ -163,20 +191,22 @@ struct App : public OpenGLApplication
 
 	// Détermine si on utilise l'exemple avec glDrawArrays ou glDrawElements.
 	bool usingElements = true;
+	// Détermine si on utilise le buffer de données combinées.
+	bool usingSingleDataBuffer = true;
 
 	// Les données de la pyramide
 	vec3 top =     { 0.0f,  0.2f,  0.0f};
 	vec3 bottomR = {-0.3f, -0.2f, -0.1f};
 	vec3 bottomL = { 0.3f, -0.2f, -0.1f};
 	vec3 bottomF = { 0.0f, -0.2f,  0.7f};
-	vec3 pyramidVertices[4] = {
+	vec3 pyramidVertexPositions[4] = {
 		top,
 		bottomR,
 		bottomL,
 		bottomF,
 	};
 	vec4 pyramidVertexColors[4] = {
-		white,
+		brightYellow,
 		brightGreen,
 		brightRed,
 		brightBlue,
@@ -211,12 +241,24 @@ struct App : public OpenGLApplication
 		// Face arrière
 		brightRed, brightGreen, brightYellow,
 	};
+	struct Data
+	{
+		vec3 position;
+		vec4 color;
+	};
+	Data pyramidVertices[4] = {
+		{top, brightYellow},
+		{bottomR, brightGreen},
+		{bottomL, brightRed},
+		{bottomF, brightBlue},
+	};
 
 	// Les ID d'objets OpenGL
 	GLuint pyramidVao = 0;
 	GLuint pyramidPositionVbo = 0;
 	GLuint pyramidColorVbo = 0;
 	GLuint pyramidEbo = 0;
+	GLuint pyramidDataVbo = 0;
 
 	// Les nuanceurs
 	GLuint shaderProgram = 0;
@@ -233,8 +275,9 @@ struct App : public OpenGLApplication
 
 
 int main(int argc, char* argv[]) {
-	// C'est beau l'orienté-objet, non?
+	WindowSettings settings = {};
+
 	App app;
-	app.run(argc, argv, "Exemple Semaine 2: Pipeline", {600, 600});
+	app.run(argc, argv, "Exemple Semaine 3: Transformations", settings);
 }
 

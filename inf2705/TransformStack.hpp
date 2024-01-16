@@ -51,8 +51,8 @@ struct TransformStack : public std::stack<mat4>
 	void frustum(const ProjectionBox& plane) {
 		top() = glm::frustum(plane.leftFace, plane.rightFace, plane.bottomFace, plane.topFace, plane.nearDist, plane.farDist);
 	}
-	void perspective(float fovyDegrees, float aspect, float nearFace, float farFace) {
-		top() = glm::perspective(radians(fovyDegrees), aspect, nearFace, farFace);
+	void perspective(float fovyDegrees, float aspect, float nearDist, float farDist) {
+		top() = glm::perspective(radians(fovyDegrees), aspect, nearDist, farDist);
 	}
 	void ortho(const ProjectionBox& plane) {
 		top() = glm::ortho(plane.leftFace, plane.rightFace, plane.bottomFace, plane.topFace, plane.nearDist, plane.farDist);
