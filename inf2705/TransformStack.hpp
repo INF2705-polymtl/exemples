@@ -35,6 +35,9 @@ struct TransformStack : public std::stack<mat4>
 		push(m);
 	}
 
+	void loadIdentity() {
+		top() = mat4(1.0f);
+	}
 	void scale(const vec3& v) {
 		top() = glm::scale(top(), v);
 	}

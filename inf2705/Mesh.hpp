@@ -17,6 +17,7 @@ using namespace gl;
 using namespace glm;
 
 
+// Utilisation légitime de macros : génération de code
 #define SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
 	glVertexAttribPointer(											\
 		index,														\
@@ -70,19 +71,27 @@ struct Mesh
 	void draw(GLenum drawMode = GL_TRIANGLES) {
 		bindVao();
 
-		// Avoir un tableau d'incices vide indique qu'on veut dessiner avec le tableau directement.
-		if (not indices.empty()) {
-			// Techniquement, on n'a pas besoin de refaire les glBindBuffer, mais ça ne coûte pas cher et c'est plus fiable de les refaire.
-			bindEbo();
-			// Tracer selon le tampon d'indices.
-			glDrawElements(drawMode, (GLint)indices.size(), GL_UNSIGNED_INT, nullptr);
-		} else {
-			bindVbo();
-			// Tracer selon le tampon de données.
-			glDrawArrays(drawMode, 0, (GLint)vertices.size());
-		}
+		// Avoir un tableau d'incices vide ou non indique si on veut dessiner avec le tableau directement ou avec les indices.
+		if (not indices.empty())
+			drawElements(drawMode, (GLsizei)indices.size(), nullptr);
+		else
+			drawArrays(drawMode);
 
 		unbindVao();
+	}
+
+	void drawArrays(GLenum drawMode) {
+		// Techniquement, on n'a pas besoin de refaire les glBindBuffer, mais ça ne coûte pas cher et c'est plus fiable de les refaire.
+		bindVbo();
+		// Tracer selon le tampon de données.
+		glDrawArrays(drawMode, 0, (GLint)vertices.size());
+	}
+
+	void drawElements(GLenum drawMode, GLsizei numIndices, const GLuint* subIndices) {
+		// Techniquement, on n'a pas besoin de refaire les glBindBuffer, mais ça ne coûte pas cher et c'est plus fiable de les refaire.
+		bindEbo();
+		// Tracer selon le tampon d'indices.
+		glDrawElements(drawMode, numIndices, GL_UNSIGNED_INT, subIndices);
 	}
 
 	void updateBuffers() {

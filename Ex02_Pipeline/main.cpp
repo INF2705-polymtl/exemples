@@ -46,7 +46,7 @@ struct App : public OpenGLApplication
 
 		loadShaders();
 		initBuffers();
-		initSquareCamera();
+		setupSquareCamera();
 	}
 
 	void drawFrame() override {
@@ -119,10 +119,24 @@ struct App : public OpenGLApplication
 		// Charger les données combinées dans un seul tableau.
 		glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertices), pyramidVertices, GL_STATIC_DRAW);
 		// Configurer l'attribut 0 (la position) avec l'index 0 avec 3 float (vec3), un stride de sizeof(Data) et un offset de 0.
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Data), (void*)offsetof(Data, position));
+		glVertexAttribPointer(
+			0,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(Data),
+			0
+		);
 		glEnableVertexAttribArray(0);
 		// Configurer l'attribut 1 (la couleur) avec l'index 0 avec 4 float (vec4), un stride de sizeof(Data) et un offset de 3*4=12.
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Data), (void*)offsetof(Data, color));
+		glVertexAttribPointer(
+			1,
+			4,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(Data),
+			(void*)(3*sizeof(float))
+		);
 		glEnableVertexAttribArray(1);
 	}
 
@@ -152,7 +166,7 @@ struct App : public OpenGLApplication
 		glLinkProgram(shaderProgram);
 	}
 
-	void initSquareCamera() {
+	void setupSquareCamera() {
 		// Configuration de caméra qui donne une projection perspective où le plan z=0 a une boîte -1 à 1 en x, y.
 		// Ça ressemble donc à la projection par défaut (orthogonale dans une boîte -1 à 1) mais avec une perspective.
 
@@ -280,4 +294,111 @@ int main(int argc, char* argv[]) {
 	App app;
 	app.run(argc, argv, "Exemple Semaine 3: Transformations", settings);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Dompe de codes qui illustrent certains éléments
+///////////////////////////////////////////////////////////////////////////////
+
+// Illustrer les valeurs de glUniformLocation.
+/*
+auto sourceVert = "#version 410 \n uniform float uni1, uni2; \n void main() { gl_Position = vec4(uni1, uni2, 0, 1); } \n";
+auto sourceFrag = "#version 410 \n void main() { } \n";
+
+GLuint p1 = glCreateProgram();
+GLuint s1v = glCreateShader(GL_VERTEX_SHADER);
+GLuint s1f = glCreateShader(GL_FRAGMENT_SHADER);
+
+glShaderSource(s1v, 1, &sourceVert, nullptr);
+glCompileShader(s1v);
+glAttachShader(p1, s1v);
+
+glShaderSource(s1f, 1, &sourceFrag, nullptr);
+glCompileShader(s1f);
+glAttachShader(p1, s1f);
+
+glLinkProgram(p1);
+glUseProgram(p1);
+
+GLuint p2 = glCreateProgram();
+GLuint s2v = glCreateShader(GL_VERTEX_SHADER);
+GLuint s2f = glCreateShader(GL_FRAGMENT_SHADER);
+
+glShaderSource(s2v, 1, &sourceVert, nullptr);
+glCompileShader(s2v);
+glAttachShader(p2, s2v);
+
+glShaderSource(s2f, 1, &sourceFrag, nullptr);
+glCompileShader(s2f);
+glAttachShader(p2, s2f);
+
+glLinkProgram(p2);
+glUseProgram(p2);
+
+GLuint u11 = glGetUniformLocation(p1, "uni1");
+GLuint u12 = glGetUniformLocation(p1, "uni2");
+GLuint u21 = glGetUniformLocation(p2, "uni1");
+GLuint u22 = glGetUniformLocation(p2, "uni2");
+*/
+
+// Illustrer le buffer mapping
+/*
+	void onKeyEvent(const sf::Event::KeyEvent& key) override {
+		float positionMod = 0.0f;
+		float colorMod = 0.0f;
+
+		using enum sf::Keyboard::Key;
+		switch (key.code) {
+		case Up:
+			positionMod = 0.1f;
+			break;
+		case Down:
+			positionMod = -0.1f;
+			break;
+		case Add:
+			colorMod = 0.1f;
+			break;
+		case Subtract:
+			colorMod = -0.1f;
+			break;
+		}
+
+		glBindVertexArray(pyramidVao);
+		auto ptr = (Data*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+		auto& top = ptr[0];
+		top.position.y += positionMod;
+		top.color.rgb = top.color.rgb + vec3(colorMod);
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
+*/
+
+// Illustrer le subdata
+/*
+	void onKeyEvent(const sf::Event::KeyEvent& key) override {
+		float positionMod = 0.0f;
+		float colorMod = 0.0f;
+
+		using enum sf::Keyboard::Key;
+		switch (key.code) {
+		case Up:
+			positionMod = 0.1f;
+			break;
+		case Down:
+			positionMod = -0.1f;
+			break;
+		case Add:
+			colorMod = 0.1f;
+			break;
+		case Subtract:
+			colorMod = -0.1f;
+			break;
+		}
+
+		glBindVertexArray(pyramidVao);
+		auto& top = pyramidVertices[0];
+		top.position.y += positionMod;
+		top.color.rgb = top.color.rgb + vec3(colorMod);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Data), &top);
+	}
+*/
 
