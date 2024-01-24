@@ -5,9 +5,7 @@
 #include <cstdint>
 
 #include <format>
-#include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -32,7 +30,7 @@ public:
 	~ShaderProgram() {
 		for (auto&& [type, shaderObjects] : shadersByType_) {
 			for (auto&& shader : shaderObjects) {
-				// glDetachShader et glDeleteShader fonctionnent un peu comme des pointeurs intelligents : Le shader est concrètement supprimé seulement s'il n'est plus attaché à un programme.
+				// glDetachShader et glDeleteShader fonctionnent un peu comme des pointeurs intelligents : Le shader est concrètement supprimé seulement s'il n'est plus attaché à un programme. Sinon, il est marqué pour suppression mais pas supprimé tout de suite.
 				glDeleteShader(shader);
 				glDetachShader(programObject_, shader);
 			}
@@ -156,7 +154,7 @@ public:
 	void setMat(GLuint loc, const TransformStack& val) { setMat(loc, val.top()); }
 
 	// Positions
-	GLuint getAttribLocation(std::string_view name) const { return(glGetAttribLocation(programObject_, name.data())); }
+	GLuint getAttribLocation(std::string_view name) const { return glGetAttribLocation(programObject_, name.data()); }
 	void setAttribLocation(GLuint index, std::string_view name) { glBindAttribLocation(programObject_, index, name.data()); }
 	GLuint getUniformLocation(std::string_view name) { return glGetUniformLocation(programObject_, name.data()); }
 

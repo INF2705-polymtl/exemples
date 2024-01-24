@@ -247,5 +247,3 @@ inline sf::Keyboard::Key getKeyEnum(const std::string& name) {
 	return it != nameToKey.end() ? it->second : Unknown;
 }
 
-
-

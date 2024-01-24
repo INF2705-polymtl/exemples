@@ -185,13 +185,10 @@ struct App : public OpenGLApplication
 		model.pushIdentity();
 		// L'ordre des opérations est important. On veut faire un « barrel roll » (Starfox, do a barrel roll!). Il faut donc faire la rotation en premier puis faire la translation.
 		model.rotate(rotatingAngle, {0, 0, 1});
-		model.translate({0, -0.5f, 0});
-		//model.scale({1, 1.5f, 1});
-		// Les programmes de nuanceur ont leur propre espace mémoire. Il faut donc mettre à jour les variables uniformes pour chaque programme.
-		coloredVertexShaders.use();
-		coloredVertexShaders.setMat("model", model);
-		solidColorShaders.use();
-		solidColorShaders.setMat("model", model);
+		model.translate({0, -0.4f, 0});
+		// Il faut faire la mise à l'échelle en dernier pour écraser la pyramide sur sa hauteur.
+		model.scale({1, 0.8f, 1});
+		setCameraMatrix("model", model);
 		model.pop();
 
 		// Dessiner la pyramide avec le nuanceur avec couleur par sommet.
@@ -259,42 +256,51 @@ struct App : public OpenGLApplication
 	}
 
 	void drawCubeScene() {
-		solidColorShaders.use();
 		model.pushIdentity();
+
+		// Faire une translation en premier pour déplacer toute la scène. Bon exemple de la raison d'utiliser une pile de matrices. 
 		model.translate({0, -1, 0});
 
+		// Dupliquer la matrice courante qui contient la translation globale.
 		model.push();
-		model.translate({0, 0, 0});
-		model.scale({1.1f, 0.1f, 1.1f});
-		solidColorShaders.setMat("model", model);
-		solidColorShaders.setVec("globalColor", grey);
-		cube.draw(GL_TRIANGLES);
-		solidColorShaders.setVec("globalColor", black);
-		cubeWire.draw(GL_LINES);
+		// Écraser le cube en Y.
+		model.scale({1.2f, 0.1f, 1.2f});
+		// Dessiner le cube gris.
+		drawCube(grey);
 		model.pop();
 
 		model.push();
+		// Appliquer la translation pour mettre le cube rouge dans le coin. Il faut faire cette translation en premier.
 		model.translate({-0.7f, 0.5f, -0.7f});
+		// Appliquer la rotation après la translation. De cette façon, le prisme rouge tourne sur lui-même en Y.
 		model.rotate(rotatingAngle, {0, 1, 0});
-		model.scale({0.2f, 0.5f, 0.2f});
-		solidColorShaders.setMat("model", model);
-		solidColorShaders.setVec("globalColor", brightRed);
-		cube.draw(GL_TRIANGLES);
-		solidColorShaders.setVec("globalColor", black);
-		cubeWire.draw(GL_LINES);
+		// Appliquer la mise à l'échelle en dernier pour avoir une forme rectangulaire.
+		model.scale({0.3f, 0.5f, 0.2f});
+		// Dessiner le cube rouge.
+		drawCube(brightRed);
 		model.pop();
 
 		model.push();
 		model.translate({0.5f, 0.2f, 0.5f});
 		model.scale({0.4f, 0.2f, 0.4f});
-		solidColorShaders.setMat("model", model);
-		solidColorShaders.setVec("globalColor", brightGreen);
-		cube.draw(GL_TRIANGLES);
-		solidColorShaders.setVec("globalColor", black);
-		cubeWire.draw(GL_LINES);
+		drawCube(brightGreen);
 		model.pop();
 
 		model.pop();
+	}
+
+	void drawCube(vec4 cubeColor) {
+		// Choisir le nuanceur à couleur globale.
+		solidColorShaders.use();
+		// Mettre à jour les variables uniformes de matrice de modélisation et de couleur.
+		solidColorShaders.setMat("model", model);
+		solidColorShaders.setVec("globalColor", cubeColor);
+		// Dessiner le cube solide.
+		cube.draw(GL_TRIANGLES);
+		// Changer la couleur globale au noir pour dessiner les arêtes.
+		solidColorShaders.setVec("globalColor", black);
+		// Dessiner les arêtes (le wireframe) avec le mesh qui correspond aux lignes.
+		cubeWire.draw(GL_LINES);
 	}
 
 	void setupSquareCamera() {
@@ -323,23 +329,27 @@ struct App : public OpenGLApplication
 	}
 
 	void applyPerspective() {
-		// On calcule l'aspect de notre caméra à partir des dimensions de la fenêtre.
+		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
 		auto windowSize = window_.getSize();
 		float aspect = (float)windowSize.x / windowSize.y;
 
 		projection.pushIdentity();
+		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
 		projection.perspective(50, aspect, 0.1f, 100.0f);
 		setCameraMatrix("projection", projection);
 		projection.pop();
 	}
 
 	void applyOrtho() {
+		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
 		auto windowSize = window_.getSize();
 		float aspect = (float)windowSize.x / windowSize.y;
 
 		projection.pushIdentity();
+		// Construire une boîte de projection en utilisant la distance de la caméra pour que les touches + et - fassent au moins une sorte de zoom.
 		float boxEdge = cameraDistance / 3;
 		ProjectionBox box = {-boxEdge, boxEdge, -boxEdge, boxEdge, 0.1f, 100.0f};
+		// Appliquer l'aspect aux limites horizontales.
 		box.leftFace *= aspect;
 		box.rightFace *= aspect;
 		projection.ortho(box);
@@ -355,6 +365,7 @@ struct App : public OpenGLApplication
 	}
 
 	void setCameraMatrix(std::string_view name, const TransformStack& matrix) {
+		// Les programmes de nuanceur ont leur propre espace mémoire. Il faut donc mettre à jour les variables uniformes pour chaque programme.
 		coloredVertexShaders.use();
 		coloredVertexShaders.setMat(name, matrix);
 		solidColorShaders.use();

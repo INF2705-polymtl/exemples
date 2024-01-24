@@ -74,6 +74,10 @@ struct TransformStack : public std::stack<mat4>
 		return *this;
 	}
 
+	operator mat4() const {
+		return top();
+	}
+
 	using stack<mat4>::push;
 	using stack<mat4>::pop;
 
