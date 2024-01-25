@@ -11,6 +11,7 @@
 #include <glbinding/gl/gl.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <tiny_obj_loader.h>
 
 
 using namespace gl;
@@ -20,7 +21,7 @@ using namespace glm;
 // Utilisation légitime de macros : génération de code
 #define SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
 	glVertexAttribPointer(											\
-		index,														\
+		(GLuint)index,												\
 		(GLint)decltype(elemType::member)::length(),				\
 		GL_FLOAT,													\
 		GL_FALSE,													\
@@ -33,9 +34,9 @@ using namespace glm;
 // Informations de base d'un sommet
 struct VertexData
 {
-	vec3 position;
-	vec3 normal;
-	vec2 texCoords;
+	vec3 position;  // layout(location = 0)
+	vec3 normal;    // layout(location = 1)
+	vec2 texCoords; // layout(location = 2)
 };
 
 // Informations de base d'une texture chargée
@@ -64,8 +65,8 @@ struct Mesh
 		if (ebo == 0)
 			glGenBuffers(1, &ebo);
 
-		setupAttribs();
 		updateBuffers();
+		setupAttribs();
 	}
 
 	void draw(GLenum drawMode = GL_TRIANGLES) {
@@ -73,25 +74,25 @@ struct Mesh
 
 		// Avoir un tableau d'incices vide ou non indique si on veut dessiner avec le tableau directement ou avec les indices.
 		if (not indices.empty())
-			drawElements(drawMode, (GLsizei)indices.size(), nullptr);
+			drawElements(drawMode, (GLsizei)indices.size());
 		else
 			drawArrays(drawMode);
 
 		unbindVao();
 	}
 
-	void drawArrays(GLenum drawMode) {
+	void drawArrays(GLenum drawMode, GLint offset = 0) {
 		// Techniquement, on n'a pas besoin de refaire les glBindBuffer, mais ça ne coûte pas cher et c'est plus fiable de les refaire.
 		bindVbo();
 		// Tracer selon le tampon de données.
-		glDrawArrays(drawMode, 0, (GLint)vertices.size());
+		glDrawArrays(drawMode, offset, (GLint)vertices.size());
 	}
 
-	void drawElements(GLenum drawMode, GLsizei numIndices, const GLuint* subIndices) {
+	void drawElements(GLenum drawMode, GLsizei numIndices, GLsizei offset = 0) {
 		// Techniquement, on n'a pas besoin de refaire les glBindBuffer, mais ça ne coûte pas cher et c'est plus fiable de les refaire.
 		bindEbo();
 		// Tracer selon le tampon d'indices.
-		glDrawElements(drawMode, numIndices, GL_UNSIGNED_INT, subIndices);
+		glDrawElements(drawMode, numIndices, GL_UNSIGNED_INT, (const void*)(size_t)offset);
 	}
 
 	void updateBuffers() {
@@ -128,10 +129,49 @@ struct Mesh
 	void bindVbo() { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
 	void bindEbo() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
 
-	void importDataFromWavefrontFile(std::string_view filename) {
-		std::ifstream file(filename.data());
+	static std::vector<Mesh> loadFromWavefrontFile(std::string_view filename) {
+		// Code inspiré de l'exemple https://github.com/tinyobjloader/tinyobjloader/tree/release#example-code-new-object-oriented-api
 
-		// TODO: Lire un fichier Wavefront
+		tinyobj::ObjReader reader;
+
+		if (not reader.ParseFromFile(filename.data(), {})) {
+			std::cerr << "ERROR tinyobj::ObjReader: " << reader.Error();
+			return {};
+		}
+
+		if (!reader.Warning().empty())
+			std::cerr << "WARNING tinyobj::ObjReader: " << reader.Warning();
+
+		std::vector<Mesh> result;
+
+		for (auto&& shape : reader.GetShapes()) {
+			Mesh mesh;
+
+			size_t index_offset = 0;
+			for (auto&& fv : shape.mesh.num_face_vertices) {
+				for (size_t v = 0; v < fv; v++) {
+					VertexData data = {};
+					tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
+					auto& attribs = reader.GetAttrib();
+
+					// positions
+					data.position = *(const vec3*)&attribs.vertices[3 * size_t(idx.vertex_index)];
+					// Check if `normal_index` is zero or positive. negative = no normal data
+					if (idx.normal_index >= 0)
+						data.normal = *(const vec3*)&attribs.normals[3 * size_t(idx.normal_index)];
+					// Check if `texcoord_index` is zero or positive. negative = no texcoord data
+					if (idx.texcoord_index >= 0)
+						data.texCoords = *(const vec2*)&attribs.texcoords[2 * size_t(idx.texcoord_index)];
+
+					mesh.vertices.push_back(data);
+				}
+				index_offset += fv;
+			}
+			
+			result.push_back(std::move(mesh));
+		}
+
+		return result;
 	}
 };
 

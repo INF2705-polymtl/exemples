@@ -15,8 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <inf2705/utils.hpp>
-
+#include "utils.hpp"
 #include "TransformStack.hpp"
 
 
@@ -74,7 +73,7 @@ public:
 		if (infologLength > 1) {
 			std::string infoLog(infologLength, '\0');
 			glGetShaderInfoLog(shaderObject, infologLength, nullptr, infoLog.data());
-			std::cout << std::format("Compilation Error in '{}':\n{}", filename, infoLog) << std::endl;
+			std::cerr << std::format("Compilation Error in '{}':\n{}", filename, infoLog) << std::endl;
 			glDeleteShader(shaderObject);
 			return 0;
 		}
@@ -102,7 +101,7 @@ public:
 		if (infologLength > 1) {
 			std::string infoLog(infologLength, '\0');
 			glGetProgramInfoLog(programObject_, infologLength, nullptr, infoLog.data());
-			std::cout << std::format("Link Error in program {}:\n{}", programObject_, infoLog) << std::endl;
+			std::cerr << std::format("Link Error in program {}:\n{}", programObject_, infoLog) << std::endl;
 			return false;
 		}
 		return true;
