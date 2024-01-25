@@ -74,7 +74,7 @@ public:
 	virtual void onClose() { }
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	virtual void onResize(const sf::Event::SizeEvent& event, const sf::Vector2u& oldSize) { }
+	virtual void onResize(const sf::Event::SizeEvent& event) { }
 
 	// Appelée sur un évènement autre que Closed, Resized ou KeyPressed.
 	virtual void onEvent(const sf::Event& event) { }
@@ -93,9 +93,9 @@ protected:
 				break;
 			// Redimensionnement de la fenêtre.
 			case Resized: {
-				auto oldSize = window_.getSize();
 				glViewport(0, 0, event.size.width, event.size.height);
-				onResize(event.size, oldSize); // À surcharger
+				onResize(event.size); // À surcharger
+				lastResize_ = event.size;
 				break;
 			}
 			// Touche appuyée.
@@ -125,6 +125,7 @@ protected:
 		);
 		window_.setFramerateLimit(settings_.fps);
 		window_.setActive(true);
+		lastResize_ = {window_.getSize().x, window_.getSize().y};
 
 		// On peut donner une « GetProcAddress » venant d'une autre librairie à glbinding.
 		// Si on met nullptr, glbinding se débrouille avec sa propre implémentation.
@@ -143,6 +144,7 @@ protected:
 	}
 
 	sf::Window window_;
+	sf::Event::SizeEvent lastResize_ = {};
 	int argc_ = 0;
 	char** argv_ = nullptr;
 	WindowSettings settings_;

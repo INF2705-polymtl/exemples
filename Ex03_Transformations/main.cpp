@@ -117,7 +117,7 @@ struct App : public OpenGLApplication
 		}
 	}
 
-	void onResize(const sf::Event::SizeEvent& event, const sf::Vector2u& oldSize) override {
+	void onResize(const sf::Event::SizeEvent& event) override {
 		// Mettre à jour la matrice de projection avec le nouvel aspect de fenêtre après le redimensionnement.
 		updateProjection();
 	}
