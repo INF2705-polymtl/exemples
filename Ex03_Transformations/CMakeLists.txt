@@ -10,7 +10,7 @@ set(ALL_FILES
     "main.cpp"
     "../inf2705/Mesh.hpp"
     "../inf2705/OpenGLApplication.hpp"
-    "../inf2705/smfl_utils.hpp"
+    "../inf2705/sfml_utils.hpp"
     "../inf2705/ShaderProgram.hpp"
     "../inf2705/TransformStack.hpp"
     "../inf2705/utils.hpp"

@@ -69,8 +69,9 @@ struct App : public OpenGLApplication
 	}
 
 	void onKeyEvent(const sf::Event::KeyEvent& key) override {
-		using enum sf::Keyboard::Key;
+		//std::cout << getKeyEnumName(key.code) << "\n";
 		
+		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		// Les touches + et - servent à rapprocher et éloigner la caméra orbitale.
 		case Add:
@@ -84,6 +85,16 @@ struct App : public OpenGLApplication
 			if (not perspectiveCamera)
 				applyOrtho();
 			break;
+		case Multiply:
+			perspectiveVerticalFov -= 5.0f;
+			if (perspectiveCamera)
+				applyPerspective();
+			break;
+		case Divide:
+			perspectiveVerticalFov += 5.0f;
+			if (perspectiveCamera)
+				applyPerspective();
+			break;
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		case Up:
 			cameraLatitude += 5.0f;
@@ -91,26 +102,36 @@ struct App : public OpenGLApplication
 		case Down:
 			cameraLatitude -= 5.0f;
 			break;
-		// Les touches gauche/droite change l'azimuth ou la longitude de la caméra orbitale.
+		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
 		case Left:
-			cameraLongitude += 5.0f;
+			if (key.shift)
+				cameraRoll -= 5.0f;
+			else
+				cameraLongitude += 5.0f;
 			break;
 		case Right:
-			cameraLongitude -= 5.0f;
+			if (key.shift)
+				cameraRoll += 5.0f;
+			else
+				cameraLongitude -= 5.0f;
 			break;
 		// Réinitialiser la position de la caméra.
 		case R:
 			cameraDistance = 5;
 			cameraLatitude = 0;
 			cameraLongitude = 0;
+			perspectiveVerticalFov = 50;
+			updateProjection();
 			break;
 		// 1 : Projection perspective
 		case Num1:
+		case Numpad1:
 			perspectiveCamera = true;
 			updateProjection();
 			break;
 		// 2 : Projection orthogonale
 		case Num2:
+		case Numpad2:
 			perspectiveCamera = false;
 			updateProjection();
 			break;
@@ -335,7 +356,7 @@ struct App : public OpenGLApplication
 
 		projection.pushIdentity();
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
-		projection.perspective(50, aspect, 0.1f, 100.0f);
+		projection.perspective(perspectiveVerticalFov, aspect, 0.1f, 100.0f);
 		setCameraMatrix("projection", projection);
 		projection.pop();
 	}
@@ -384,6 +405,7 @@ struct App : public OpenGLApplication
 	TransformStack projection;
 
 	bool perspectiveCamera = true;
+	float perspectiveVerticalFov = 50;
 	float cameraDistance = 5;
 	float cameraRoll = 0;
 	float cameraLatitude = 0;
