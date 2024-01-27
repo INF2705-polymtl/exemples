@@ -27,7 +27,7 @@ inline std::string getKeyDescription(sf::Event::KeyEvent key) {
 
 inline std::string getKeyEnumName(sf::Keyboard::Key key) {
 	using enum sf::Keyboard::Key;
-	static std::unordered_map<sf::Keyboard::Key, std::string> keyToName = {
+	static const std::unordered_map<sf::Keyboard::Key, std::string> keyToName = {
 		{Unknown, "Unknown"},
 		{A, "A"},
 		{B, "B"},
@@ -138,7 +138,7 @@ inline std::string getKeyEnumName(sf::Keyboard::Key key) {
 
 inline sf::Keyboard::Key getKeyEnum(const std::string& name) {
 	using enum sf::Keyboard::Key;
-	static std::unordered_map<std::string, sf::Keyboard::Key> nameToKey = {
+	static const std::unordered_map<std::string, sf::Keyboard::Key> nameToKey = {
 		{"Unknown", Unknown},
 		{"A", A},
 		{"B", B},
@@ -176,6 +176,16 @@ inline sf::Keyboard::Key getKeyEnum(const std::string& name) {
 		{"Num7", Num7},
 		{"Num8", Num8},
 		{"Num9", Num9},
+		{"0", Num0},
+		{"1", Num1},
+		{"2", Num2},
+		{"3", Num3},
+		{"4", Num4},
+		{"5", Num5},
+		{"6", Num6},
+		{"7", Num7},
+		{"8", Num8},
+		{"9", Num9},
 		{"Escape", Escape},
 		{"LControl", LControl},
 		{"LShift", LShift},
