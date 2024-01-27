@@ -231,7 +231,7 @@ struct App : public OpenGLApplication
 		vec3 frontBottomL = { 1, -1,  1};
 		vec3 frontTopL =    { 1,  1,  1};
 
-		cube.vertices = {
+		cubeBox.vertices = {
 			{backBottomR, {}, {}},
 			{backTopR, {}, {}},
 			{backBottomL, {}, {}},
@@ -241,7 +241,7 @@ struct App : public OpenGLApplication
 			{frontBottomL, {}, {}},
 			{frontTopL, {}, {}},
 		};
-		cube.indices = {
+		cubeBox.indices = {
 			// Faces arrière
 			0, 1, 3,
 			0, 2, 3,
@@ -261,10 +261,10 @@ struct App : public OpenGLApplication
 			6, 4, 0,
 			6, 2, 0,
 		};
-		cube.setup();
+		cubeBox.setup();
 
 		// Configurer un deuxième mesh pour le wireframe du cube, de cette façon on ne dessine pas les lignes des triangles dans les faces et on dessine seulement les arêtes du cube.
-		cubeWire.vertices = cube.vertices;
+		cubeWire.vertices = cubeBox.vertices;
 		cubeWire.indices = {
 			// Face arrière
 			0, 1, 1, 3, 3, 2, 2, 0,
@@ -317,7 +317,7 @@ struct App : public OpenGLApplication
 		solidColorShaders.setMat("model", model);
 		solidColorShaders.setVec("globalColor", cubeColor);
 		// Dessiner le cube solide.
-		cube.draw(GL_TRIANGLES);
+		cubeBox.draw(GL_TRIANGLES);
 		// Changer la couleur globale au noir pour dessiner les arêtes.
 		solidColorShaders.setVec("globalColor", black);
 		// Dessiner les arêtes (le wireframe) avec le mesh qui correspond aux lignes.
@@ -394,7 +394,7 @@ struct App : public OpenGLApplication
 	}
 
 	Mesh pyramid;
-	Mesh cube;
+	Mesh cubeBox;
 	Mesh cubeWire;
 	GLuint pyramidColorVbo = 0;
 	ShaderProgram coloredVertexShaders;

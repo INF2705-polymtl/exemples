@@ -39,19 +39,11 @@ struct VertexData
 	vec2 texCoords; // layout(location = 2)
 };
 
-// Informations de base d'une texture chargée
-struct Texture
-{
-	GLuint id;
-	std::string type;
-};
-
 // Un mesh représente la géométrie d'une forme d'une façon traçable par OpenGL.
 struct Mesh
 {
 	std::vector<VertexData> vertices;
 	std::vector<GLuint> indices;
-	std::vector<Texture> textures;
 	GLuint vao = 0;
 	GLuint vbo = 0;
 	GLuint ebo = 0;

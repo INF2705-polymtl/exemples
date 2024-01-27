@@ -121,6 +121,7 @@ public:
 	void setInt(std::string_view name, int val) { setInt(getUniformLocation(name), (GLint)val); }
 	void setUInt(std::string_view name, unsigned val) { setUInt(getUniformLocation(name), (GLuint)val); }
 	void setFloat(std::string_view name, float val) { setFloat(getUniformLocation(name), (GLfloat)val); }
+	void setTextureUnit(std::string_view name, int val) { setInt(name, val); }
 	void setVec(std::string_view name, const vec2& val) { setVec(getUniformLocation(name), val); }
 	void setVec(std::string_view name, const vec3& val) { setVec(getUniformLocation(name), val); }
 	void setVec(std::string_view name, const vec4& val) { setVec(getUniformLocation(name), val); }
@@ -138,6 +139,7 @@ public:
 	void setInt(GLuint loc, int val) { glUniform1i(loc, (GLint)val); }
 	void setUInt(GLuint loc, unsigned val) { glUniform1ui(loc, (GLuint)val); }
 	void setFloat(GLuint loc, float val) { glUniform1f(loc, (GLfloat)val); }
+	void setTextureUnit(GLuint loc, int val) { setInt(loc, val); }
 	void setVec(GLuint loc, const vec2& val) { glUniform2fv(loc, 1, glm::value_ptr(val)); }
 	void setVec(GLuint loc, const vec3& val) { glUniform3fv(loc, 1, glm::value_ptr(val)); }
 	void setVec(GLuint loc, const vec4& val) { glUniform4fv(loc, 1, glm::value_ptr(val)); }
