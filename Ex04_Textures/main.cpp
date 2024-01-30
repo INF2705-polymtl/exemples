@@ -43,6 +43,7 @@ struct App : public OpenGLApplication
 
 		GLint maxTexUnits = 0;
 		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTexUnits);
+		std::cout << "Max texture units: " << maxTexUnits << "\n";
 
 		loadShaders();
 
@@ -52,12 +53,12 @@ struct App : public OpenGLApplication
 		cubeBox = Mesh::loadFromWavefrontFile("cube_box.obj")[0];
 		cubeBox.setup();
 
+		cubeRoad = Mesh::loadFromWavefrontFile("cube_road.obj")[0];
+		cubeRoad.setup();
+
 		loadTextures();
 
-		progCompositing.use();
-		progCompositing.setTextureUnit("tex0", 1);
-		progCompositing.setTextureUnit("tex1", 2);
-		progCompositing.setTextureUnit("tex2", 0);
+		bindBoxTextures();
 	}
 
 	// Appelée à chaque trame. Le buffer swap est fait juste après.
@@ -71,6 +72,11 @@ struct App : public OpenGLApplication
 			progCompositing.setVec("globalColor", vec4(1.0, 1.0, 1.0, 1.0));
 			cubeBox.draw();
 			break;
+		case 2:
+			progBasic.use();
+			progBasic.setMat("model", model);
+			progBasic.setVec("globalColor", vec4(1.0, 1.0, 1.0, 1.0));
+			cubeRoad.draw();
 		}
 	}
 
@@ -113,15 +119,15 @@ struct App : public OpenGLApplication
 			break;
 		// Changer l'exemple courant
 		case Num1: // 1 : Boîte en carton avec du texte compositionné.
-		case Num2:
-		case Num3:
-		case Num4:
-		case Num5:
-		case Num6:
-			mode = key.code - Num0;
+			bindBoxTextures();
+			mode = 1;
 			break;
-		case A:
-
+		case Num2: // 2 : Exemple de route avec texture qui se répète.
+			progBasic.use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texAsphalt);
+			progBasic.setTextureUnit("tex0", 0);
+			mode = 2;
 			break;
 		}
 
@@ -147,15 +153,15 @@ struct App : public OpenGLApplication
 	}
 
 	void loadTextures() {
-		glActiveTexture(GL_TEXTURE0);
 		texBlank = loadTextureFromFile("blank.png");
-		glActiveTexture(GL_TEXTURE1);
 		texBoxBG = loadTextureFromFile("box_bg.png");
-		glActiveTexture(GL_TEXTURE2);
 		texBoxText = loadTextureFromFile("box_text.png");
+		texAsphalt = loadTextureFromFile("asphalt.png");
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 
-	GLuint loadTextureFromFile(const std::string& filename) {
+	GLuint loadTextureFromFile(const std::string& filename, bool mipmap = true) {
 		sf::Image texImg;
 		texImg.loadFromFile(filename);
 		// Beaucoup de bibliothèques importent les images avec x=0,y=0 (donc premier pixel du tableau) au coin haut-gauche de l'image. C'est la convention en graphisme, mais les textures en OpenGL ont leur origine au coin bas-gauche.
@@ -175,9 +181,30 @@ struct App : public OpenGLApplication
 			GL_UNSIGNED_BYTE,
 			texImg.getPixelsPtr()
 		);
-		glGenerateMipmap(GL_TEXTURE_2D);
+
+		if (mipmap) {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		} else {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
 
 		return texID;
+	}
+
+	void bindBoxTextures() {
+		progCompositing.use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texBoxBG);
+		progCompositing.setTextureUnit("tex0", 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texBoxText);
+		progCompositing.setTextureUnit("tex1", 1);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, texBlank);
+		progCompositing.setTextureUnit("tex2", 2);
 	}
 
 	void updateCamera() {
@@ -210,6 +237,7 @@ struct App : public OpenGLApplication
 
 	Mesh pyramid;
 	Mesh cubeBox;
+	Mesh cubeRoad;
 	ShaderProgram allPrograms[2] = {};
 	ShaderProgram& progBasic = allPrograms[0];
 	ShaderProgram& progCompositing = allPrograms[1];
@@ -217,6 +245,7 @@ struct App : public OpenGLApplication
 	GLuint texBlank = 0;
 	GLuint texBoxBG = 0;
 	GLuint texBoxText = 0;
+	GLuint texAsphalt = 0;
 
 	TransformStack model;
 	TransformStack view;
