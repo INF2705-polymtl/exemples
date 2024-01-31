@@ -30,7 +30,7 @@ struct App : public OpenGLApplication
 {
 	// Appelée avant la première trame.
 	void init() override {
-		// Config de base, pas de cull, lignes assez visibles.
+		// Config de base: pas de cull, lignes assez visibles.
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
@@ -69,23 +69,26 @@ struct App : public OpenGLApplication
 		case 1:
 			progCompositing.use();
 			progCompositing.setMat("model", model);
-			progCompositing.setVec("globalColor", vec4(1.0, 1.0, 1.0, 1.0));
 			cubeBox.draw();
 			break;
 		case 2:
+		case 3:
 			progBasic.use();
 			progBasic.setMat("model", model);
-			progBasic.setVec("globalColor", vec4(1.0, 1.0, 1.0, 1.0));
 			cubeRoad.draw();
+			break;
 		}
 	}
 
 	// Appelée lors d'une touche de clavier.
 	void onKeyEvent(const sf::Event::KeyEvent& key) override {
-		//std::cout << getKeyEnumName(key.code) << "\n";
-
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
+		// Réinitialiser la position de la caméra.
+		case R:
+			camera = {};
+			break;
+
 		// Les touches + et - servent à rapprocher et éloigner la caméra orbitale.
 		case Add:
 			camera.altitude -= 0.5f;
@@ -93,6 +96,7 @@ struct App : public OpenGLApplication
 		case Subtract:
 			camera.altitude += 0.5f;
 			break;
+
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		case Up:
 			camera.moveNorth(5.0f);
@@ -100,6 +104,7 @@ struct App : public OpenGLApplication
 		case Down:
 			camera.moveSouth(5.0f);
 			break;
+
 		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
 		case Left:
 			if (key.shift)
@@ -113,21 +118,25 @@ struct App : public OpenGLApplication
 			else
 				camera.moveEast(5.0f);
 			break;
-		// Réinitialiser la position de la caméra.
-		case R:
-			camera = {};
-			break;
-		// Changer l'exemple courant
-		case Num1: // 1 : Boîte en carton avec du texte compositionné.
+
+		// Touches numériques: changer l'exemple courant.
+		case Num1: // 1: Boîte en carton avec du texte compositionné.
 			bindBoxTextures();
 			mode = 1;
 			break;
-		case Num2: // 2 : Exemple de route avec texture qui se répète.
+		case Num2: // 2: Exemple de route avec texture qui se répète.
 			progBasic.use();
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texAsphalt);
 			progBasic.setTextureUnit("tex0", 0);
 			mode = 2;
+			break;
+		case Num3: // 3: Exemple de Mipmap manuel.
+			progBasic.use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texLevels);
+			progBasic.setTextureUnit("tex0", 0);
+			mode = 3;
 			break;
 		}
 
@@ -153,15 +162,19 @@ struct App : public OpenGLApplication
 	}
 
 	void loadTextures() {
-		texBlank = loadTextureFromFile("blank.png");
-		texBoxBG = loadTextureFromFile("box_bg.png");
-		texBoxText = loadTextureFromFile("box_text.png");
-		texAsphalt = loadTextureFromFile("asphalt.png");
+		texBlank = loadTextureFromFile("blank.png", false);
+		texBoxBG = loadTextureFromFile("box_bg.png", true);
+		texBoxText = loadTextureFromFile("box_text.png", true);
+
+		texAsphalt = loadTextureFromFile("asphalt.png", true);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		texLevels = loadMipmapFromFiles("lvl{}.png", 6);
+
 	}
 
-	GLuint loadTextureFromFile(const std::string& filename, bool mipmap = true) {
+	GLuint loadTextureFromFile(const std::string& filename, bool generateMipmap = true) {
 		sf::Image texImg;
 		texImg.loadFromFile(filename);
 		// Beaucoup de bibliothèques importent les images avec x=0,y=0 (donc premier pixel du tableau) au coin haut-gauche de l'image. C'est la convention en graphisme, mais les textures en OpenGL ont leur origine au coin bas-gauche.
@@ -182,14 +195,44 @@ struct App : public OpenGLApplication
 			texImg.getPixelsPtr()
 		);
 
-		if (mipmap) {
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+		if (generateMipmap) {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		} else {
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
+
+		return texID;
+	}
+
+	GLuint loadMipmapFromFiles(const std::string& filenameFormat, int numLevels) {
+		GLuint texID = 0;
+		glGenTextures(1, &texID);
+		glBindTexture(GL_TEXTURE_2D, texID);
+		for (int i = 0; i < numLevels; i++) {
+			auto filename = std::vformat(filenameFormat, std::make_format_args(i));
+			sf::Image texImg;
+			texImg.loadFromFile(filename);
+			texImg.flipVertically();
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				i,
+				GL_RGBA,
+				texImg.getSize().x,
+				texImg.getSize().y,
+				0,
+				GL_RGBA,
+				GL_UNSIGNED_BYTE,
+				texImg.getPixelsPtr()
+			);
+		}
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numLevels - 1);
 
 		return texID;
 	}
@@ -222,7 +265,7 @@ struct App : public OpenGLApplication
 
 		projection.pushIdentity();
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
-		projection.perspective(50, aspect, 0.1f, 100.0f);
+		projection.perspective(50, aspect, 0.01f, 100.0f);
 		setMatrixOnAll("projection", projection);
 		projection.pop();
 	}
@@ -246,12 +289,13 @@ struct App : public OpenGLApplication
 	GLuint texBoxBG = 0;
 	GLuint texBoxText = 0;
 	GLuint texAsphalt = 0;
+	GLuint texLevels = 0;
 
 	TransformStack model;
 	TransformStack view;
 	TransformStack projection;
 
-	OrbitCamera camera;
+	OrbitCamera camera = {5, 30, -30, 0};
 
 	int mode = 1;
 };
@@ -260,7 +304,7 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 4;
+	settings.context.antialiasingLevel = 0;
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 4: Textures", settings);

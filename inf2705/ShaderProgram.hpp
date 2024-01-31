@@ -68,7 +68,7 @@ public:
 		glCompileShader(shaderObject);
 
 		// Afficher le message d'erreur si applicable.
-		int infologLength = 0;
+		GLint infologLength = 0;
 		glGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &infologLength);
 		if (infologLength > 1) {
 			std::string infoLog(infologLength, '\0');

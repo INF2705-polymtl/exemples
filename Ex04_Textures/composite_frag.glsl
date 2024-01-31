@@ -1,8 +1,8 @@
 #version 410
 
 
-in vec4 color;
 in vec2 texCoords;
+in vec4 color;
 
 uniform sampler2D tex0;
 uniform sampler2D tex1;

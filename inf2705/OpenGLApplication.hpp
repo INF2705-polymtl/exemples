@@ -5,10 +5,13 @@
 #include <cstdint>
 
 #include <array>
+#include <format>
 #include <iostream>
 #include <memory>
+#include <filesystem>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
@@ -149,4 +152,43 @@ protected:
 	char** argv_ = nullptr;
 	WindowSettings settings_;
 };
+
+
+GLenum printGLError(std::string_view sourceFile = "", int sourceLine = -1) {
+	static const std::unordered_map<GLenum, std::string> codeToName = {
+		{GL_NO_ERROR, "GL_NO_ERROR"},
+		{GL_INVALID_ENUM, "GL_INVALID_ENUM"},
+		{GL_INVALID_VALUE, "GL_INVALID_VALUE"},
+		{GL_INVALID_OPERATION, "GL_INVALID_OPERATION"},
+		{GL_STACK_OVERFLOW, "GL_STACK_OVERFLOW"},
+		{GL_STACK_UNDERFLOW, "GL_STACK_UNDERFLOW"},
+		{GL_OUT_OF_MEMORY, "GL_OUT_OF_MEMORY"},
+		{GL_INVALID_FRAMEBUFFER_OPERATION, "GL_INVALID_FRAMEBUFFER_OPERATION"},
+		{GL_INVALID_FRAMEBUFFER_OPERATION_EXT, "GL_INVALID_FRAMEBUFFER_OPERATION_EXT"},
+		{GL_TABLE_TOO_LARGE, "GL_TABLE_TOO_LARGE"},
+		{GL_TABLE_TOO_LARGE_EXT, "GL_TABLE_TOO_LARGE_EXT"},
+		{GL_TEXTURE_TOO_LARGE_EXT, "GL_TEXTURE_TOO_LARGE_EXT"},
+	};
+
+	GLenum errorCode = glGetError();
+	if (errorCode == GL_NO_ERROR)
+		return GL_NO_ERROR;
+
+	auto& errorName = codeToName.at(errorCode);
+
+	if (not sourceFile.empty()) {
+		auto filename = std::filesystem::path(sourceFile).filename().string();
+		std::cerr << std::format(
+			"{}({}): ",
+			filename, sourceLine
+		);
+	}
+	
+	std::cerr << std::format(
+		"OpenGL Error 0x{:04X}: {}\n",
+		(int)errorCode, errorName.data()
+	);
+
+	return errorCode;
+}
 
