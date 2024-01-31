@@ -108,7 +108,7 @@ struct Mesh
 		bindVao();
 		bindVbo();
 
-		// Les données des sommets (positions, normales, coords de textures) sont placées ensembles dans le même tampon, de façon contigües. Les attributs sont configurés pour accéder à une position dans chaque élément
+		// Les données des sommets (positions, normales, coords de textures) sont placées ensembles dans le même tampon, de façon contigües. Les attributs sont configurés pour accéder à un membre de VertexData dans chaque élément.
 		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(0, VertexData, position);
 		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(1, VertexData, normal);
 		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(2, VertexData, texCoords);
@@ -121,21 +121,25 @@ struct Mesh
 	void bindVbo() { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
 	void bindEbo() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
 
+	// Charge des mesh d'objets à partir d'un fichier Wavefront (il peut y avoir plusieurs objet dans le même fichier).
 	static std::vector<Mesh> loadFromWavefrontFile(std::string_view filename) {
 		// Code inspiré de l'exemple https://github.com/tinyobjloader/tinyobjloader/tree/release#example-code-new-object-oriented-api
 
+		// Lire le fichier et vérifier les erreurs. On le charge en spécifiant à tinyobjloader de faire la séparation en triangles des faces non triangulaires (des quadrilatères par exemple).
 		tinyobj::ObjReader reader;
-
+		tinyobj::ObjReaderConfig config = {};
+		config.triangulate = true;
+		config.triangulation_method;
 		if (not reader.ParseFromFile(filename.data(), {})) {
 			std::cerr << "ERROR tinyobj::ObjReader: " << reader.Error();
 			return {};
 		}
-
-		if (!reader.Warning().empty())
+		if (not reader.Warning().empty())
 			std::cerr << "WARNING tinyobj::ObjReader: " << reader.Warning();
 
 		std::vector<Mesh> result;
 
+		// Pour chaque objet défini dans le fichier:
 		for (auto&& shape : reader.GetShapes()) {
 			Mesh mesh;
 
