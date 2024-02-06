@@ -11,10 +11,12 @@
 #include <filesystem>
 #include <stdexcept>
 #include <string>
+#include <chrono>
 #include <unordered_map>
 
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
 	#include <Windows.h>
 #endif
 
@@ -56,11 +58,15 @@ public:
 
 		init(); // À surcharger
 
+		lastFrameTime_ = std::chrono::high_resolution_clock::now();
+		deltaTime_ = 1.0f / settings_.fps;
+
 		while (window_.isOpen()) {
 			drawFrame(); // À surcharger
 			window_.display();
 
 			handleEvents();
+			updateDeltaTime();
 		}
 	}
 
@@ -146,8 +152,26 @@ protected:
 		printf("GLSL   %s\n", glslVersion);
 	}
 
+	void updateDeltaTime() {
+		using namespace std::chrono;
+		auto t = high_resolution_clock::now();
+		duration<float> dt = t - lastFrameTime_;
+		deltaTime_ = dt.count();
+		lastFrameTime_ = t;
+	}
+
+	float getWindowAspect() {
+		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
+		auto windowSize = window_.getSize();
+		float aspect = (float)windowSize.x / windowSize.y;
+		return aspect;
+	}
+
 	sf::Window window_;
 	sf::Event::SizeEvent lastResize_ = {};
+	float deltaTime_ = 0.0f;
+	std::chrono::high_resolution_clock::time_point lastFrameTime_;
+
 	int argc_ = 0;
 	char** argv_ = nullptr;
 	WindowSettings settings_;

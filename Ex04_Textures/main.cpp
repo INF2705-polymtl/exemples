@@ -53,7 +53,7 @@ struct App : public OpenGLApplication
 		applyPerspective();
 
 		// Pour le reste de la session, ça va devenir de moins en moins faisable de hard-coder toutes les données à la main. On va plutôt importer nos mesh de fichiers Wavefront (.obj). Ceux-ci contiennent les positions, normales et coordonnées de texture.
-		// Beaucoup de logiciels de modélisation 3D (Blender, 3ds Max, même Wings 3D) supporte l'exporation en Wavefront.
+		// Beaucoup de logiciels de modélisation 3D (Blender, 3ds Max, même Wings 3D) supporte l'exportation en Wavefront.
 		cubeBox = Mesh::loadFromWavefrontFile("cube_box.obj")[0];
 		cubeBox.setup();
 		cubeRoad = Mesh::loadFromWavefrontFile("cube_road.obj")[0];
@@ -87,43 +87,15 @@ struct App : public OpenGLApplication
 
 	// Appelée lors d'une touche de clavier.
 	void onKeyEvent(const sf::Event::KeyEvent& key) override {
+		// La touche R réinitialise la position de la caméra.
+		// Les touches + et - rapprochent et éloignent la caméra orbitale.
+		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
+		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
+		camera.handleKeyEvent(key, 5.0f, 0.5f);
+		updateCamera();
+
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
-		// Réinitialiser la position de la caméra.
-		case R:
-			camera = {};
-			break;
-
-		// Les touches + et - servent à rapprocher et éloigner la caméra orbitale.
-		case Add:
-			camera.altitude -= 0.5f;
-			break;
-		case Subtract:
-			camera.altitude += 0.5f;
-			break;
-
-		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
-		case Up:
-			camera.moveNorth(5.0f);
-			break;
-		case Down:
-			camera.moveSouth(5.0f);
-			break;
-
-		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
-		case Left:
-			if (key.shift)
-				camera.rollCCW(5.0f);
-			else
-				camera.moveWest(5.0f);
-			break;
-		case Right:
-			if (key.shift)
-				camera.rollCW(5.0f);
-			else
-				camera.moveEast(5.0f);
-			break;
-
 		// Touches numériques: changer l'exemple courant.
 		case Num1: // 1: Boîte en carton avec du texte compositionné.
 			bindBoxTextures();
@@ -146,8 +118,6 @@ struct App : public OpenGLApplication
 			mode = 3;
 			break;
 		}
-
-		updateCamera();
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
@@ -282,7 +252,7 @@ struct App : public OpenGLApplication
 
 	void updateCamera() {
 		view.pushIdentity();
-		camera.applyView(view);
+		camera.applyToView(view);
 		// En positionnant la caméra, on met seulement à jour la matrice de visualisation.
 		setMatrixOnAll("view", view);
 		view.pop();

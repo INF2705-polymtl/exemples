@@ -121,7 +121,7 @@ struct Mesh
 	void bindVbo() { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
 	void bindEbo() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
 
-	// Charge des mesh d'objets à partir d'un fichier Wavefront (il peut y avoir plusieurs objet dans le même fichier).
+	// Charge des mesh d'objets à partir d'un fichier Wavefront (il peut y avoir plusieurs objet dans le même fichier). Les données sont chargées par sommet sans tableau d'indices.
 	static std::vector<Mesh> loadFromWavefrontFile(std::string_view filename) {
 		// Code inspiré de l'exemple https://github.com/tinyobjloader/tinyobjloader/tree/release#example-code-new-object-oriented-api
 
@@ -129,8 +129,7 @@ struct Mesh
 		tinyobj::ObjReader reader;
 		tinyobj::ObjReaderConfig config = {};
 		config.triangulate = true;
-		config.triangulation_method;
-		if (not reader.ParseFromFile(filename.data(), {})) {
+		if (not reader.ParseFromFile(filename.data(), config)) {
 			std::cerr << "ERROR tinyobj::ObjReader: " << reader.Error();
 			return {};
 		}
@@ -144,24 +143,28 @@ struct Mesh
 			Mesh mesh;
 
 			size_t index_offset = 0;
-			for (auto&& fv : shape.mesh.num_face_vertices) {
-				for (size_t v = 0; v < fv; v++) {
+			// Pour chaque face:
+			for (auto&& numVertices : shape.mesh.num_face_vertices) {
+				// Pour chaque sommet de la face:
+				for (size_t v = 0; v < numVertices; v++) {
 					VertexData data = {};
+					// Obtenir les indices des éléments du sommet.
 					tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
 					auto& attribs = reader.GetAttrib();
 
-					// positions
+					// Copier la position.
 					data.position = *(const vec3*)&attribs.vertices[3 * size_t(idx.vertex_index)];
-					// Check if `normal_index` is zero or positive. negative = no normal data
+					// Copier la normale si l'index de normales est positif.
 					if (idx.normal_index >= 0)
 						data.normal = *(const vec3*)&attribs.normals[3 * size_t(idx.normal_index)];
-					// Check if `texcoord_index` is zero or positive. negative = no texcoord data
+					// Copier les coordonnées de texture si l'index est positif.
 					if (idx.texcoord_index >= 0)
 						data.texCoords = *(const vec2*)&attribs.texcoords[2 * size_t(idx.texcoord_index)];
 
+					// Ajouter le sommet au tableau de sommets.
 					mesh.vertices.push_back(data);
 				}
-				index_offset += fv;
+				index_offset += numVertices;
 			}
 			
 			result.push_back(std::move(mesh));
