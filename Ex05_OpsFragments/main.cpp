@@ -48,13 +48,14 @@ struct App : public OpenGLApplication
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		loadShaders();
+
+		// Initialiser l'intervalle de distance et la couleur du brouillard.
 		fogProg.use();
 		fogProg.setVec("fogColor", vec3{0.1f, 0.2f, 0.2f});
 		fogProg.setFloat("fogNear", fogNear);
 		fogProg.setFloat("fogFar", fogFar);
 
 		cube = Mesh::loadFromWavefrontFile("cube_box.obj")[0];
-		cube.setup();
 		quad.vertices = {
 			{{-1, -1, 0}, {}, {0, 0}},
 			{{ 1, -1, 0}, {}, {1, 0}},
@@ -76,35 +77,45 @@ struct App : public OpenGLApplication
 
 	// Appelée à chaque trame. Le buffer swap est fait juste après.
 	void drawFrame() override {
-		// On ajoute le bit de stencil.
+		// On ajoute le bit de profondeur.
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// Choisir le programme nuanceur à utiliser selon le mode (avec ou sans brouillard). Remarquez que c'est la seule opération à faire pour activer ou non le brouillard. Pas besoin de changer la façon de dessiner la scène.
 		auto& currentProg = (showingFog) ? fogProg : basicProg;
 		currentProg.use();
 
-		//glColorMask(0, 1, 1, 1);
+		// La façon la plus fiable d'afficher des objets semi transparents dans une scène est d'afficher les objets opaques en premier en activant l'écriture dans le tampon de profondeur. On affiche ensuite les objets translucides en appliquant le test de profondeur mais sans la modification du tampon pour ne pas que les objets transparents se cachent.
+
+		// Activer l'écriture dans le tampon de profondeur.
 		glDepthMask(GL_TRUE);
+		// Lier la texture de plâtre
 		texDrywall.bindToTextureUnit(0, currentProg, "texDiffuse");
+		// Positionner le paneau applati.
 		model.push(); {
 			model.translate({0, -1, 0});
 			model.scale({1, 0.2f, 2});
 			currentProg.setMat("model", model);
 		} model.pop();
+		// Dessiner le cube.
 		cube.draw();
-		//glColorMask(1, 1, 1, 1);
 
+		// Lier la texture de carton imprimés.
 		texBox.bindToTextureUnit(0, currentProg, "texDiffuse");
+		// Positionner la boîte de carton.
 		model.push(); {
 			model.translate({0, 0, -1});
 			model.scale({0.5f, 0.5f, 0.5f});
 			currentProg.setMat("model", model);
 		} model.pop();
+		// Dessiner le cube.
 		cube.draw();
 
+		// Désactiver l'écriture dans le tampon de profondeur. Le test de profondeur va quand même s'effectuer, mais le tampon ne sera pas modifié.
 		glDepthMask(GL_FALSE);
-		//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+		// Lier la texture de vitre givrée.
 		texWindow.bindToTextureUnit(0, currentProg, "texDiffuse");
 
+		// Dessiner le cube de vitre si applicable.
 		if (showingGlassCube) {
 			model.push(); {
 				model.translate({0, 0, 1});
@@ -114,6 +125,7 @@ struct App : public OpenGLApplication
 			cube.draw();
 		}
 
+		// Dessiner le carré de vitre si applicable.
 		if (showingGlassQuad) {
 			model.push(); {
 				model.rotate(-90, {0, 1, 0});
@@ -125,8 +137,10 @@ struct App : public OpenGLApplication
 			quad.draw();
 		}
 
+		// Réactiver l'écriture dans le tampon. Oui, c'est un peu redondant vu qu'on le fait au début de la fonction, mais c'est bon pour la paix d'esprit.
 		glDepthMask(GL_TRUE);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Malgré nos précautions, on observe quand même une aberration si on regarde le cube devant le carré (en regardant d'en dessous). Ça donne l'impression que le carré est devant le cube. Il n'y a pas de façon magique de régler ce problème juste en manipulant les tampons. Il faut soit changer l'ordre d'affichage (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poid. De nos jours, la tendance est définitivement vers le ray-tracing (pas matière à INF2705) pour gérer les problèmes de transparence/réflexion/réfraction.
 	}
 
 	// Appelée lors d'une touche de clavier.
@@ -139,6 +153,10 @@ struct App : public OpenGLApplication
 		camera.updateProgram(basicProg, "view", view);
 		camera.updateProgram(fogProg, "view", view);
 
+		// Touche 1 : Carré de vitre.
+		// Touche 2 : Cube de vitre.
+		// Touche 3 : Brouillard à la Silent Hill.
+		// Touches z, x, c, v, b : Intervalle de distance du brouillard.
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case Num1:
@@ -162,6 +180,10 @@ struct App : public OpenGLApplication
 			break;
 		case V:
 			fogFar += 0.5f;
+			break;
+		case B:
+			fogNear = 2;
+			fogFar = 10;
 			break;
 		}
 
@@ -188,13 +210,9 @@ struct App : public OpenGLApplication
 	}
 
 	void applyPerspective() {
-		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
-		auto windowSize = window_.getSize();
-		float aspect = (float)windowSize.x / windowSize.y;
-
 		projection.pushIdentity();
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
-		projection.perspective(50, aspect, 0.01f, 100.0f);
+		projection.perspective(50, getWindowAspect(), 0.01f, 100.0f);
 		basicProg.use();
 		basicProg.setMat("projection", projection);
 		fogProg.use();
@@ -220,16 +238,18 @@ struct App : public OpenGLApplication
 	bool showingGlassCube = false;
 	bool showingFog = false;
 	float fogNear = 2;
-	float fogFar = 10;
+	float fogFar = 7;
 };
 
 
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 0;
+	// On peut choisir le niveau d'anticrenélage (CSAA) dans la création du contexte OpenGL. SDL a un équivalent pour configurer l'antialias.
+	settings.context.antialiasingLevel = 16;
+	// Il faut aussi à la création du contexte demander une certaine largeur (taille des valeurs pour chaque fragments) de tampon de profondeur.
 	settings.context.depthBits = 24;
-	settings.context.stencilBits = 8;
+	// Allez dans OpenGLApplication::createWindowAndContext pour voir comment ceci est passé à SFML.
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 5: Opérations sur les fragments", settings);

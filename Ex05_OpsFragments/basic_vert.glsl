@@ -13,8 +13,10 @@ out vec2 texCoords;
 
 
 void main() {
-	mat4 transform = projection * view * model;
-	vec4 position = transform * vec4(a_position, 1.0);
-	gl_Position = position;
+	vec4 worldPosition = model * vec4(a_position, 1.0);
+	vec4 viewPosition = view * worldPosition;
+	vec4 normPosition = projection * viewPosition;
+
+	gl_Position = normPosition;
 	texCoords = a_texCoords;
 }

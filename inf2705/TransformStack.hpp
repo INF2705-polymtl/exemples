@@ -74,6 +74,18 @@ struct TransformStack : public std::stack<mat4>
 		return *this;
 	}
 
+	mat4 operator* (const mat4& matrix) const {
+		return top() * matrix;
+	}
+
+	vec4 operator* (const vec4& vect) const {
+		return top() * vect;
+	}
+
+	vec4 operator* (const vec3& vect) const {
+		return top() * vec4(vect, 1.0f);
+	}
+
 	operator mat4() const {
 		return top();
 	}

@@ -166,7 +166,8 @@ struct Mesh
 				}
 				index_offset += numVertices;
 			}
-			
+
+			mesh.setup();
 			result.push_back(std::move(mesh));
 		}
 

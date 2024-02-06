@@ -55,9 +55,7 @@ struct App : public OpenGLApplication
 		// Pour le reste de la session, ça va devenir de moins en moins faisable de hard-coder toutes les données à la main. On va plutôt importer nos mesh de fichiers Wavefront (.obj). Ceux-ci contiennent les positions, normales et coordonnées de texture.
 		// Beaucoup de logiciels de modélisation 3D (Blender, 3ds Max, même Wings 3D) supporte l'exportation en Wavefront.
 		cubeBox = Mesh::loadFromWavefrontFile("cube_box.obj")[0];
-		cubeBox.setup();
 		cubeRoad = Mesh::loadFromWavefrontFile("cube_road.obj")[0];
-		cubeRoad.setup();
 
 		loadTextures();
 
