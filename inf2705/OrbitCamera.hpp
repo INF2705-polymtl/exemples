@@ -32,14 +32,16 @@ struct OrbitCamera
 	void rollCCW(float angleDegrees) { roll -= angleDegrees; }
 
 	void handleKeyEvent(sf::Event::KeyEvent key, float angleStep, float distanceStep) {
+		// La touche R réinitialise la position de la caméra.
+		// Les touches + et - rapprochent et éloignent la caméra orbitale.
+		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
+		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
-		// La touche R réinitialise la position de la caméra.
 		case R:
 			*this = {};
 			break;
 
-		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		case Add:
 			altitude -= distanceStep;
 			break;
@@ -47,7 +49,6 @@ struct OrbitCamera
 			altitude += distanceStep;
 			break;
 
-		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		case Up:
 			moveNorth(angleStep);
 			break;
@@ -55,7 +56,6 @@ struct OrbitCamera
 			moveSouth(angleStep);
 			break;
 
-		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
 		case Left:
 			if (key.shift)
 				rollCCW(angleStep);
