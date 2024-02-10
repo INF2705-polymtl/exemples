@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <type_traits>
 
 #include <glbinding/gl/gl.h>
 #include <glm/glm.hpp>
@@ -154,13 +155,82 @@ public:
 	void setMat(GLuint loc, const mat4& val) { glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val)); }
 	void setMat(GLuint loc, const TransformStack& val) { setMat(loc, val.top()); }
 
+	// Variable uniforme générique
+	template <typename T>
+	void setUniform(GLuint loc, const T& val) {
+		if constexpr (std::is_same_v<T, bool>) {
+			setBool(loc, val);
+		} else if (std::is_integral_v<T>) {
+			if (std::is_signed<T>)
+				setInt(loc, (int)val);
+			else
+				setUInt(loc, (unsigned)val);
+		} else if (std::is_floating_point_v<T>) {
+			setFloat(loc, (float)val);
+		} else if (isTypeOneOf_v<T, vec2, vec3, vec4, ivec2, ivec3, ivec4, uvec2, uvec3, uvec4>) {
+			setVec(loc, val);
+		} else if (isTypeOneOf_v<T, mat2, mat3, mat4, TransformStack>) {
+			setMat(loc, val);
+		}
+	}
+
 	// Positions
 	GLuint getAttribLocation(std::string_view name) const { return glGetAttribLocation(programObject_, name.data()); }
 	void setAttribLocation(GLuint index, std::string_view name) { glBindAttribLocation(programObject_, index, name.data()); }
-	GLuint getUniformLocation(std::string_view name) { return glGetUniformLocation(programObject_, name.data()); }
+	GLuint getUniformLocation(std::string_view name) const { return glGetUniformLocation(programObject_, name.data()); }
 
 private:
 	GLuint programObject_ = 0; // Le ID de programme nuanceur.
 	std::unordered_map<GLenum, std::unordered_set<GLuint>> shadersByType_; // Les nuanceurs.
+};
+
+template <typename T>
+class Uniform
+{
+public:
+	Uniform(const std::string& name, const T& value = {})
+	: name_(name), value_(value)
+	{ }
+
+	const T& getValue() const { return value_; }
+	T& getValue() { return value_; }
+	const T* operator->() const { return &value_;  }
+	T* operator->() { return &value_;  }
+	const T& operator*() const { return value_; }
+	T& operator*() { return value_; }
+
+	const std::string& getName() const { return name_; }
+
+	void setName(const std::string& name) {
+		name_ = name;
+		locs_.clear();
+	}
+
+	GLuint getLoc(const ShaderProgram& prog) const {
+		auto it = locs_.find(prog.getObject());
+		if (it != locs_.end())
+			return it->second;
+		else
+			return prog.getUniformLocation(name_);
+	}
+
+	GLuint getLoc(const ShaderProgram& prog) {
+		auto it = locs_.find(prog.getObject());
+		if (it == locs_.end()) {
+			locs_[prog.getObject()] = prog.getUniformLocation(name_);
+			it = locs_.find(prog.getObject());
+		}
+		return it->second;
+	}
+
+	void updateProgram(ShaderProgram& prog) {
+		prog.use();
+		prog.setUniform(getLoc(prog), value_);
+	}
+
+private:
+	std::string name_;
+	T value_;
+	std::unordered_map<GLuint, GLuint> locs_;
 };
 

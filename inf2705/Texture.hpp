@@ -136,3 +136,24 @@ struct Texture
 	}
 };
 
+struct BoundTexture
+{
+	Texture* texture;
+	int activeUnit;
+	const std::string uniformName;
+	std::unordered_map<const ShaderProgram*, GLuint> uniformLocs;
+
+	GLuint getLoc(const ShaderProgram& prog) {
+		auto it = uniformLocs.find(&prog);
+		if (it == uniformLocs.end()) {
+			uniformLocs[&prog] = prog.getUniformLocation(uniformName);
+			it = uniformLocs.find(&prog);
+		}
+		return it->second;
+	}
+
+	void bindToProgram(ShaderProgram& prog) {
+		texture->bindToTextureUnit(activeUnit, prog, getLoc(prog));
+	}
+};
+

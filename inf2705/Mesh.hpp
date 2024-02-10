@@ -13,6 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <tiny_obj_loader.h>
 
+#include "utils.hpp"
+
 
 using namespace gl;
 using namespace glm;
@@ -23,7 +25,7 @@ using namespace glm;
 	glVertexAttribPointer(											\
 		(GLuint)index,												\
 		(GLint)decltype(elemType::member)::length(),				\
-		GL_FLOAT,													\
+		getTypeGLenum_v<decltype(elemType::member)::value_type>,	\
 		GL_FALSE,													\
 		(GLint)sizeof(elemType),									\
 		(const void*)offsetof(elemType, member)						\
