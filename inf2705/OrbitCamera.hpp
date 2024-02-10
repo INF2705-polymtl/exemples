@@ -31,7 +31,7 @@ struct OrbitCamera
 	void rollCW(float angleDegrees) { roll += angleDegrees; }
 	void rollCCW(float angleDegrees) { roll -= angleDegrees; }
 
-	void handleKeyEvent(sf::Event::KeyEvent key, float angleStep, float distanceStep) {
+	void handleKeyEvent(const sf::Event::KeyEvent& key, float angleStep, float distanceStep, OrbitCamera reset = {}) {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -39,23 +39,20 @@ struct OrbitCamera
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case R:
-			*this = {};
+			*this = reset;
 			break;
-
 		case Add:
 			altitude -= distanceStep;
 			break;
 		case Subtract:
 			altitude += distanceStep;
 			break;
-
 		case Up:
 			moveNorth(angleStep);
 			break;
 		case Down:
 			moveSouth(angleStep);
 			break;
-
 		case Left:
 			if (key.shift)
 				rollCCW(angleStep);
@@ -68,6 +65,15 @@ struct OrbitCamera
 			else
 				moveEast(angleStep);
 			break;
+		}
+	}
+
+	void handleMouseMoveEvent(sf::Event::MouseMoveEvent move, const MouseState& mouse, float degsPerPixel = 1.0f) {
+		if (mouse.buttons[sf::Mouse::Middle] and mouse.isInsideWindow) {
+			float deltaLong = std::clamp(move.x * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
+			float deltaLat =  std::clamp(move.y * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
+			moveNorth(deltaLat);
+			moveWest(deltaLong);
 		}
 	}
 

@@ -15,6 +15,15 @@
 #include <SFML/Window.hpp>
 
 
+struct MouseState
+{
+	bool buttons[sf::Mouse::ButtonCount] = {};
+	sf::Vector2i absolutePosition;
+	sf::Vector2i relativePosition;
+	bool isInsideWindow;
+};
+
+
 // Convertir une std::string UTF-8 en sf::String.
 inline sf::String sfStr(std::string_view s) {
 	return sf::String::fromUtf8(s.begin(), s.end());
@@ -255,5 +264,23 @@ inline sf::Keyboard::Key getKeyEnum(const std::string& name) {
 
 	auto it = nameToKey.find(name);
 	return it != nameToKey.end() ? it->second : Unknown;
+}
+
+inline MouseState getMouseState(const sf::WindowBase& window) {
+	MouseState result;
+
+	for (int i = 0; i < sf::Mouse::ButtonCount; i++) {
+		auto btn = (sf::Mouse::Button)i;
+		result.buttons[btn] = sf::Mouse::isButtonPressed(btn);
+	}
+
+	sf::Vector2i windowSize(window.getSize().x, window.getSize().y);
+	result.absolutePosition = sf::Mouse::getPosition();
+	result.relativePosition = sf::Mouse::getPosition(window);
+	result.isInsideWindow =
+		0 <= result.relativePosition.x and result.relativePosition.x < windowSize.x and
+		0 <= result.relativePosition.y and result.relativePosition.y < windowSize.y;
+
+	return result;
 }
 

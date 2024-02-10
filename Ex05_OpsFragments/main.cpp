@@ -144,7 +144,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyEvent(const sf::Event::KeyEvent& key) {
+	void onKeyPress(const sf::Event::KeyEvent& key) override {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -193,7 +193,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) {
+	void onResize(const sf::Event::SizeEvent& event) override {
 		applyPerspective();
 	}
 

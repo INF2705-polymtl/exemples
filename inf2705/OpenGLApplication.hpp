@@ -39,7 +39,7 @@ struct WindowSettings
 
 // Classe de base pour les application OpenGL. Fait pour nous la création de fenêtre et la gestion des événements.
 // On doit en hériter et on peut surcharger init() et drawFrame() pour créer un programme de base.
-// Les autres méthodes à surcharcher sont pour la gestion d'événements.
+// Les autres méthodes à surcharger sont pour la gestion d'événements.
 class OpenGLApplication
 {
 public:
@@ -60,6 +60,7 @@ public:
 
 		lastFrameTime_ = std::chrono::high_resolution_clock::now();
 		deltaTime_ = 1.0f / settings_.fps;
+		lastMouseState_ = getMouse();
 
 		while (window_.isOpen()) {
 			drawFrame(); // À surcharger
@@ -67,6 +68,7 @@ public:
 
 			handleEvents();
 			updateDeltaTime();
+			frame_++;
 		}
 	}
 
@@ -77,7 +79,22 @@ public:
 	virtual void drawFrame() { }
 
 	// Appelée lors d'une touche de clavier.
-	virtual void onKeyEvent(const sf::Event::KeyEvent& key) { }
+	virtual void onKeyPress(const sf::Event::KeyEvent& key) { }
+
+	// Appelée lors d'une touche de clavier relachée.
+	virtual void onKeyRelease(const sf::Event::KeyEvent& key) { }
+
+	// Appelée lors d'un bouton de souris appuyé.
+	virtual void onMouseButtonPress(const sf::Event::MouseButtonEvent& mouseBtn) { }
+
+	// Appelée lors d'un bouton de souris relâché.
+	virtual void onMouseButtonRelease(const sf::Event::MouseButtonEvent& mouseBtn) { }
+
+	// Appelée lors d'un mouvement de souris.
+	virtual void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) { }
+
+	// Appelée lors d'un défilement de souris.
+	virtual void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) { }
 
 	// Appelée lorsque la fenêtre se ferme.
 	virtual void onClose() { }
@@ -109,7 +126,33 @@ protected:
 			}
 			// Touche appuyée.
 			case KeyPressed:
-				onKeyEvent(event.key); // À surcharger
+				onKeyPress(event.key); // À surcharger
+				break;
+			// Touche relâchée.
+			case KeyReleased:
+				onKeyRelease(event.key); // À surcharger
+				break;
+			// Bouton appuyé.
+			case MouseButtonPressed:
+				onMouseButtonPress(event.mouseButton); // À surcharger
+				break;
+			// Bouton relâché.
+			case MouseButtonReleased:
+				onMouseButtonRelease(event.mouseButton); // À surcharger
+				break;
+			// Souris bougée.
+			case MouseEntered:
+				//lastMouseState_ = getMouse();
+				break;
+			case MouseMoved:
+				onMouseMove({
+					event.mouseMove.x - lastMouseState_.relativePosition.x,
+					event.mouseMove.y - lastMouseState_.relativePosition.y
+				});
+				break;
+			// Souris défilée
+			case MouseWheelScrolled:
+				onMouseScroll(event.mouseWheelScroll);
 				break;
 			// Autre événement.
 			default:
@@ -117,6 +160,7 @@ protected:
 				break;
 			}
 		}
+		lastMouseState_ = getMouse();
 	}
 
 	void createWindowAndContext(std::string_view title) {
@@ -160,7 +204,11 @@ protected:
 		lastFrameTime_ = t;
 	}
 
-	float getWindowAspect() {
+	MouseState getMouse() const {
+		return getMouseState(window_);
+	}
+
+	float getWindowAspect() const {
 		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
 		auto windowSize = window_.getSize();
 		float aspect = (float)windowSize.x / windowSize.y;
@@ -169,8 +217,10 @@ protected:
 
 	sf::Window window_;
 	sf::Event::SizeEvent lastResize_ = {};
+	int frame_ = 0;
 	float deltaTime_ = 0.0f;
 	std::chrono::high_resolution_clock::time_point lastFrameTime_;
+	MouseState lastMouseState_ = {};
 
 	int argc_ = 0;
 	char** argv_ = nullptr;

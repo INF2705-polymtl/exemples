@@ -68,7 +68,7 @@ struct App : public OpenGLApplication
 		rotatingAngle += 2;
 	}
 
-	void onKeyEvent(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyEvent& key) override {
 		//std::cout << getKeyEnumName(key.code) << "\n";
 		
 		using enum sf::Keyboard::Key;
