@@ -209,7 +209,7 @@ struct App : public OpenGLApplication
 		model.translate({0, -0.4f, 0});
 		// Il faut faire la mise à l'échelle en dernier pour écraser la pyramide sur sa hauteur.
 		model.scale({1, 0.8f, 1});
-		setCameraMatrix("model", model);
+		setMatrix("model", model);
 		model.pop();
 
 		// Dessiner la pyramide avec le nuanceur avec couleur par sommet.
@@ -333,8 +333,8 @@ struct App : public OpenGLApplication
 		// La matrice de projection contrôle comment la caméra observe la scène.
 		projection.frustum({-2.0f / 3, 2.0f / 3, -2.0f / 3, 2.0f / 3, 4.0f, 10.0f});
 
-		setCameraMatrix("view", view);
-		setCameraMatrix("projection", projection);
+		setMatrix("view", view);
+		setMatrix("projection", projection);
 	}
 
 	void setupOrbitCamera() {
@@ -345,7 +345,7 @@ struct App : public OpenGLApplication
 		view.rotate(cameraLatitude,  {1, 0, 0});
 		view.rotate(cameraLongitude, {0, 1, 0});
 		// En positionnant la caméra, on met seulement à jour la matrice de visualisation.
-		setCameraMatrix("view", view);
+		setMatrix("view", view);
 		view.pop();
 	}
 
@@ -357,7 +357,7 @@ struct App : public OpenGLApplication
 		projection.pushIdentity();
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
 		projection.perspective(perspectiveVerticalFov, aspect, 0.1f, 100.0f);
-		setCameraMatrix("projection", projection);
+		setMatrix("projection", projection);
 		projection.pop();
 	}
 
@@ -374,7 +374,7 @@ struct App : public OpenGLApplication
 		box.leftFace *= aspect;
 		box.rightFace *= aspect;
 		projection.ortho(box);
-		setCameraMatrix("projection", projection);
+		setMatrix("projection", projection);
 		projection.pop();
 	}
 
@@ -385,7 +385,7 @@ struct App : public OpenGLApplication
 			applyOrtho();
 	}
 
-	void setCameraMatrix(std::string_view name, const TransformStack& matrix) {
+	void setMatrix(std::string_view name, const TransformStack& matrix) {
 		// Les programmes de nuanceur ont leur propre espace mémoire. Il faut donc mettre à jour les variables uniformes pour chaque programme.
 		coloredVertexShaders.use();
 		coloredVertexShaders.setMat(name, matrix);

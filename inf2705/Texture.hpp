@@ -136,12 +136,13 @@ struct Texture
 	}
 };
 
+// Une texture liée à une variable uniforme et une unité active.
 struct BoundTexture
 {
-	Texture* texture;
-	int activeUnit;
-	const std::string uniformName;
-	std::unordered_map<const ShaderProgram*, GLuint> uniformLocs;
+	Texture* texture; // La texture référencée
+	int activeUnit; // L'unité active (les GL_TEXTURE*)
+	const std::string uniformName; // Le nom de la variable uniforme à mettre à jour
+	std::unordered_map<const ShaderProgram*, GLuint> uniformLocs; // Les localisations de la variable uni par programme.
 
 	GLuint getLoc(const ShaderProgram& prog) {
 		auto it = uniformLocs.find(&prog);
