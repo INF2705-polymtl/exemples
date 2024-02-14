@@ -9,5 +9,6 @@ out vec4 fragColor;
 
 
 void main() {
+	// Échantillonnage habituel de la texture.
 	fragColor = texture(texDiffuse, texCoords);
 }
