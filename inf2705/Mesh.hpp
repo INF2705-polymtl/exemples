@@ -158,7 +158,7 @@ struct Mesh
 					data.position = *(const vec3*)&attribs.vertices[3 * size_t(idx.vertex_index)];
 					// Copier la normale si l'index de normales est positif.
 					if (idx.normal_index >= 0)
-						data.normal = *(const vec3*)&attribs.normals[3 * size_t(idx.normal_index)];
+						data.normal = normalize(*(const vec3*)&attribs.normals[3 * size_t(idx.normal_index)]);
 					// Copier les coordonnées de texture si l'index est positif.
 					if (idx.texcoord_index >= 0)
 						data.texCoords = *(const vec2*)&attribs.texcoords[2 * size_t(idx.texcoord_index)];

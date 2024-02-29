@@ -83,7 +83,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -101,7 +101,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,7 +119,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,7 +137,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

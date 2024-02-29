@@ -224,7 +224,7 @@ struct App : public OpenGLApplication
 
 			// Passer au nuanceur le ID de l'objet et sa couleur convertie.
 			prog->use();
-			prog->setUInt("objectID", obj.id);
+			prog->setUint("objectID", obj.id);
 			prog->setVec("objectColor", uintToVec4(obj.id));
 
 			// Appliquer la matrice de modélisation globale à celle de l'objet (en restaurant après le dessin).

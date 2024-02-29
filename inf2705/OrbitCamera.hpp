@@ -80,6 +80,7 @@ struct OrbitCamera
 
 	void applyToView(TransformStack& viewMatrix) const {
 		// L'ordre des opération est important. Il faut se rappeler que de modifier la caméra est l'inverse de modifier la scène au complet. 
+		viewMatrix.loadIdentity();
 		viewMatrix.translate({0, 0, -altitude});
 		viewMatrix.rotate(roll, {0, 0, 1});
 		viewMatrix.rotate(latitude, {1, 0, 0});
@@ -92,12 +93,14 @@ struct OrbitCamera
 	}
 
 	void updateProgram(ShaderProgram& prog, GLuint uniformLoc, TransformStack& viewMatrix) {
-		viewMatrix.push(); {
-			prog.use();
-			applyToView(viewMatrix);
-			// En positionnant la caméra, on met seulement à jour la matrice de visualisation.
-			prog.setMat(uniformLoc, viewMatrix);
-		} viewMatrix.pop();
+		prog.use();
+		applyToView(viewMatrix);
+		// En positionnant la caméra, on met seulement à jour la matrice de visualisation.
+		prog.setMat(uniformLoc, viewMatrix);
+	}
+
+	void updateProgram(ShaderProgram& prog, Uniform<TransformStack>& viewMatrix) {
+		updateProgram(prog, viewMatrix.getLoc(prog), *viewMatrix);
 	}
 };
 

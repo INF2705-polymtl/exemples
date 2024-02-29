@@ -120,7 +120,7 @@ public:
 	// Assigner des variables uniformes
 	void setBool(std::string_view name, bool val) { setBool(getUniformLocation(name), (GLint)val); }
 	void setInt(std::string_view name, int val) { setInt(getUniformLocation(name), (GLint)val); }
-	void setUInt(std::string_view name, unsigned val) { setUInt(getUniformLocation(name), (GLuint)val); }
+	void setUint(std::string_view name, unsigned val) { setUint(getUniformLocation(name), (GLuint)val); }
 	void setFloat(std::string_view name, float val) { setFloat(getUniformLocation(name), (GLfloat)val); }
 	void setTextureUnit(std::string_view name, int val) { setInt(name, val); }
 	void setVec(std::string_view name, const vec2& val) { setVec(getUniformLocation(name), val); }
@@ -138,7 +138,7 @@ public:
 	void setMat(std::string_view name, const TransformStack& val) { setMat(name, val.top()); }
 	void setBool(GLuint loc, bool val) { glUniform1i(loc, (GLint)val); }
 	void setInt(GLuint loc, int val) { glUniform1i(loc, (GLint)val); }
-	void setUInt(GLuint loc, unsigned val) { glUniform1ui(loc, (GLuint)val); }
+	void setUint(GLuint loc, unsigned val) { glUniform1ui(loc, (GLuint)val); }
 	void setFloat(GLuint loc, float val) { glUniform1f(loc, (GLfloat)val); }
 	void setTextureUnit(GLuint loc, int val) { setInt(loc, val); }
 	void setVec(GLuint loc, const vec2& val) { glUniform2fv(loc, 1, glm::value_ptr(val)); }
@@ -158,40 +158,65 @@ public:
 	// Variable uniforme générique
 	template <typename T>
 	void setUniform(GLuint loc, const T& val) {
+		// Du beau C++ pour choisir à la compilation quelle méthode choisir pour mettre à jour une variable uniforme selon le type de valeur.
 		if constexpr (std::is_same_v<T, bool>) {
 			setBool(loc, val);
-		} else if (std::is_integral_v<T>) {
-			if (std::is_signed<T>)
+		} else if constexpr (std::is_integral_v<T>) {
+			if constexpr (std::is_signed_v<T>)
 				setInt(loc, (int)val);
 			else
-				setUInt(loc, (unsigned)val);
-		} else if (std::is_floating_point_v<T>) {
+				setUint(loc, (unsigned)val);
+		} else if constexpr (std::is_floating_point_v<T>) {
 			setFloat(loc, (float)val);
-		} else if (isTypeOneOf_v<T, vec2, vec3, vec4, ivec2, ivec3, ivec4, uvec2, uvec3, uvec4>) {
+		} else if constexpr (isTypeOneOf_v<T, vec2, vec3, vec4, ivec2, ivec3, ivec4, uvec2, uvec3, uvec4>) {
 			setVec(loc, val);
-		} else if (isTypeOneOf_v<T, mat2, mat3, mat4, TransformStack>) {
+		} else if constexpr (isTypeOneOf_v<T, mat2, mat3, mat4, TransformStack>) {
 			setMat(loc, val);
 		}
 	}
 
+	void bindUniformBlock(std::string_view name, GLuint bindingIndex) {
+		glUniformBlockBinding(programObject_, getUniformBlockIndex(name), bindingIndex);
+	}
+
+	void bindUniformBlock(GLuint blockIndex, GLuint bindingIndex) {
+		glUniformBlockBinding(programObject_, blockIndex, bindingIndex);
+	}
+
 	// Positions
-	GLuint getAttribLocation(std::string_view name) const { return glGetAttribLocation(programObject_, name.data()); }
-	void setAttribLocation(GLuint index, std::string_view name) { glBindAttribLocation(programObject_, index, name.data()); }
-	GLuint getUniformLocation(std::string_view name) const { return glGetUniformLocation(programObject_, name.data()); }
+	GLuint getAttribLocation(std::string_view name) const {
+		return glGetAttribLocation(programObject_, name.data());
+	}
+
+	void setAttribLocation(GLuint index, std::string_view name) {
+		glBindAttribLocation(programObject_, index, name.data());
+	}
+
+	GLuint getUniformLocation(std::string_view name) const {
+		return glGetUniformLocation(programObject_, name.data());
+	}
+
+	GLuint getUniformBlockIndex(std::string_view name) const {
+		return glGetUniformBlockIndex(programObject_, name.data());
+	}
 
 private:
 	GLuint programObject_ = 0; // Le ID de programme nuanceur.
 	std::unordered_map<GLenum, std::unordered_set<GLuint>> shadersByType_; // Les nuanceurs.
 };
 
+// Une variable uniforme qui se rappelle de ses localisations pour chaque programme nuanceur. On peut accéder à la valeur sous-jacente avec getValue() ou comme un pointeur avec * et ->.
 template <typename T>
 class Uniform
 {
 public:
+	Uniform() = default;
+
 	Uniform(const std::string& name, const T& value = {})
 	: name_(name), value_(value)
 	{ }
 
+	// Accès à la valeur.
 	const T& getValue() const { return value_; }
 	T& getValue() { return value_; }
 	const T* operator->() const { return &value_;  }
@@ -202,6 +227,7 @@ public:
 	const std::string& getName() const { return name_; }
 
 	void setName(const std::string& name) {
+		// Changer le nom de la variable invalide les localisations.
 		name_ = name;
 		locs_.clear();
 	}
@@ -211,26 +237,75 @@ public:
 		if (it != locs_.end())
 			return it->second;
 		else
-			return prog.getUniformLocation(name_);
+			// Dans la version constante, on ne peut pas modifier les localisations connues, donc on fait la recherche à chaque fois.
+			return queryUniformLocation(prog);
 	}
 
 	GLuint getLoc(const ShaderProgram& prog) {
 		auto it = locs_.find(prog.getObject());
-		if (it == locs_.end()) {
-			locs_[prog.getObject()] = prog.getUniformLocation(name_);
-			it = locs_.find(prog.getObject());
-		}
+		// Si le programme nuanceur n'est pas reconnu, chercher la localisation et la sauvegarder.
+		if (it == locs_.end())
+			it = locs_.insert({prog.getObject(), queryUniformLocation(prog)}).first;
 		return it->second;
 	}
 
-	void updateProgram(ShaderProgram& prog) {
+	virtual void updateProgram(ShaderProgram& prog) {
+		// Mettre à jour la variable uniforme en utilisant
 		prog.use();
 		prog.setUniform(getLoc(prog), value_);
 	}
 
-private:
+	virtual GLuint queryUniformLocation(const ShaderProgram& prog) const {
+		return prog.getUniformLocation(name_);
+	}
+
+protected:
 	std::string name_;
 	T value_;
 	std::unordered_map<GLuint, GLuint> locs_;
 };
 
+// Un bloc de données uniforme. C'est une variable uniforme mais chargé avec dans buffer (un Uniform Buffer Object, ou UBO) et un index plutôt qu'avec des glUniform*. On hérite de Uniform<T> pour réutiliser les fonctionnalités de sauvegarde de localisation.
+template <typename T>
+class UniformBlock : public Uniform<T>
+{
+public:
+	UniformBlock() = default;
+
+	UniformBlock(const std::string& name, GLuint bindingIndex, const T& value = {})
+	: Uniform<T>(name, value), bindingIndex_(bindingIndex)
+	{ }
+
+	GLuint getUbo() const { return ubo_; }
+
+	void setup() {
+		if (ubo_ == 0)
+			glGenBuffers(1, &ubo_);
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(this->getValue()), &this->getValue(), GL_DYNAMIC_COPY);
+		glBindBufferBase(GL_UNIFORM_BUFFER, bindingIndex_, ubo_);
+	}
+
+	void updateBuffer() {
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(this->getValue()), &this->getValue());
+	}
+
+	void bindToProgram(ShaderProgram& prog) {
+		prog.use();
+		prog.bindUniformBlock(this->getLoc(prog), bindingIndex_);
+	}
+
+	void updateProgram(ShaderProgram& prog) override {
+		updateBuffer();
+		bindToProgram(prog);
+	}
+
+	GLuint queryUniformLocation(const ShaderProgram& prog) const override {
+		return prog.getUniformBlockIndex(this->getName());
+	}
+
+private:
+	GLuint ubo_ = 0;
+	GLuint bindingIndex_ = -1;
+};

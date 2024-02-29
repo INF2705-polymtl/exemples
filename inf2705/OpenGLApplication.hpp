@@ -60,7 +60,7 @@ public:
 
 		lastFrameTime_ = std::chrono::high_resolution_clock::now();
 		deltaTime_ = 1.0f / settings_.fps;
-		lastMouseState_ = getMouse();
+		currentMouseState_ = lastMouseState_ = getMouseState(window_);
 
 		while (window_.isOpen()) {
 			drawFrame(); // À surcharger
@@ -107,6 +107,9 @@ public:
 
 protected:
 	void handleEvents() {
+		lastMouseState_ = currentMouseState_;
+		currentMouseState_ = getMouseState(window_);
+
 		// Traiter les événements survenus depuis la dernière trame.
 		sf::Event event;
 		while (window_.pollEvent(event)) {
@@ -142,7 +145,6 @@ protected:
 				break;
 			// Souris bougée.
 			case MouseEntered:
-				//lastMouseState_ = getMouse();
 				break;
 			case MouseMoved:
 				onMouseMove({
@@ -160,7 +162,6 @@ protected:
 				break;
 			}
 		}
-		lastMouseState_ = getMouse();
 	}
 
 	void createWindowAndContext(std::string_view title) {
@@ -204,8 +205,9 @@ protected:
 		lastFrameTime_ = t;
 	}
 
-	MouseState getMouse() const {
-		return getMouseState(window_);
+	// Obtenir l'état de la souris (mis à jour une fois par trame avant la gestion d'événements).
+	const MouseState& getMouse() const {
+		return currentMouseState_;
 	}
 
 	float getWindowAspect() const {
@@ -221,6 +223,7 @@ protected:
 	float deltaTime_ = 0.0f;
 	std::chrono::high_resolution_clock::time_point lastFrameTime_;
 	MouseState lastMouseState_ = {};
+	MouseState currentMouseState_ = {};
 
 	int argc_ = 0;
 	char** argv_ = nullptr;
