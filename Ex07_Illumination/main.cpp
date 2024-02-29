@@ -262,10 +262,10 @@ struct App : public OpenGLApplication
 			break;
 
 		case U:
-			*numCelShadingBands = std::max(0, *numCelShadingBands + 1);
+			*numCelShadingBands = std::max(1, *numCelShadingBands + 1);
 			break;
 		case I:
-			*numCelShadingBands = std::max(0, *numCelShadingBands - 1);
+			*numCelShadingBands = std::max(1, *numCelShadingBands - 1);
 			break;
 		}
 
@@ -403,7 +403,7 @@ struct App : public OpenGLApplication
 	Uniform<bool> showingSpecularReflection = {"showingSpecularReflection", true};
 	Uniform<bool> usingSmoothNormals = {"usingSmoothNormals", false};
 	Uniform<bool> usingBlinnFormula = {"usingBlinnFormula", true};
-	Uniform<int> numCelShadingBands = {"numCelShadingBands",  0};
+	Uniform<int> numCelShadingBands = {"numCelShadingBands", 1};
 };
 
 
