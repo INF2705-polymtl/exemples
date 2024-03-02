@@ -24,7 +24,7 @@ void main() {
 	vec4 viewPosition = view * worldPosition;
 	vec4 normPosition = projection * viewPosition;
 
-	// Passer tout au nuanceur de géométrie qui fera les calculs d'éclairage.
+	// Passer tout au nuanceur de géométrie qui fera les calculs géométriques et d'éclairage.
 	gl_Position = normPosition;
 	outAttribs.texCoords = a_texCoords;
 	outAttribs.normal = a_normal;

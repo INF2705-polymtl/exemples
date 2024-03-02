@@ -115,7 +115,7 @@ void main() {
 	// Calculer le centroïde géométrique de la face en faisant la moyenne des trois sommets.
 	vec3 faceCentroid = (inAttribs[0].origPosition + inAttribs[1].origPosition + inAttribs[2].origPosition) / 3.0;
 
-	// La position du sommet dans le référentiel de la caméra (donc coords de visualisation).
+	// La position du point dans le référentiel de la caméra (donc coords de visualisation).
 	vec3 pos = vec3(view * model * vec4(faceCentroid, 1));
 
 	// Calculer la position de la lumière en coords de visualisation (light.position est en coordonnées de scène).

@@ -227,5 +227,5 @@ int main(int argc, char* argv[]) {
 	settings.videoMode = {200, 200};
 
 	App app;
-	app.run(argc, argv, "Exemple Semaine X: Lorem Ipsum", settings);
+	app.run(argc, argv, "Exemple Semaine 5: Calculs de tampons", settings);
 }
