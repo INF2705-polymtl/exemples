@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex07_Illumination", "Ex07_I
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex08_Geometrie", "Ex08_Geometrie\Ex08_Geometrie.vcxproj", "{B4546A3B-153A-4B9B-B4C0-2148A474F44C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex08_Tessellation", "Ex08_Tessellation\Ex08_Tessellation.vcxproj", "{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -111,6 +113,14 @@ Global
 		{B4546A3B-153A-4B9B-B4C0-2148A474F44C}.Release|x64.Build.0 = Release|x64
 		{B4546A3B-153A-4B9B-B4C0-2148A474F44C}.Release|x86.ActiveCfg = Release|Win32
 		{B4546A3B-153A-4B9B-B4C0-2148A474F44C}.Release|x86.Build.0 = Release|Win32
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Debug|x64.ActiveCfg = Debug|x64
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Debug|x64.Build.0 = Debug|x64
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Debug|x86.ActiveCfg = Debug|Win32
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Debug|x86.Build.0 = Debug|Win32
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Release|x64.ActiveCfg = Release|x64
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Release|x64.Build.0 = Release|x64
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Release|x86.ActiveCfg = Release|Win32
+		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

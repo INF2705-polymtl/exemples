@@ -162,7 +162,9 @@ struct App : public OpenGLApplication
 		// U : Augmenter l'extrusion.
 		// I : Diminuer l'extrusion.
 		// O : Appliquer l'extrusion sur les coordonnées de scène ou d'objet.
-		// Espace : Coup d'épée.
+		// W et S : Étirer/compresser le D20 en Y
+		// A et D : Étirer/compresser le D20 en XZ
+		// Espace : Coup d'épée (début d'animation).
 
 		camera.handleKeyEvent(key, 5, 0.5, {5, 30, 30, 0});
 		camera.updateProgram(extrudeSpikesProg, view);
