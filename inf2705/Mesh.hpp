@@ -50,7 +50,7 @@ struct Mesh
 	GLuint vbo = 0;
 	GLuint ebo = 0;
 
-	void setup() {
+	void setup(GLenum usageMode = GL_STATIC_DRAW) {
 		// Créer les buffer objects.
 		if (vao == 0)
 			glGenVertexArrays(1, &vao);
@@ -59,7 +59,7 @@ struct Mesh
 		if (ebo == 0)
 			glGenBuffers(1, &ebo);
 
-		updateBuffers();
+		updateBuffers(usageMode);
 		setupAttribs();
 	}
 
@@ -89,18 +89,18 @@ struct Mesh
 		glDrawElements(drawMode, numIndices, GL_UNSIGNED_INT, (const void*)(size_t)offset);
 	}
 
-	void updateBuffers() {
+	void updateBuffers(GLenum usageMode = GL_STATIC_DRAW) {
 		bindVao();
 		bindVbo();
 		bindEbo();
 
 		if (not vertices.empty()) {
 			auto numBytes = vertices.size() * sizeof(VertexData);
-			glBufferData(GL_ARRAY_BUFFER, (GLint)numBytes, vertices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, (GLint)numBytes, vertices.data(), usageMode);
 		}
 		if (not indices.empty()) {
 			auto numBytes = indices.size() * sizeof(GLuint);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLint)numBytes, indices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLint)numBytes, indices.data(), usageMode);
 		}
 
 		unbindVao();
@@ -124,7 +124,7 @@ struct Mesh
 	void bindEbo() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
 
 	// Charge des mesh d'objets à partir d'un fichier Wavefront (il peut y avoir plusieurs objet dans le même fichier). Les données sont chargées par sommet sans tableau d'indices.
-	static std::vector<Mesh> loadFromWavefrontFile(std::string_view filename) {
+	static std::vector<Mesh> loadFromWavefrontFile(std::string_view filename, bool setupOnLoad = true) {
 		// Code inspiré de l'exemple https://github.com/tinyobjloader/tinyobjloader/tree/release#example-code-new-object-oriented-api
 
 		// Lire le fichier et vérifier les erreurs. On le charge en spécifiant à tinyobjloader de faire la séparation en triangles des faces non triangulaires (des quadrilatères par exemple).
@@ -169,7 +169,8 @@ struct Mesh
 				index_offset += numVertices;
 			}
 
-			mesh.setup();
+			if (setupOnLoad)
+				mesh.setup();
 			result.push_back(std::move(mesh));
 		}
 

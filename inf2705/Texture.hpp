@@ -40,16 +40,11 @@ struct Texture
 		prog.setTextureUnit(loc, textureUnit);
 	}
 
-	// Si generatedLevels est > 1, demande à OpenGL de générer les mipmaps.
-	static Texture loadFromFile(const std::string& filename, int generatedLevels = 1) {
-		// Lire les pixels de l'image. SFML (la bibliothèque qu'on utilise pour gérer la fenêtre) a déjà une fonctionnalité de chargement d'images. Une alternatives plus légère est stb_image.
-		sf::Image texImg;
-		if (not texImg.loadFromFile(filename)) {
-			std::cerr << std::format("{} could not be loaded", filename) << "\n";
-			return {};
-		}
+	// Si detailLevels est > 1, demande à OpenGL de générer les mipmaps.
+	static Texture loadFromImage(const sf::Image& img, int detailLevels = 1) {
 		// Beaucoup de bibliothèques importent les images avec x=0,y=0 (donc premier pixel du tableau) au coin haut-gauche de l'image. C'est la convention en graphisme, mais les textures en OpenGL ont leur origine au coin bas-gauche.
 		// SFML applique la convention origine = haut-gauche, il faut donc renverser l'image verticalement avant de la passer à OpenGL.
+		sf::Image texImg = img;
 		texImg.flipVertically();
 
 		// Générer et lier un objet de texture. Ça ressemble un peu aux VBO.
@@ -70,16 +65,16 @@ struct Texture
 		);
 
 		// Le paramètre contrôle la génération automatique de mipmaps.
-		if (generatedLevels > 1) {
+		if (detailLevels > 1) {
 			// Spécifier le mode de filtrage pour la minimisation (zoom out). Si on utilise du mipmap, il faut utiliser le mode spécifique aux mipmaps (GL_NEAREST_MIPMAP_* ou GL_LINEAR_MIPMAP_*)
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 			// Spécifier le mode de filtrage pour le grossissement (zoom in). Beaucoup de ressources en ligne font l'erreur d'utiliser GL_*_MIPMAP_* pour le grossissement. Les seules valeurs applicables sont GL_LINEAR et GL_NEAREST.
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			// Générer automatiquement les mipmaps. L'algorithme utilisé pour faire la mise à l'échelle n'est pas spécifiée dans le standard OpenGL. C'est un compromis entre la solution simple (pas de mipmap) et la solution compliqué (mipmap manuel).
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, generatedLevels - 1);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, detailLevels - 1);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		} else {
-			// Spéficier les modes de filtrages. GL_NEAREST pour la minimisation et GL_LINEAR pour le grossissement fonctionnent bien dans une majorité des cas.
+			// Spéficier les modes de filtrage. GL_NEAREST pour la minimisation et GL_LINEAR pour le grossissement fonctionnent bien dans une majorité des cas.
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
@@ -87,8 +82,19 @@ struct Texture
 		return {
 			texID,
 			{texImg.getSize().x, texImg.getSize().y},
-			generatedLevels
+			detailLevels
 		};
+	}
+
+	// Si detailLevels est > 1, demande à OpenGL de générer les mipmaps.
+	static Texture loadFromFile(const std::string& filename, int detailLevels = 1) {
+		// Lire les pixels de l'image. SFML (la bibliothèque qu'on utilise pour gérer la fenêtre) a déjà une fonctionnalité de chargement d'images. Une alternative plus légère est stb_image.
+		sf::Image texImg;
+		if (not texImg.loadFromFile(filename)) {
+			std::cerr << std::format("{} could not be loaded", filename) << "\n";
+			return {};
+		}
+		return loadFromImage(texImg, detailLevels);
 	}
 
 	// filenamePattern doit contenir un "{}" qui sera remplacé par 0 à numLevels (avec un format de spécification optionnel comme en Python).
@@ -140,17 +146,10 @@ struct Texture
 struct BoundTexture
 {
 	Texture* texture; // La texture référencée
-	int activeUnit; // L'unité active (les GL_TEXTURE*)
-	const std::string uniformName; // Le nom de la variable uniforme à mettre à jour
-	std::unordered_map<const ShaderProgram*, GLuint> uniformLocs; // Les localisations de la variable uni par programme.
+	Uniform<int> activeUnit; // L'unité active (les GL_TEXTURE*) qui est la variable uniforme à mettre à jour
 
 	GLuint getLoc(const ShaderProgram& prog) {
-		auto it = uniformLocs.find(&prog);
-		if (it == uniformLocs.end()) {
-			uniformLocs[&prog] = prog.getUniformLocation(uniformName);
-			it = uniformLocs.find(&prog);
-		}
-		return it->second;
+		return activeUnit.getLoc(prog);
 	}
 
 	void bindToProgram(ShaderProgram& prog) {

@@ -61,13 +61,13 @@
     <None Include="basic_frag.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
-    <None Include="basic_vert.glsl">
+    <None Include="manual_vert.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
-    <None Include="CMakeLists.txt" >
+    <None Include="CMakeLists.txt">
       <Filter>VSCode Files</Filter>
     </None>
-    <None Include=".vscode\settings.json" >
+    <None Include=".vscode\settings.json">
       <Filter>VSCode Files</Filter>
     </None>
     <None Include="CMakeLists.txt">

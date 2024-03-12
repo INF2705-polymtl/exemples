@@ -5,7 +5,7 @@ in vec2 texCoords;
 // La distance à la caméra calculé par le sommet et interpolée par le trammage.
 in float distanceToCamera;
 
-uniform sampler2D texDiffuse;
+uniform sampler2D texMain;
 // La couleur du brouillard (probablement égale à la couleur du glClearColor).
 uniform vec3 fogColor;
 // Le plan proche du brouillard (où le brouillard commence).
@@ -18,7 +18,7 @@ out vec4 fragColor;
 
 void main() {
 	// Échantiollonnage de texture habituel.
-	fragColor = texture(texDiffuse, texCoords);
+	fragColor = texture(texMain, texCoords);
 
 	// Calculer la valeur d'intensité du brouillard (0 = pas de brouillard, 1 = juste du brouillard).
 	float d = clamp(distanceToCamera, fogNear, fogFar);

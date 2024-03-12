@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#define GLM_FORCE_SWIZZLE // Pour utiliser les .xyz .rb etc. comme avec GLSL.
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -247,7 +246,7 @@ struct App : public OpenGLApplication
 					(unsigned)id,
 					"Piece",
 					&meshTeapot,
-					{{(j == 0) ? &texRock : &texRockDark, 0, "texDiffuse"}},
+					{{(j == 0) ? &texRock : &texRockDark, {"texMain", 0}}},
 					{}
 				};
 				// L'origine est au centre du damier.
@@ -271,7 +270,7 @@ struct App : public OpenGLApplication
 			1,
 			"Board",
 			&meshBoard,
-			{{&texCheckers, 0, "texDiffuse"}},
+			{{&texCheckers, {"texMain", 0}}},
 			{}
 		};
 		board = &objects.at(1);

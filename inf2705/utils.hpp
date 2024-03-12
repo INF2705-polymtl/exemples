@@ -45,19 +45,19 @@ template <typename T>
 inline constexpr GLenum getTypeGLenum() {
 	if constexpr (std::is_same_v<T, GLbyte>)
 		return GL_BYTE;
-	else if (std::is_same_v<T, GLubyte>)
+	else if constexpr (std::is_same_v<T, GLubyte>)
 		return GL_UNSIGNED_BYTE;
-	else if (std::is_same_v<T, GLshort>)
+	else if constexpr (std::is_same_v<T, GLshort>)
 		return GL_SHORT;
-	else if (std::is_same_v<T, GLushort>)
+	else if constexpr (std::is_same_v<T, GLushort>)
 		return GL_UNSIGNED_SHORT;
-	else if (std::is_same_v<T, GLint>)
+	else if constexpr (std::is_same_v<T, GLint>)
 		return GL_INT;
-	else if (std::is_same_v<T, GLuint>)
+	else if constexpr (std::is_same_v<T, GLuint>)
 		return GL_UNSIGNED_INT;
-	else if (std::is_same_v<T, GLfloat>)
+	else if constexpr (std::is_same_v<T, GLfloat>)
 		return GL_FLOAT;
-	else if (std::is_same_v<T, GLdouble>)
+	else if constexpr (std::is_same_v<T, GLdouble>)
 		return GL_DOUBLE;
 	else
 		return GL_INVALID_ENUM;

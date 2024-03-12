@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#define GLM_FORCE_SWIZZLE // Pour utiliser les v.xz, v.rb, etc. comme dans GLSL.
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

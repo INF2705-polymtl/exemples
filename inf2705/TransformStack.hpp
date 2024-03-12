@@ -54,15 +54,25 @@ struct TransformStack : public std::stack<mat4>
 	void frustum(const ProjectionBox& plane) {
 		top() = glm::frustum(plane.leftFace, plane.rightFace, plane.bottomFace, plane.topFace, plane.nearDist, plane.farDist);
 	}
+	void frustum(float leftFace, float rightFace, float bottomFace, float topFace, float nearDist, float farDist) {
+		frustum({leftFace, rightFace, bottomFace, topFace, nearDist, farDist});
+	}
 	void perspective(float fovyDegrees, float aspect, float nearDist, float farDist) {
 		top() = glm::perspective(radians(fovyDegrees), aspect, nearDist, farDist);
 	}
 	void ortho(const ProjectionBox& plane) {
 		top() = glm::ortho(plane.leftFace, plane.rightFace, plane.bottomFace, plane.topFace, plane.nearDist, plane.farDist);
 	}
+	void ortho(float leftFace, float rightFace, float bottomFace, float topFace, float nearDist, float farDist) {
+		ortho({leftFace, rightFace, bottomFace, topFace, nearDist, farDist});
+	}
 	void ortho2D(const ProjectionBox& plane) {
 		top() = glm::ortho(plane.leftFace, plane.rightFace, plane.bottomFace, plane.topFace);
 	}
+	void ortho2D(float leftFace, float rightFace, float bottomFace, float topFace) {
+		ortho2D({leftFace, rightFace, bottomFace, topFace});
+	}
+
 
 	TransformStack& operator*= (const mat4& matrix) {
 		top() *= matrix;

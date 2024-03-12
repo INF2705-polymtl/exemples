@@ -24,20 +24,16 @@ using namespace gl;
 using namespace glm;
 
 
+template <typename T>
+class Uniform;
+
+
 class ShaderProgram
 {
 public:
-	~ShaderProgram() {
-		for (auto&& [type, shaderObjects] : shadersByType_) {
-			for (auto&& shader : shaderObjects) {
-				// glDetachShader et glDeleteShader fonctionnent un peu comme des pointeurs intelligents : Le shader est concrètement supprimé seulement s'il n'est plus attaché à un programme. Sinon, il est marqué pour suppression mais pas supprimé tout de suite.
-				glDeleteShader(shader);
-				glDetachShader(programObject_, shader);
-			}
-		}
-		glDeleteProgram(programObject_);
-		unuse();
-	}
+	ShaderProgram() = default;
+
+	ShaderProgram(GLuint obj) : programObject_(obj) { }
 
 	// Le code donné par OpenGL
 	GLuint getObject() const { return programObject_; }
@@ -57,6 +53,9 @@ public:
 
 	// Associer le contenu du fichier au nuanceur spécifié.
 	GLuint attachSourceFile(GLenum type, std::string_view filename) {
+		if (programObject_ == 0)
+			create();
+
 		// Créer le nuanceur.
 		GLuint shaderObject = glCreateShader(type);
 		if (shaderObject == 0)
@@ -117,6 +116,23 @@ public:
 		glUseProgram(0);
 	}
 
+	void deleteShaders() {
+		for (auto&& [type, shaderObjects] : shadersByType_) {
+			for (auto&& shader : shaderObjects) {
+				// glDetachShader et glDeleteShader fonctionnent un peu comme des pointeurs intelligents : Le shader est concrètement supprimé seulement s'il n'est plus attaché à un programme. Sinon, il est marqué pour suppression mais pas supprimé tout de suite.
+				glDeleteShader(shader);
+				glDetachShader(programObject_, shader);
+			}
+		}
+		shadersByType_.clear();
+	}
+
+	void deleteProgram() {
+		glDeleteProgram(programObject_);
+		programObject_ = 0;
+		unuse();
+	}
+
 	// Assigner des variables uniformes
 	void setBool(std::string_view name, bool val) { setBool(getUniformLocation(name), (GLint)val); }
 	void setInt(std::string_view name, int val) { setInt(getUniformLocation(name), (GLint)val); }
@@ -175,6 +191,11 @@ public:
 		}
 	}
 
+	template <typename T>
+	void setUniform(Uniform<T>& uniValue) {
+		uniValue.updateProgram(*this);
+	}
+
 	void bindUniformBlock(std::string_view name, GLuint bindingIndex) {
 		glUniformBlockBinding(programObject_, getUniformBlockIndex(name), bindingIndex);
 	}
@@ -210,26 +231,46 @@ template <typename T>
 class Uniform
 {
 public:
-	Uniform() = default;
+	using value_type = T;
 
-	Uniform(const std::string& name, const T& value = {})
-	: name_(name), value_(value)
-	{ }
+	Uniform(const std::string& name = "", const T& value = {}) {
+		reset(name, value);
+	}
+
+	Uniform& operator= (const Uniform& other) {
+		reset(other.name_, other.value_);
+		return *this;
+	}
+
+	Uniform& operator= (const T& value) {
+		value_ = value;
+		return *this;
+	}
 
 	// Accès à la valeur.
-	const T& getValue() const { return value_; }
-	T& getValue() { return value_; }
-	const T* operator->() const { return &value_;  }
-	T* operator->() { return &value_;  }
-	const T& operator*() const { return value_; }
-	T& operator*() { return value_; }
+	const T& get() const { return value_; }
+	T& get() { return value_; }
+	const T* operator->() const { return &get(); }
+	T* operator->() { return &get(); }
+	const T& operator*() const { return get(); }
+	T& operator*() { return get(); }
+	operator T&() const { return get(); }
+	operator T&() { return get(); }
 
 	const std::string& getName() const { return name_; }
 
 	void setName(const std::string& name) {
 		// Changer le nom de la variable invalide les localisations.
 		name_ = name;
+		auto oldLocs = std::move(locs_);
 		locs_.clear();
+		for (auto&& [progObj, loc] : oldLocs)
+			getLoc(ShaderProgram(progObj));
+	}
+
+	void reset(const std::string& name, const T& value = {}) {
+		setName(name);
+		value_ = value;
 	}
 
 	GLuint getLoc(const ShaderProgram& prog) const {
@@ -260,8 +301,8 @@ public:
 	}
 
 protected:
+	T value_ = {};
 	std::string name_;
-	T value_;
 	std::unordered_map<GLuint, GLuint> locs_;
 };
 
@@ -270,25 +311,39 @@ template <typename T>
 class UniformBlock : public Uniform<T>
 {
 public:
-	UniformBlock() = default;
+	UniformBlock(const std::string& name = "", GLuint bindingIndex = -1, const T& value = {}) {
+		reset(name, bindingIndex, value);
+	}
 
-	UniformBlock(const std::string& name, GLuint bindingIndex, const T& value = {})
-	: Uniform<T>(name, value), bindingIndex_(bindingIndex)
-	{ }
+	UniformBlock& operator= (const UniformBlock& other) {
+		reset(other.name_, other.bindingIndex_, other.value_);
+		return *this;
+	}
+
+	UniformBlock& operator= (const T& value) {
+		this->get() = value;
+		return *this;
+	}
 
 	GLuint getUbo() const { return ubo_; }
+	GLuint getBindingIndex() const { return bindingIndex_; }
 
-	void setup() {
+	void reset(const std::string& name, GLuint bindingIndex, const T& value = {}) {
+		Uniform<T>::reset(name, value);
+		bindingIndex_ = bindingIndex;
+	}
+
+	void setup(GLenum usageMode = GL_DYNAMIC_COPY) {
 		if (ubo_ == 0)
 			glGenBuffers(1, &ubo_);
 		glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(this->getValue()), &this->getValue(), GL_DYNAMIC_COPY);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(this->get()), &this->get(), usageMode);
 		glBindBufferBase(GL_UNIFORM_BUFFER, bindingIndex_, ubo_);
 	}
 
 	void updateBuffer() {
 		glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(this->getValue()), &this->getValue());
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(this->get()), &this->get());
 	}
 
 	void bindToProgram(ShaderProgram& prog) {

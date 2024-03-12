@@ -18,8 +18,8 @@
 struct MouseState
 {
 	bool buttons[sf::Mouse::ButtonCount] = {};
-	sf::Vector2i absolutePosition;
-	sf::Vector2i relativePosition;
+	sf::Vector2i absolute;
+	sf::Vector2i relative;
 	bool isInsideWindow;
 };
 
@@ -275,11 +275,11 @@ inline MouseState getMouseState(const sf::WindowBase& window) {
 	}
 
 	sf::Vector2i windowSize(window.getSize().x, window.getSize().y);
-	result.absolutePosition = sf::Mouse::getPosition();
-	result.relativePosition = sf::Mouse::getPosition(window);
+	result.absolute = sf::Mouse::getPosition();
+	result.relative = sf::Mouse::getPosition(window);
 	result.isInsideWindow =
-		0 <= result.relativePosition.x and result.relativePosition.x < windowSize.x and
-		0 <= result.relativePosition.y and result.relativePosition.y < windowSize.y;
+		0 <= result.relative.x and result.relative.x < windowSize.x and
+		0 <= result.relative.y and result.relative.y < windowSize.y;
 
 	return result;
 }

@@ -3,7 +3,6 @@
 #version 410
 
 
-in vec2 texCoords;
 in vec4 color;
 
 out vec4 fragColor;

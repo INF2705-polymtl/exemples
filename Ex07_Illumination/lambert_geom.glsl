@@ -2,8 +2,7 @@
 
 #version 410
 
-
-// On reçoit en entrée les triangles de la primitives et on les sort dans le même format.
+// On reçoit en entrée les triangles de la primitive et on les sort dans le même format.
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
@@ -13,7 +12,6 @@ in Attribs {
 	vec2 texCoords;
 	vec3 normal;
 } inAttribs[];
-
 
 uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
@@ -52,7 +50,6 @@ layout(std140) uniform LightModel
 	vec4 ambientColor;
 	bool localViewer;
 } lightModel;
-
 
 out vec2 texCoords;
 out vec4 color;

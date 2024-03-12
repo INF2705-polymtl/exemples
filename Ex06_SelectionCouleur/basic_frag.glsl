@@ -3,12 +3,12 @@
 
 in vec2 texCoords;
 
-uniform sampler2D texDiffuse;
+uniform sampler2D texMain;
 
 out vec4 fragColor;
 
 
 void main() {
 	// Échantillonnage habituel de la texture.
-	fragColor = texture(texDiffuse, texCoords);
+	fragColor = texture(texMain, texCoords);
 }

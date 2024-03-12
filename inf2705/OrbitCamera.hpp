@@ -100,7 +100,7 @@ struct OrbitCamera
 	}
 
 	void updateProgram(ShaderProgram& prog, Uniform<TransformStack>& viewMatrix) {
-		updateProgram(prog, viewMatrix.getLoc(prog), *viewMatrix);
+		updateProgram(prog, viewMatrix.getLoc(prog), viewMatrix);
 	}
 };
 

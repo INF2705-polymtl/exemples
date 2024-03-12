@@ -5,7 +5,7 @@ const float PI = 3.14159265;
 
 in vec2 texCoords;
 
-uniform sampler2D texDiffuse;
+uniform sampler2D texMain;
 uniform vec4 flashingColor = vec4(1, 1, 1, 1);
 // Valeur entre 0 et 1 qui change dans le temps.
 uniform float flashingValue = 0;
@@ -15,7 +15,7 @@ out vec4 fragColor;
 
 void main() {
 	// Échantillonner la texture normalement.
-	vec4 texColor = texture(texDiffuse, texCoords);
+	vec4 texColor = texture(texMain, texCoords);
 	// Calculer l'inverse des composantes RGB du texel. On garde le alpha original.
 	vec4 invColor = vec4(vec3(1, 1, 1) - texColor.rgb, 1);
 

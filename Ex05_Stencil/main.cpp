@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#define GLM_FORCE_SWIZZLE // Pour utiliser les .xyz .rb etc. comme avec GLSL.
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -195,7 +194,7 @@ struct App : public OpenGLApplication
 
 		basicProg.use();
 
-		texRoad.bindToTextureUnit(0, basicProg, "texDiffuse");
+		texRoad.bindToTextureUnit(0, basicProg, "texMain");
 		model.push(); {
 			model.translate({0, -1, 0});
 			model.scale({4, 1, 4});
@@ -204,14 +203,14 @@ struct App : public OpenGLApplication
 		} model.pop();
 		road.draw();
 
-		texBuilding.bindToTextureUnit(0, basicProg, "texDiffuse");
+		texBuilding.bindToTextureUnit(0, basicProg, "texMain");
 		model.push(); {
 			model.translate({2, 0, 0});
 			basicProg.setMat("model", model);
 		} model.pop();
 		cube.draw();
 
-		texBuilding.bindToTextureUnit(0, basicProg, "texDiffuse");
+		texBuilding.bindToTextureUnit(0, basicProg, "texMain");
 		model.push(); {
 			model.translate({-2, 1, 3});
 			model.rotate(90, {0, 1, 0});
@@ -220,7 +219,7 @@ struct App : public OpenGLApplication
 		} model.pop();
 		cube.draw();
 
-		texBox.bindToTextureUnit(0, basicProg, "texDiffuse");
+		texBox.bindToTextureUnit(0, basicProg, "texMain");
 		model.push(); {
 			model.translate({0, 2, -10});
 			model.scale({2.5f, 3, 2.5f});
@@ -228,7 +227,7 @@ struct App : public OpenGLApplication
 		} model.pop();
 		cube.draw();
 
-		texDrywall.bindToTextureUnit(0, basicProg, "texDiffuse");
+		texDrywall.bindToTextureUnit(0, basicProg, "texMain");
 		model.push(); {
 			model.translate({0, 1, -10});
 			model.scale({3.2f, 3.2f, 3.2f});
@@ -250,7 +249,7 @@ struct App : public OpenGLApplication
 		// Activer l'élimination de pixels invisibles. Voir commentaire dans le nuanceur de fragments.
 		basicProg.setBool("shouldDiscard", true);
 		// Dessiner le quad avec sa texture.
-		texScopeMask.bindToTextureUnit(0, basicProg, "texDiffuse");
+		texScopeMask.bindToTextureUnit(0, basicProg, "texMain");
 		quad.draw();
 		// Rétablir l'état et les matrices.
 		basicProg.setBool("shouldDiscard", false);
@@ -266,7 +265,7 @@ struct App : public OpenGLApplication
 		basicProg.setMat("model", model);
 		basicProg.setMat("view", mat4(1));
 		basicProg.setMat("projection", mat4(1));
-		texScopeReticle.bindToTextureUnit(0, basicProg, "texDiffuse");
+		texScopeReticle.bindToTextureUnit(0, basicProg, "texMain");
 		quad.draw();
 		model.pop();
 		basicProg.setMat("view", view);

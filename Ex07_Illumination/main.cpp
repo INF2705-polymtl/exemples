@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#define GLM_FORCE_SWIZZLE // Pour utiliser les .xyz .rb etc. comme avec GLSL.
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -98,7 +97,7 @@ struct App : public OpenGLApplication
 		buildNormalLines(0.5f);
 
 		// Initialiser le matériau.
-		material = {
+		material.reset(
 			"Material", 0, {
 				{0.0, 0.1, 0.0, 1.0},
 				{0.2, 0.1, 0.1, 1.0},
@@ -106,11 +105,11 @@ struct App : public OpenGLApplication
 				{0.5, 0.5, 1.0, 1.0},
 				50
 			}
-		};
+		);
 		material.setup();
 
 		// Initialiser la lumière.
-		light = {
+		light.reset(
 			"LightSource", 1, {
 				{0.0, 0.0, 5.0, 1.0},
 				{1.0, 1.0, 1.0, 1.0},
@@ -123,14 +122,14 @@ struct App : public OpenGLApplication
 				20,
 				1,
 			}
-		};
+		);
 		light.setup();
 
 		// Initialiser le modèle d'éclairage. dans ce cas on n'utilise pas de couleur ambiante (c'est la source lumineuse qui l'a).
-		lightModel = {
+		lightModel.reset(
 			"LightModel", 2,
 			{{0, 0, 0, 1}, true}
-		};
+		);
 		lightModel.setup();
 
 		// On lie chacun des blocs uniformes aux variables uniforme des nuanceurs.
@@ -159,16 +158,16 @@ struct App : public OpenGLApplication
 		case 4:
 			currentProg->use();
 			// Passer les variables uniformes de contrôle.
-			showingAmbientReflection.updateProgram(*currentProg);
-			showingDiffuseReflection.updateProgram(*currentProg);
-			showingSpecularReflection.updateProgram(*currentProg);
-			usingBlinnFormula.updateProgram(*currentProg);
-			numCelShadingBands.updateProgram(*currentProg);
+			currentProg->setUniform(showingAmbientReflection);
+			currentProg->setUniform(showingDiffuseReflection);
+			currentProg->setUniform(showingSpecularReflection);
+			currentProg->setUniform(usingBlinnFormula);
+			currentProg->setUniform(numCelShadingBands);
 			// Passer la transposée de l'inverse de la matrice modèle-vue pour transformer les normales avec l'objet.
 			currentProg->setMat("normalTransformMat", transpose(inverse(mat3(view * model))));
 			currentProg->setMat("model", model);
 			// Dessiner la sphère éclairée avec les normales "flat" ou "smooth", selon le mode choisi.
-			if (*usingSmoothNormals)
+			if (usingSmoothNormals)
 				shapeSmooth.draw();
 			else
 				shapeFlat.draw();
@@ -245,27 +244,27 @@ struct App : public OpenGLApplication
 			break;
 
 		case N:
-			*usingSmoothNormals ^= 1;
+			usingSmoothNormals ^= 1;
 			break;
 		case B:
-			*usingBlinnFormula ^= 1;
+			usingBlinnFormula ^= 1;
 			break;
 
 		case J:
-			*showingAmbientReflection ^= 1;
+			showingAmbientReflection ^= 1;
 			break;
 		case K:
-			*showingDiffuseReflection ^= 1;
+			showingDiffuseReflection ^= 1;
 			break;
 		case L:
-			*showingSpecularReflection ^= 1;
+			showingSpecularReflection ^= 1;
 			break;
 
 		case U:
-			*numCelShadingBands = std::max(1, *numCelShadingBands + 1);
+			numCelShadingBands = std::max(1, numCelShadingBands + 1);
 			break;
 		case I:
-			*numCelShadingBands = std::max(1, *numCelShadingBands - 1);
+			numCelShadingBands = std::max(1, numCelShadingBands - 1);
 			break;
 		}
 
@@ -422,7 +421,7 @@ void runDiffuseModelTest(const std::string& filename, vec3 posL, vec3 n1, vec3 n
 	for (float x : xs) {
 		float xValue = (x - p1.x) / (p2.x - p1.x);
 		float diffuse = glm::mix(c1, c2, xValue);
-		gouraud.push_back(diffuse);
+		gouraud.push_back(std::clamp(diffuse, 0.0f, 1.0f));
 	}
 
 	// Avec Phong, on calcule les vecteurs (L pour le diffus) aux sommets et on calcule les couleurs dans les fragments avec les vecteurs interpolés.
@@ -434,7 +433,7 @@ void runDiffuseModelTest(const std::string& filename, vec3 posL, vec3 n1, vec3 n
 		vec3 l = normalize(glm::mix(l1, l2, xValue));
 		vec3 n = glm::mix(n1, n2, xValue);
 		float diffuse = dot(n, l);
-		phong.push_back(diffuse);
+		phong.push_back(std::clamp(diffuse, 0.0f, 1.0f));
 	}
 
 	std::ofstream file(filename);
@@ -442,6 +441,7 @@ void runDiffuseModelTest(const std::string& filename, vec3 posL, vec3 n1, vec3 n
 	for (size_t i = 0; i < xs.size(); i++)
 		file << std::format("{}\t{}\t{}\n", xs[i], gouraud[i], phong[i]);
 }
+
 
 int main(int argc, char* argv[]) {
 	// Vous pouvez utiliser cette fonction pour générer des courbes d'interpolations selon les modèles de Gouraud et Phong. Les données sont ensuite importables dans Excel pour la visualisation.

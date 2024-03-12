@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include <array>
+#include <ctime>
 #include <format>
 #include <iostream>
 #include <memory>
@@ -13,16 +14,16 @@
 #include <string>
 #include <chrono>
 #include <unordered_map>
+#include <thread>
 
 #ifdef _WIN32
-	#define WIN32_LEAN_AND_MEAN
-	#define NOMINMAX
 	#include <Windows.h>
 #endif
 
 #include <glbinding/Binding.h>
 #include <glbinding/gl/gl.h>
 #include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "sfml_utils.hpp"
 
@@ -52,6 +53,8 @@ public:
 		argv_ = argv;
 		settings_ = settings;
 
+		startTime_ = std::chrono::system_clock::now();
+
 		createWindowAndContext(title);
 		printGLInfo();
 		std::cout << std::endl;
@@ -70,6 +73,99 @@ public:
 			updateDeltaTime();
 			frame_++;
 		}
+	}
+
+	void printGLInfo() {
+		// Afficher les informations de base de la carte graphique et de la version OpenGL des drivers.
+		auto openglVersion = glGetString(GL_VERSION);
+		auto openglVendor = glGetString(GL_VENDOR);
+		auto openglRenderer = glGetString(GL_RENDERER);
+		auto glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+		auto& sfmlSettings = window_.getSettings();
+		printf("OpenGL       %s\n", openglVersion);
+		printf("GPU          %s, %s\n", openglRenderer, openglVendor);
+		printf("GLSL         %s\n", glslVersion);
+		printf("SFML Context %i.%i\n", sfmlSettings.majorVersion, sfmlSettings.minorVersion);
+		printf("Depth bits   %i\n", sfmlSettings.depthBits);
+		printf("Stencil bits %i\n", sfmlSettings.stencilBits);
+	}
+
+	// Obtenir l'état de la souris (mis à jour une fois par trame avant la gestion d'événements).
+	const MouseState& getMouse() const {
+		return currentMouseState_;
+	}
+
+	int getCurrentFrameNumber() const {
+		return frame_;
+	}
+
+	float getFrameDeltaTime() const {
+		deltaTime_;
+	}
+
+	float getWindowAspect() const {
+		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
+		auto windowSize = window_.getSize();
+		float aspect = (float)windowSize.x / windowSize.y;
+		return aspect;
+	}
+
+	sf::Image captureCurrentFrame() {
+		// Les dimensions de la fenêtre.
+		auto windowSize = window_.getSize();
+		size_t numPixels = windowSize.x * windowSize.y;
+
+		// Obtenir la source actuelle de glReadBuffer.
+		GLint readBufferSrc;
+		glGetIntegerv(GL_READ_BUFFER, &readBufferSrc);
+		// Lire du front buffer (le tampon d'affichage, donc ce qui est à l'écran). On remarque qu'on n'a pas besoin de faire glFinish(), vu que le tampon d'affichage est complet après le buffer swap.
+		glReadBuffer(GL_FRONT);
+		std::vector<sf::Uint8> pixels(numPixels * sizeof(sf::Color), 0);
+		glReadPixels(0, 0, windowSize.x, windowSize.y, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+		// Restaurer la source de glReadBuffer.
+		glReadBuffer((GLenum)readBufferSrc);
+		// Créer l'image avec les pixels lus.
+		sf::Image img;
+		img.create(windowSize.x, windowSize.y, pixels.data());
+		// Renverser l'image verticalement à cause de l'origine (x,y=0,0) OpenGL qui est bas-gauche et celle des images SFML qui est haut-gauche.
+		img.flipVertically();
+
+		return std::move(img);
+	}
+
+	void saveScreenshot(const std::string& folder = "screenshots", const std::string& filename = "") {
+		// Capturer la trame actuelle.
+		sf::Image frameImage = captureCurrentFrame();
+
+		int frameNumber = frame_;
+		std::time_t timestamp = std::chrono::system_clock::to_time_t(startTime_);
+		// Faire l'écriture dans le fichier dans un fil parallèle pour moins ralentir le fil principal avec une écriture sur le disque. La capture (avec glReadPixels) doit être faite dans le fil principal, mais l'écriture sur le disque peut être faite en parallèle sans causer de problème de synchronisation. On remarque la capture par copie.
+		std::thread thr([=]() {
+			using namespace std::filesystem;
+
+			path folderPath(folder);
+			if (not folder.empty())
+				create_directory(folderPath);
+
+			std::string filePathStr;
+			if (not filename.empty()) {
+				filePathStr = (folderPath / path(filename)).make_preferred().string();
+			} else {
+				// Si aucun nom de fichier est fourni, construire un nom avec le nom de l'exécutable, l'heure de démarrage de l'application et le numéro de la trame actuelle.
+				path execFilename = path(argv_[0]).stem();
+				std::string dateTimeStr(512, 0);
+				strftime(dateTimeStr.data(), dateTimeStr.size(), "%Y%m%d_%H%M%S", localtime(&timestamp));
+				filePathStr = std::format(
+					"{}_{}_{}.png",
+					(folderPath / execFilename).make_preferred().string(),
+					dateTimeStr.c_str(),
+					frameNumber
+				);
+			}
+			frameImage.saveToFile(filePathStr);
+		});
+		// Détacher le fil pour qu'il se gère tout seul, donc pas besoin de join() ou de garder la variable vivante.
+		thr.detach();
 	}
 
 	// Appelée avant la première trame.
@@ -148,8 +244,8 @@ protected:
 				break;
 			case MouseMoved:
 				onMouseMove({
-					event.mouseMove.x - lastMouseState_.relativePosition.x,
-					event.mouseMove.y - lastMouseState_.relativePosition.y
+					event.mouseMove.x - lastMouseState_.relative.x,
+					event.mouseMove.y - lastMouseState_.relative.y
 				});
 				break;
 			// Souris défilée
@@ -186,17 +282,6 @@ protected:
 		glbinding::Binding::initialize(nullptr, true);
 	}
 
-	void printGLInfo() {
-		// Afficher les informations de base de la carte graphique et de la version OpenGL des drivers.
-		auto openglVersion = glGetString(GL_VERSION);
-		auto openglVendor = glGetString(GL_VENDOR);
-		auto openglRenderer = glGetString(GL_RENDERER);
-		auto glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-		printf("OpenGL %s\n", openglVersion);
-		printf("GPU    %s, %s\n", openglRenderer, openglVendor);
-		printf("GLSL   %s\n", glslVersion);
-	}
-
 	void updateDeltaTime() {
 		using namespace std::chrono;
 		auto t = high_resolution_clock::now();
@@ -205,22 +290,11 @@ protected:
 		lastFrameTime_ = t;
 	}
 
-	// Obtenir l'état de la souris (mis à jour une fois par trame avant la gestion d'événements).
-	const MouseState& getMouse() const {
-		return currentMouseState_;
-	}
-
-	float getWindowAspect() const {
-		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
-		auto windowSize = window_.getSize();
-		float aspect = (float)windowSize.x / windowSize.y;
-		return aspect;
-	}
-
 	sf::Window window_;
 	sf::Event::SizeEvent lastResize_ = {};
 	int frame_ = 0;
 	float deltaTime_ = 0.0f;
+	std::chrono::system_clock::time_point startTime_;
 	std::chrono::high_resolution_clock::time_point lastFrameTime_;
 	MouseState lastMouseState_ = {};
 	MouseState currentMouseState_ = {};
@@ -231,7 +305,7 @@ protected:
 };
 
 
-GLenum printGLError(std::string_view sourceFile = "", int sourceLine = -1) {
+void printGLError(std::string_view sourceFile = "", int sourceLine = -1) {
 	static const std::unordered_map<GLenum, std::string> codeToName = {
 		{GL_NO_ERROR, "GL_NO_ERROR"},
 		{GL_INVALID_ENUM, "GL_INVALID_ENUM"},
@@ -247,12 +321,6 @@ GLenum printGLError(std::string_view sourceFile = "", int sourceLine = -1) {
 		{GL_TEXTURE_TOO_LARGE_EXT, "GL_TEXTURE_TOO_LARGE_EXT"},
 	};
 
-	GLenum errorCode = glGetError();
-	if (errorCode == GL_NO_ERROR)
-		return GL_NO_ERROR;
-
-	auto& errorName = codeToName.at(errorCode);
-
 	if (not sourceFile.empty()) {
 		auto filename = std::filesystem::path(sourceFile).filename().string();
 		std::cerr << std::format(
@@ -260,12 +328,17 @@ GLenum printGLError(std::string_view sourceFile = "", int sourceLine = -1) {
 			filename, sourceLine
 		);
 	}
-	
-	std::cerr << std::format(
-		"OpenGL Error 0x{:04X}: {}\n",
-		(int)errorCode, errorName.data()
-	);
 
-	return errorCode;
+	while (true) {
+		GLenum errorCode = glGetError();
+		if (errorCode == GL_NO_ERROR)
+			break;
+
+		auto& errorName = codeToName.at(errorCode);
+		std::cerr << std::format(
+			"OpenGL Error 0x{:04X}: {}\n",
+			(int)errorCode, errorName.data()
+		);
+	}
 }
 

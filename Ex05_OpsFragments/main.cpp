@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#define GLM_FORCE_SWIZZLE // Pour utiliser les .xyz .rb etc. comme avec GLSL.
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -89,7 +88,7 @@ struct App : public OpenGLApplication
 		// Activer l'écriture dans le tampon de profondeur.
 		glDepthMask(GL_TRUE);
 		// Lier la texture de plâtre
-		texDrywall.bindToTextureUnit(0, currentProg, "texDiffuse");
+		texDrywall.bindToTextureUnit(0, currentProg, "texMain");
 		// Positionner le paneau applati.
 		model.push(); {
 			model.translate({0, -1, 0});
@@ -100,7 +99,7 @@ struct App : public OpenGLApplication
 		cube.draw();
 
 		// Lier la texture de carton imprimés.
-		texBox.bindToTextureUnit(0, currentProg, "texDiffuse");
+		texBox.bindToTextureUnit(0, currentProg, "texMain");
 		// Positionner la boîte de carton.
 		model.push(); {
 			model.translate({0, 0, -1});
@@ -113,7 +112,7 @@ struct App : public OpenGLApplication
 		// Désactiver l'écriture dans le tampon de profondeur. Le test de profondeur va quand même s'effectuer, mais le tampon ne sera pas modifié.
 		glDepthMask(GL_FALSE);
 		// Lier la texture de vitre givrée.
-		texWindow.bindToTextureUnit(0, currentProg, "texDiffuse");
+		texWindow.bindToTextureUnit(0, currentProg, "texMain");
 
 		// Dessiner le cube de vitre si applicable.
 		if (showingGlassCube) {
