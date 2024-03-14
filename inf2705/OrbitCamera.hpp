@@ -31,7 +31,7 @@ struct OrbitCamera
 	void rollCW(float angleDegrees) { roll += angleDegrees; }
 	void rollCCW(float angleDegrees) { roll -= angleDegrees; }
 
-	void handleKeyEvent(const sf::Event::KeyEvent& key, float angleStep, float distanceStep, OrbitCamera reset = {}) {
+	void handleKeyEvent(const sf::Event::KeyEvent& key, float angleStep, float distanceStep, OrbitCamera reset) {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.

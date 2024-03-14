@@ -16,9 +16,6 @@
 #include <inf2705/OpenGLApplication.hpp>
 #include <inf2705/Mesh.hpp>
 #include <inf2705/ShaderProgram.hpp>
-#include <inf2705/Texture.hpp>
-#include <inf2705/TransformStack.hpp>
-#include <inf2705/SceneObject.hpp>
 
 
 using namespace gl;
@@ -210,10 +207,6 @@ struct App : public OpenGLApplication
 	Mesh points;
 
 	ShaderProgram basicProg;
-
-	TransformStack model;
-	TransformStack view;
-	TransformStack projection;
 
 	bool firstRun = true;
 };

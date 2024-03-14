@@ -155,7 +155,7 @@ struct App : public OpenGLApplication
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
-		camera.handleKeyEvent(key, 5, 0.5f);
+		camera.handleKeyEvent(key, 5, 0.5f, {10, 30, -30, 0});
 		applyCamera();
 
 		// Touche 1 : La lunette
@@ -182,6 +182,21 @@ struct App : public OpenGLApplication
 			scopeZoom += 1;
 			break;
 		}
+	}
+
+	// Appelée lors d'un mouvement de souris.
+	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
+		// Mettre à jour la caméra si on a un clic de la roulette.
+		auto& mouse = getMouse();
+		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
+		applyCamera();
+	}
+
+	// Appelée lors d'un défilement de souris.
+	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+		// Zoom in/out
+		camera.altitude -= mouseScroll.delta;
+		applyCamera();
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).

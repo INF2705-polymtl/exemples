@@ -148,7 +148,7 @@ struct App : public OpenGLApplication
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
-		camera.handleKeyEvent(key, 5.0f, 0.5f);
+		camera.handleKeyEvent(key, 5.0f, 0.5f, {5, 30, -30, 0});
 		camera.updateProgram(basicProg, "view", view);
 		camera.updateProgram(fogProg, "view", view);
 
@@ -189,6 +189,23 @@ struct App : public OpenGLApplication
 		fogProg.use();
 		fogProg.setFloat("fogNear", fogNear);
 		fogProg.setFloat("fogFar", fogFar);
+	}
+
+	// Appelée lors d'un mouvement de souris.
+	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
+		// Mettre à jour la caméra si on a un clic de la roulette.
+		auto& mouse = getMouse();
+		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
+		camera.updateProgram(basicProg, "view", view);
+		camera.updateProgram(fogProg, "view", view);
+	}
+
+	// Appelée lors d'un défilement de souris.
+	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+		// Zoom in/out
+		camera.altitude -= mouseScroll.delta;
+		camera.updateProgram(basicProg, "view", view);
+		camera.updateProgram(fogProg, "view", view);
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).

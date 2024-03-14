@@ -100,7 +100,7 @@ public:
 	}
 
 	float getFrameDeltaTime() const {
-		deltaTime_;
+		return deltaTime_;
 	}
 
 	float getWindowAspect() const {
@@ -139,6 +139,7 @@ public:
 
 		int frameNumber = frame_;
 		std::time_t timestamp = std::chrono::system_clock::to_time_t(startTime_);
+		std::string execFilename = argv_[0];
 		// Faire l'écriture dans le fichier dans un fil parallèle pour moins ralentir le fil principal avec une écriture sur le disque. La capture (avec glReadPixels) doit être faite dans le fil principal, mais l'écriture sur le disque peut être faite en parallèle sans causer de problème de synchronisation. On remarque la capture par copie.
 		std::thread thr([=]() {
 			using namespace std::filesystem;
@@ -152,12 +153,12 @@ public:
 				filePathStr = (folderPath / path(filename)).make_preferred().string();
 			} else {
 				// Si aucun nom de fichier est fourni, construire un nom avec le nom de l'exécutable, l'heure de démarrage de l'application et le numéro de la trame actuelle.
-				path execFilename = path(argv_[0]).stem();
+				path execPath = path(execFilename).stem();
 				std::string dateTimeStr(512, 0);
 				strftime(dateTimeStr.data(), dateTimeStr.size(), "%Y%m%d_%H%M%S", localtime(&timestamp));
 				filePathStr = std::format(
 					"{}_{}_{}.png",
-					(folderPath / execFilename).make_preferred().string(),
+					(folderPath / execPath).make_preferred().string(),
 					dateTimeStr.c_str(),
 					frameNumber
 				);
