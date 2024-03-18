@@ -110,6 +110,16 @@ public:
 		return aspect;
 	}
 
+	auto getStartTime() const {
+		return startTime_;
+	}
+
+	std::string formatStartTime(const std::string& format = "%Y-%m-%d %H:%M:%S") const {
+		std::time_t timestamp = std::chrono::system_clock::to_time_t(startTime_);
+		auto locTime = localtime(&timestamp);
+		return (std::stringstream() << std::put_time(locTime, format.c_str())).str();
+	}
+
 	sf::Image captureCurrentFrame() {
 		// Les dimensions de la fenêtre.
 		auto windowSize = window_.getSize();
@@ -138,10 +148,10 @@ public:
 		sf::Image frameImage = captureCurrentFrame();
 
 		int frameNumber = frame_;
-		std::time_t timestamp = std::chrono::system_clock::to_time_t(startTime_);
+		std::string dateTimeStr = formatStartTime("%Y%m%d_%H%M%S");
 		std::string execFilename = argv_[0];
 		// Faire l'écriture dans le fichier dans un fil parallèle pour moins ralentir le fil principal avec une écriture sur le disque. La capture (avec glReadPixels) doit être faite dans le fil principal, mais l'écriture sur le disque peut être faite en parallèle sans causer de problème de synchronisation. On remarque la capture par copie.
-		std::thread thr([=]() {
+		std::thread savingThread([=]() {
 			using namespace std::filesystem;
 
 			path folderPath(folder);
@@ -154,19 +164,17 @@ public:
 			} else {
 				// Si aucun nom de fichier est fourni, construire un nom avec le nom de l'exécutable, l'heure de démarrage de l'application et le numéro de la trame actuelle.
 				path execPath = path(execFilename).stem();
-				std::string dateTimeStr(512, 0);
-				strftime(dateTimeStr.data(), dateTimeStr.size(), "%Y%m%d_%H%M%S", localtime(&timestamp));
 				filePathStr = std::format(
 					"{}_{}_{}.png",
 					(folderPath / execPath).make_preferred().string(),
-					dateTimeStr.c_str(),
+					dateTimeStr,
 					frameNumber
 				);
 			}
 			frameImage.saveToFile(filePathStr);
 		});
 		// Détacher le fil pour qu'il se gère tout seul, donc pas besoin de join() ou de garder la variable vivante.
-		thr.detach();
+		savingThread.detach();
 	}
 
 	// Appelée avant la première trame.

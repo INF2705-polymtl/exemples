@@ -21,16 +21,31 @@ using namespace glm;
 
 
 // Utilisation légitime de macros : génération de code
-#define SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
-	glVertexAttribPointer(											\
-		(GLuint)index,												\
-		(GLint)decltype(elemType::member)::length(),				\
-		getTypeGLenum_v<decltype(elemType::member)::value_type>,	\
-		GL_FALSE,													\
-		(GLint)sizeof(elemType),									\
-		(const void*)offsetof(elemType, member)						\
-	);																\
-	glEnableVertexAttribArray(index);								\
+#define SET_SCALAR_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
+{																			\
+	glVertexAttribPointer(													\
+		(GLuint)index,														\
+		1,																	\
+		getTypeGLenum_v<decltype(elemType::member)>,						\
+		GL_FALSE,															\
+		(GLint)sizeof(elemType),											\
+		(const void*)offsetof(elemType, member)								\
+	);																		\
+	glEnableVertexAttribArray(index);										\
+}																			\
+
+#define SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
+{																		\
+	glVertexAttribPointer(												\
+		(GLuint)index,													\
+		(GLint)decltype(elemType::member)::length(),					\
+		getTypeGLenum_v<decltype(elemType::member)::value_type>,		\
+		GL_FALSE,														\
+		(GLint)sizeof(elemType),										\
+		(const void*)offsetof(elemType, member)							\
+	);																	\
+	glEnableVertexAttribArray(index);									\
+}																		\
 
 
 // Informations de base d'un sommet
@@ -79,7 +94,7 @@ struct Mesh
 		// Techniquement, on n'a pas besoin de refaire les glBindBuffer, mais ça ne coûte pas cher et c'est plus fiable de les refaire.
 		bindVbo();
 		// Tracer selon le tampon de données.
-		glDrawArrays(drawMode, offset, (GLint)vertices.size());
+		glDrawArrays(drawMode, offset, (GLsizei)vertices.size());
 	}
 
 	void drawElements(GLenum drawMode, GLsizei numIndices, GLsizei offset = 0) {
@@ -96,11 +111,11 @@ struct Mesh
 
 		if (not vertices.empty()) {
 			auto numBytes = vertices.size() * sizeof(VertexData);
-			glBufferData(GL_ARRAY_BUFFER, (GLint)numBytes, vertices.data(), usageMode);
+			glBufferData(GL_ARRAY_BUFFER, numBytes, vertices.data(), usageMode);
 		}
 		if (not indices.empty()) {
 			auto numBytes = indices.size() * sizeof(GLuint);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLint)numBytes, indices.data(), usageMode);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, indices.data(), usageMode);
 		}
 
 		unbindVao();
@@ -111,9 +126,9 @@ struct Mesh
 		bindVbo();
 
 		// Les données des sommets (positions, normales, coords de textures) sont placées ensembles dans le même tampon, de façon contigües. Les attributs sont configurés pour accéder à un membre de VertexData dans chaque élément.
-		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(0, VertexData, position);
-		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(1, VertexData, normal);
-		SET_VERTEX_ATTRIB_FROM_STRUCT_MEM(2, VertexData, texCoords);
+		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(0, VertexData, position);
+		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(1, VertexData, normal);
+		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(2, VertexData, texCoords);
 
 		unbindVao();
 	}

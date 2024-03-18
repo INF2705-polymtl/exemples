@@ -40,6 +40,21 @@ struct Texture
 		prog.setTextureUnit(loc, textureUnit);
 	}
 
+	void setPixelData(GLenum format, const void* data) {
+		glBindTexture(GL_TEXTURE_2D, id);
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			format,
+			size.x,
+			size.y,
+			0,
+			format,
+			GL_UNSIGNED_BYTE,
+			data
+		);
+	}
+
 	// Si detailLevels est > 1, demande à OpenGL de générer les mipmaps.
 	static Texture loadFromImage(const sf::Image& img, int detailLevels = 1) {
 		// Beaucoup de bibliothèques importent les images avec x=0,y=0 (donc premier pixel du tableau) au coin haut-gauche de l'image. C'est la convention en graphisme, mais les textures en OpenGL ont leur origine au coin bas-gauche.
@@ -48,21 +63,13 @@ struct Texture
 		texImg.flipVertically();
 
 		// Générer et lier un objet de texture. Ça ressemble un peu aux VBO.
-		GLuint texID = 0;
-		glGenTextures(1, &texID);
-		glBindTexture(GL_TEXTURE_2D, texID);
+		Texture tex = {};
+		tex.size = {texImg.getSize().x, texImg.getSize().y};
+		tex.numLevels = detailLevels;
+		glGenTextures(1, &tex.id);
+		glBindTexture(GL_TEXTURE_2D, tex.id);
 		// Passer les données de l'image (un peu comme avec glBufferData). Il faut spécifier le format interne qui sera enregistré sur le GPU ainsi que celui dont est fait le tableau de données passé en paramètre.
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			GL_RGBA,
-			texImg.getSize().x,
-			texImg.getSize().y,
-			0,
-			GL_RGBA,
-			GL_UNSIGNED_BYTE,
-			texImg.getPixelsPtr()
-		);
+		tex.setPixelData(GL_RGBA, texImg.getPixelsPtr());
 
 		// Le paramètre contrôle la génération automatique de mipmaps.
 		if (detailLevels > 1) {
@@ -79,11 +86,7 @@ struct Texture
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
 
-		return {
-			texID,
-			{texImg.getSize().x, texImg.getSize().y},
-			detailLevels
-		};
+		return tex;
 	}
 
 	// Si detailLevels est > 1, demande à OpenGL de générer les mipmaps.

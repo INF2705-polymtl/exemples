@@ -18,8 +18,12 @@
 struct MouseState
 {
 	bool buttons[sf::Mouse::ButtonCount] = {};
+	// Les coordonnées en pixels dans le référentiel de l'écran (0,0 est coin haut-gauche).
 	sf::Vector2i absolute;
+	// Les coordonnées en pixels dans le référentiel de la fenêtre (0,0 est coin haut-gauche).
 	sf::Vector2i relative;
+	// Les coordonnées normalisées en [-1,1] où 0,0 est le centre de la fenêtre.
+	sf::Vector2f normalized;
 	bool isInsideWindow;
 };
 
@@ -269,17 +273,26 @@ inline sf::Keyboard::Key getKeyEnum(const std::string& name) {
 inline MouseState getMouseState(const sf::WindowBase& window) {
 	MouseState result;
 
+	// Obtenir l'état des boutons.
 	for (int i = 0; i < sf::Mouse::ButtonCount; i++) {
 		auto btn = (sf::Mouse::Button)i;
 		result.buttons[btn] = sf::Mouse::isButtonPressed(btn);
 	}
 
 	sf::Vector2i windowSize(window.getSize().x, window.getSize().y);
+	// Position absolue, donc par rapport à l'écran (dépasse les dimensions de l'écran si plusieurs moniteurs).
 	result.absolute = sf::Mouse::getPosition();
+	// Position relative à la fenêtre (son coin haut-gauche). Le coin haut-gauche est celui de la partie dessinable de la fenêtre et n'inclue pas le cadre de celle-ci.
 	result.relative = sf::Mouse::getPosition(window);
-	result.isInsideWindow =
-		0 <= result.relative.x and result.relative.x < windowSize.x and
-		0 <= result.relative.y and result.relative.y < windowSize.y;
+	// Position relative au centre de la fenêtre, avec les y positifs vers le haut et normalisée et bornée dans [-1,1]. C'est l'équivalent des coords normalisées d'OpenGL.
+	result.normalized.x =  (2.0f * result.relative.x - (windowSize.x - 1)) / (windowSize.x - 1);
+	result.normalized.y = -(2.0f * result.relative.y - (windowSize.y - 1)) / (windowSize.y - 1);
+	result.normalized.x = std::clamp(result.normalized.x, -1.0f, 1.0f);
+	result.normalized.y = std::clamp(result.normalized.y, -1.0f, 1.0f);
+	// Vérifier que le curseur est dans l'espace de la fenêtre.
+	auto& rel = result.relative;
+	result.isInsideWindow = 0 <= rel.x and rel.x < windowSize.x and
+	                        0 <= rel.y and rel.y < windowSize.y;
 
 	return result;
 }
