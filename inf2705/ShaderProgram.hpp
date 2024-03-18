@@ -170,6 +170,8 @@ public:
 	void setMat(GLuint loc, const mat3& val) { glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(val)); }
 	void setMat(GLuint loc, const mat4& val) { glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val)); }
 	void setMat(GLuint loc, const TransformStack& val) { setMat(loc, val.top()); }
+	void setMat(const TransformStack& val) { setMat(val.getLoc(getObject()), val.top()); }
+	void setMat(TransformStack& val) { setMat(val.getLoc(getObject()), val.top()); }
 
 	// Variable uniforme générique
 	template <typename T>
@@ -192,8 +194,21 @@ public:
 	}
 
 	template <typename T>
+	void setUniform(std::string_view name, const T& val) {
+		setUniform(getUniformLocation(name), val);
+	}
+
+	template <typename T>
 	void setUniform(Uniform<T>& uniValue) {
 		uniValue.updateProgram(*this);
+	}
+
+	void setUniform(const TransformStack& val) {
+		setMat(val);
+	}
+
+	void setUniform(TransformStack& val) {
+		setMat(val);
 	}
 
 	void bindUniformBlock(std::string_view name, GLuint bindingIndex) {

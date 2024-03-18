@@ -141,7 +141,7 @@ struct App : public OpenGLApplication
 
 		// Caméra et projection habituelles.
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 		applyPerspective();
 	}
 
@@ -164,8 +164,9 @@ struct App : public OpenGLApplication
 			currentProg->setUniform(usingBlinnFormula);
 			currentProg->setUniform(numCelShadingBands);
 			// Passer la transposée de l'inverse de la matrice modèle-vue pour transformer les normales avec l'objet.
-			currentProg->setMat("normalTransformMat", transpose(inverse(mat3(view * model))));
-			currentProg->setMat("model", model);
+			normalTransformMat = transpose(inverse(mat3(view * model)));
+			currentProg->setUniform(normalTransformMat);
+			currentProg->setMat(model);
 			// Dessiner la sphère éclairée avec les normales "flat" ou "smooth", selon le mode choisi.
 			if (usingSmoothNormals)
 				shapeSmooth.draw();
@@ -174,8 +175,11 @@ struct App : public OpenGLApplication
 
 			// Dessiner la lumière avec une couleur uniforme (la lumière ne s'éclaire pas elle-même, pour simplifier l'affichage).
 			uniformProg.use();
-			uniformProg.setMat("model", scale(translate(mat4(1), vec3(light->position)), {0.2, 0.2, 0.2}));
-			uniformProg.setVec("globalColor", vec4(1, 1, 0.7, 1));
+			model.push(scale(translate(mat4(1), vec3(light->position)), {0.2, 0.2, 0.2}));
+			uniformProg.setMat(model);
+			model.pop();
+			globalColor = {1, 1, 0.7, 1};
+			uniformProg.setUniform(globalColor);
 			shapeFlat.draw();
 
 			break;
@@ -272,7 +276,7 @@ struct App : public OpenGLApplication
 			drawMode = key.code - Num0;
 
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 	}
 
 	// Appelée lors d'un mouvement de souris.
@@ -281,7 +285,7 @@ struct App : public OpenGLApplication
 		auto& mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 	}
 
 	// Appelée lors d'un défilement de souris.
@@ -289,7 +293,7 @@ struct App : public OpenGLApplication
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
@@ -323,20 +327,25 @@ struct App : public OpenGLApplication
 
 	void drawUnlitShapeWithNormalLines() {
 		currentProg->use();
-		currentProg->setMat("model", mat4(1));
+		model.pushIdentity();
+		currentProg->setMat(model);
+		model.pop();
 
 		// Dessiner la sphère avec une couleur uniforme (rouge).
-		currentProg->setVec("globalColor", vec4(1, 0.2, 0.2, 1));
+		globalColor = {1, 0.2, 0.2, 1};
+		currentProg->setUniform(globalColor);
 		shapeSmooth.draw(GL_TRIANGLES);
 
 		// Dessiner les arêtes des primitives en noir en dessinant la sphère en wireframe.
-		currentProg->setVec("globalColor", vec4(0, 0, 0, 1));
+		globalColor = {0, 0, 0, 1};
+		currentProg->setUniform(globalColor);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		shapeSmooth.draw(GL_TRIANGLES);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		// Dessiner les droites de normales selon le type voulu.
-		currentProg->setVec("globalColor", vec4(0.2, 1, 0.2, 1));
+		globalColor = {0.2, 1, 0.2, 1};
+		currentProg->setUniform(globalColor);
 		if (*usingSmoothNormals)
 			normalsSmooth.draw(GL_LINES);
 		else
@@ -348,7 +357,7 @@ struct App : public OpenGLApplication
 		projection.perspective(fovy, getWindowAspect(), 0.01f, 100.0f);
 		for (auto&& prog : programs) {
 			prog->use();
-			prog->setMat("projection", projection);
+			prog->setMat(projection);
 		}
 	}
 
@@ -390,9 +399,9 @@ struct App : public OpenGLApplication
 	ShaderProgram* programs[4] = {&uniformProg, &lambertProg, &gouraudProg, &phongProg};
 	ShaderProgram* currentProg = &lambertProg;
 
-	TransformStack model;
-	TransformStack view;
-	TransformStack projection;
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
 
 	OrbitCamera camera = {10, 30, 30, 0};
 
@@ -403,6 +412,8 @@ struct App : public OpenGLApplication
 	Uniform<bool> usingSmoothNormals = {"usingSmoothNormals", false};
 	Uniform<bool> usingBlinnFormula = {"usingBlinnFormula", true};
 	Uniform<int> numCelShadingBands = {"numCelShadingBands", 1};
+	Uniform<mat3> normalTransformMat = {"normalTransformMat"};
+	Uniform<vec4> globalColor = {"globalColor"};
 };
 
 

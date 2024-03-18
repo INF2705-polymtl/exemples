@@ -334,9 +334,9 @@ struct App : public OpenGLApplication
 	ShaderProgram flashingProg;
 	ShaderProgram* programs[3] = {&basicProg, &selectionProg, &flashingProg};
 
-	TransformStack model;
-	TransformStack view;
-	TransformStack projection;
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
 
 	OrbitCamera camera = {10, 90, 180, 0};
 

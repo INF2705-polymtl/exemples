@@ -64,7 +64,7 @@ struct App : public OpenGLApplication
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		sphereProg.use();
-		sphereProg.setUniform(model);
+		sphereProg.setMat(model);
 		glPolygonMode(GL_FRONT_AND_BACK, (wireframeMode) ? GL_LINE : GL_FILL);
 		if (cullMode)
 			glEnable(GL_CULL_FACE);
@@ -78,7 +78,7 @@ struct App : public OpenGLApplication
 		// Dessiner la forme originale pour mieux illustrer la tessellation.
 		if (showingOriginalShape) {
 			uniColorProg.use();
-			uniColorProg.setUniform(model);
+			uniColorProg.setMat(model);
 			glDisable(GL_DEPTH_TEST);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			d20.draw(GL_TRIANGLES);
@@ -106,16 +106,16 @@ struct App : public OpenGLApplication
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case A:
-			model->scale({1.1f, 1, 1.1f});
+			model.scale({1.1f, 1, 1.1f});
 			break;
 		case D:
-			model->scale({0.9f, 1, 0.9f});
+			model.scale({0.9f, 1, 0.9f});
 			break;
 		case W:
-			model->scale({1, 1.1f, 1});
+			model.scale({1, 1.1f, 1});
 			break;
 		case S:
-			model->scale({1, 0.9f, 1});
+			model.scale({1, 0.9f, 1});
 			break;
 
 		case Z:
@@ -171,8 +171,10 @@ struct App : public OpenGLApplication
 
 	void applyPerspective(float fovy = 50) {
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
-		projection->perspective(fovy, getWindowAspect(), 0.01f, 100.0f);
+		projection.perspective(fovy, getWindowAspect(), 0.01f, 100.0f);
+		sphereProg.use();
 		sphereProg.setUniform(projection);
+		uniColorProg.use();
 		uniColorProg.setUniform(projection);
 	}
 
@@ -195,9 +197,9 @@ struct App : public OpenGLApplication
 	ShaderProgram uniColorProg;
 	ShaderProgram sphereProg;
 
-	Uniform<TransformStack> model = {"model"};
-	Uniform<TransformStack> view = {"view"};
-	Uniform<TransformStack> projection = {"projection"};
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
 
 	OrbitCamera camera = {5, 30, 30, 0};
 

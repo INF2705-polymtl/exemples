@@ -69,8 +69,8 @@ struct App : public OpenGLApplication
 		texDrywall = Texture::loadFromFile("drywall.png", 5);
 		texWindow = Texture::loadFromFile("window.png", 5);
 
-		camera.updateProgram(basicProg, "view", view);
-		camera.updateProgram(fogProg, "view", view);
+		camera.updateProgram(basicProg, view);
+		camera.updateProgram(fogProg, view);
 		applyPerspective();
 	}
 
@@ -93,7 +93,7 @@ struct App : public OpenGLApplication
 		model.push(); {
 			model.translate({0, -1, 0});
 			model.scale({1, 0.2f, 2});
-			currentProg.setMat("model", model);
+			currentProg.setMat(model);
 		} model.pop();
 		// Dessiner le cube.
 		cube.draw();
@@ -104,7 +104,7 @@ struct App : public OpenGLApplication
 		model.push(); {
 			model.translate({0, 0, -1});
 			model.scale({0.5f, 0.5f, 0.5f});
-			currentProg.setMat("model", model);
+			currentProg.setMat(model);
 		} model.pop();
 		// Dessiner le cube.
 		cube.draw();
@@ -119,7 +119,7 @@ struct App : public OpenGLApplication
 			model.push(); {
 				model.translate({0, 0, 1});
 				model.scale({0.5f, 0.5f, 0.5f});
-				currentProg.setMat("model", model);
+				currentProg.setMat(model);
 			} model.pop();
 			cube.draw();
 		}
@@ -131,7 +131,7 @@ struct App : public OpenGLApplication
 				model.rotate(-45, {1, 0, 0});
 				model.translate({0, 0, 3});
 				model.scale({1.5f, 1.5f, 1.5f});
-				currentProg.setMat("model", model);
+				currentProg.setMat(model);
 			} model.pop();
 			quad.draw();
 		}
@@ -149,8 +149,8 @@ struct App : public OpenGLApplication
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
 		camera.handleKeyEvent(key, 5.0f, 0.5f, {5, 30, -30, 0});
-		camera.updateProgram(basicProg, "view", view);
-		camera.updateProgram(fogProg, "view", view);
+		camera.updateProgram(basicProg, view);
+		camera.updateProgram(fogProg, view);
 
 		// Touche 1 : Carré de vitre.
 		// Touche 2 : Cube de vitre.
@@ -196,16 +196,16 @@ struct App : public OpenGLApplication
 		// Mettre à jour la caméra si on a un clic de la roulette.
 		auto& mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
-		camera.updateProgram(basicProg, "view", view);
-		camera.updateProgram(fogProg, "view", view);
+		camera.updateProgram(basicProg, view);
+		camera.updateProgram(fogProg, view);
 	}
 
 	// Appelée lors d'un défilement de souris.
 	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
-		camera.updateProgram(basicProg, "view", view);
-		camera.updateProgram(fogProg, "view", view);
+		camera.updateProgram(basicProg, view);
+		camera.updateProgram(fogProg, view);
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
@@ -244,9 +244,9 @@ struct App : public OpenGLApplication
 	ShaderProgram basicProg;
 	ShaderProgram fogProg;
 
-	TransformStack model;
-	TransformStack view;
-	TransformStack projection;
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
 
 	OrbitCamera camera = {5, 30, -30, 0};
 

@@ -1,6 +1,5 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib teapot.mtl
 o Teapot
 v -0.712320 0.450000 0.239280
 v -0.693135 0.481500 0.232835

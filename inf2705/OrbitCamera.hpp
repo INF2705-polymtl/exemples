@@ -23,6 +23,7 @@ struct OrbitCamera
 	float latitude = 0;
 	float longitude = 0;
 	float roll = 0;
+	vec3 origin = {};
 
 	void moveNorth(float angleDegrees) { latitude += angleDegrees; }
 	void moveSouth(float angleDegrees) { latitude -= angleDegrees; }
@@ -85,22 +86,19 @@ struct OrbitCamera
 		viewMatrix.rotate(roll, {0, 0, 1});
 		viewMatrix.rotate(latitude, {1, 0, 0});
 		viewMatrix.rotate(longitude, {0, 1, 0});
+		viewMatrix.translate(-origin);
 	}
 
 	void updateProgram(ShaderProgram& prog, std::string_view uniformName, TransformStack& viewMatrix) {
 		prog.use();
-		updateProgram(prog, prog.getUniformLocation(uniformName), viewMatrix);
+		updateProgram(prog, viewMatrix);
 	}
 
-	void updateProgram(ShaderProgram& prog, GLuint uniformLoc, TransformStack& viewMatrix) {
+	void updateProgram(ShaderProgram& prog, TransformStack& viewMatrix) {
 		prog.use();
 		applyToView(viewMatrix);
 		// En positionnant la caméra, on met seulement à jour la matrice de visualisation.
-		prog.setMat(uniformLoc, viewMatrix);
-	}
-
-	void updateProgram(ShaderProgram& prog, Uniform<TransformStack>& viewMatrix) {
-		updateProgram(prog, viewMatrix.getLoc(prog), viewMatrix);
+		prog.setMat(viewMatrix);
 	}
 };
 

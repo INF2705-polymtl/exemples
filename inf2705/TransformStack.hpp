@@ -9,9 +9,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <glbinding/gl/gl.h>
 
+
+using namespace gl;
 using namespace glm;
 
+
+class ShaderProgram;
 
 struct ProjectionBox
 {
@@ -23,16 +28,26 @@ struct ProjectionBox
 	float farDist;
 };
 
-struct TransformStack : public std::stack<mat4>
+class TransformStack : public std::stack<mat4>
 {
+public:
 	using stack<mat4>::stack;
 
 	TransformStack() {
 		pushIdentity();
 	}
 
+	TransformStack(const std::string name) : TransformStack() {
+		setName(name);
+	}
+
 	TransformStack(const mat4& m) {
 		push(m);
+	}
+
+	TransformStack& operator= (const mat4& m) {
+		top() = m;
+		return *this;
 	}
 
 	void loadIdentity() {
@@ -110,5 +125,39 @@ struct TransformStack : public std::stack<mat4>
 	void pushIdentity() {
 		push(mat4(1.0f));
 	}
+
+	const std::string& getName() const { return name_; }
+
+	void setName(const std::string& name) {
+		// Changer le nom de la variable invalide les localisations.
+		name_ = name;
+		auto oldLocs = std::move(locs_);
+		locs_.clear();
+		for (auto&& [progObj, loc] : oldLocs)
+			getLoc(progObj);
+	}
+
+	GLuint getLoc(GLuint prog) const {
+		auto it = locs_.find(prog);
+		if (it != locs_.end())
+			return it->second;
+		else
+			// Dans la version constante, on ne peut pas modifier les localisations connues, donc on fait la recherche à chaque fois.
+			return glGetUniformLocation(prog, name_.c_str());
+	}
+
+	GLuint getLoc(GLuint prog) {
+		auto it = locs_.find(prog);
+		// Si le programme nuanceur n'est pas reconnu, chercher la localisation et la sauvegarder.
+		if (it == locs_.end()) {
+			GLuint loc = glGetUniformLocation(prog, name_.c_str());
+			it = locs_.insert({prog, loc}).first;
+		}
+		return it->second;
+	}
+
+private:
+	std::string name_;
+	std::unordered_map<GLuint, GLuint> locs_;
 };
 

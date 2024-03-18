@@ -115,7 +115,7 @@ struct App : public OpenGLApplication
 			drawScene();
 			// Rétablir la matrice de projection.
 			projection.pop();
-			basicProg.setMat("projection", projection);
+			basicProg.setMat(projection);
 			if (showingScopeWireframe)
 				// Rétablir à GL_FILL
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -214,14 +214,14 @@ struct App : public OpenGLApplication
 			model.translate({0, -1, 0});
 			model.scale({4, 1, 4});
 			model.translate({0, 0, -1});
-			basicProg.setMat("model", model);
+			basicProg.setMat(model);
 		} model.pop();
 		road.draw();
 
 		texBuilding.bindToTextureUnit(0, basicProg, "texMain");
 		model.push(); {
 			model.translate({2, 0, 0});
-			basicProg.setMat("model", model);
+			basicProg.setMat(model);
 		} model.pop();
 		cube.draw();
 
@@ -230,7 +230,7 @@ struct App : public OpenGLApplication
 			model.translate({-2, 1, 3});
 			model.rotate(90, {0, 1, 0});
 			model.scale({1.1f, 2.0f, 1.1f});
-			basicProg.setMat("model", model);
+			basicProg.setMat(model);
 		} model.pop();
 		cube.draw();
 
@@ -238,7 +238,7 @@ struct App : public OpenGLApplication
 		model.push(); {
 			model.translate({0, 2, -10});
 			model.scale({2.5f, 3, 2.5f});
-			basicProg.setMat("model", model);
+			basicProg.setMat(model);
 		} model.pop();
 		cube.draw();
 
@@ -247,7 +247,7 @@ struct App : public OpenGLApplication
 			model.translate({0, 1, -10});
 			model.scale({3.2f, 3.2f, 3.2f});
 			model.translate({0, 2.0f, 0});
-			basicProg.setMat("model", model);
+			basicProg.setMat(model);
 		} model.pop();
 		teapot.draw();
 	}
@@ -257,7 +257,7 @@ struct App : public OpenGLApplication
 		model.pushIdentity();
 		// Faire un scale de 50% et prendre moins de place dans la fenêtre. Pour conserver une forme ronde, on applique l'aspect de la fenêtre au facteur en x.
 		model.scale({0.5f / getWindowAspect(), 0.5f, 1});
-		basicProg.setMat("model", model);
+		basicProg.setMat(model);
 		// Passer des matrices identités vu qu'on ne fait rien avec les autres matrices de transformation.
 		basicProg.setMat("view", mat4(1));
 		basicProg.setMat("projection", mat4(1));
@@ -269,22 +269,22 @@ struct App : public OpenGLApplication
 		// Rétablir l'état et les matrices.
 		basicProg.setBool("shouldDiscard", false);
 		model.pop();
-		basicProg.setMat("view", view);
-		basicProg.setMat("projection", projection);
+		basicProg.setMat(view);
+		basicProg.setMat(projection);
 	}
 
 	void drawCrosshairs() {
 		// Même concept que dans drawScopeMask, mais on ne fait pas le test de pixel transparent.
 		model.pushIdentity();
 		model.scale({0.5f / getWindowAspect(), 0.5f, 1});
-		basicProg.setMat("model", model);
+		basicProg.setMat(model);
 		basicProg.setMat("view", mat4(1));
 		basicProg.setMat("projection", mat4(1));
 		texScopeReticle.bindToTextureUnit(0, basicProg, "texMain");
 		quad.draw();
 		model.pop();
-		basicProg.setMat("view", view);
-		basicProg.setMat("projection", projection);
+		basicProg.setMat(view);
+		basicProg.setMat(projection);
 	}
 
 	void applyCamera() {
@@ -292,7 +292,7 @@ struct App : public OpenGLApplication
 		view.translate({0, -2, 0});
 		basicProg.use();
 		camera.applyToView(view);
-		basicProg.setMat("view", view);
+		basicProg.setMat(view);
 	}
 
 	void applyPerspective(float vfov = 50) {
@@ -300,7 +300,7 @@ struct App : public OpenGLApplication
 		projection.loadIdentity();
 		projection.perspective(vfov, getWindowAspect(), 0.01f, 100.0f);
 		basicProg.use();
-		basicProg.setMat("projection", projection);
+		basicProg.setMat(projection);
 	}
 
 	void loadShaders() {
@@ -323,9 +323,9 @@ struct App : public OpenGLApplication
 
 	ShaderProgram basicProg;
 
-	TransformStack model;
-	TransformStack view;
-	TransformStack projection;
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
 
 	OrbitCamera camera = {10, 30, -30, 0};
 

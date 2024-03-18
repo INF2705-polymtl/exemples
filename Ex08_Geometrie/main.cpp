@@ -182,16 +182,16 @@ struct App : public OpenGLApplication
 			break;
 
 		case A:
-			modelExtrude->scale({1.1f, 1, 1.1f});
+			modelExtrude.scale({1.1f, 1, 1.1f});
 			break;
 		case D:
-			modelExtrude->scale({0.9f, 1, 0.9f});
+			modelExtrude.scale({0.9f, 1, 0.9f});
 			break;
 		case W:
-			modelExtrude->scale({1, 1.1f, 1});
+			modelExtrude.scale({1, 1.1f, 1});
 			break;
 		case S:
-			modelExtrude->scale({1, 0.9f, 1});
+			modelExtrude.scale({1, 0.9f, 1});
 			break;
 
 		case Space:
@@ -216,7 +216,7 @@ struct App : public OpenGLApplication
 	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
-		camera.updateProgram(extrudeSpikesProg,  view);
+		camera.updateProgram(extrudeSpikesProg, view);
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
@@ -227,13 +227,14 @@ struct App : public OpenGLApplication
 	void drawExtrudedD20() {
 		// Appliquer les transformations et afficher.
 		extrudeSpikesProg.use();
-		modelExtrude.updateProgram(extrudeSpikesProg);
+		extrudeSpikesProg.setMat(modelExtrude);
 		d20.draw();
 	}
 
 	void drawAnimatedCharacter() {
-		// Calculer l'état de l'animation.
 		spritesProg.use();
+
+		// Calculer l'état de l'animation.
 		int numSwingAnimFrames = (int)spriteLink.sprites.size();
 		int swingAnimFrame = 0;
 		if (swingStartFrame != -1) {
@@ -244,19 +245,20 @@ struct App : public OpenGLApplication
 		// Choisir quel lutin (sprite) utiliser selon la trame actuelle.
 		spriteLink.bindToTextureUnit(swingAnimFrame % numSwingAnimFrames, 1);
 
-		modelSprite->loadIdentity();
+		modelSprite.loadIdentity();
 		// Positionner le point.
-		modelSprite->translate({-0.6, 0, 0});
+		modelSprite.translate({-0.6, 0, 0});
 		// Mettre à l'échelle en appliquant les proportions de la texture.
-		modelSprite->scale({spriteLink.elemSize.x * 0.1f, spriteLink.elemSize.y * 0.1f, 1});
-		modelSprite->scale({0.1, 0.1, 1});
-		//modelSprite->scale({1, (float)spriteLink.elemSize.y / spriteLink.elemSize.x * 2, 1});
+		modelSprite.scale({spriteLink.elemSize.x * 0.1f, spriteLink.elemSize.y * 0.1f, 1});
+		modelSprite.scale({0.1, 0.1, 1});
 
-		spritesProg.setUniform(modelSprite);
+		spritesProg.setMat(modelSprite);
 		point.draw(GL_POINTS);
 	}
 
 	void drawAnimatedSword() {
+		spritesProg.use();
+
 		// Calculer l'état de l'animation.
 		int linkAnimLength = (int)spriteLink.sprites.size() * 4;
 		int swordAnimFrame = getCurrentFrameNumber() - swingStartFrame - linkAnimLength;
@@ -267,13 +269,13 @@ struct App : public OpenGLApplication
 		// Choisir quel lutin (sprite) utiliser selon la trame actuelle.
 		spriteSword.bindToTextureUnit(swordAnimFrame / 2 % numSwordAnimFrames, 1);
 
-		modelSprite->loadIdentity();
+		modelSprite.loadIdentity();
 		// Positionner le point en fonction de la trame actuelle (donc mouvement vers la droite).
-		modelSprite->translate({-0.5 + swordAnimFrame * 0.05, -0.015, 0});
+		modelSprite.translate({-0.5 + swordAnimFrame * 0.05, -0.015, 0});
 		// Mettre à l'échelle en appliquant les proportions de la texture.
-		modelSprite->scale({spriteSword.elemSize.x * 0.1f, spriteSword.elemSize.y * 0.1f, 1});
-		modelSprite->scale({0.1, 0.1, 1});
-		spritesProg.setUniform(modelSprite);
+		modelSprite.scale({spriteSword.elemSize.x * 0.1f, spriteSword.elemSize.y * 0.1f, 1});
+		modelSprite.scale({0.1, 0.1, 1});
+		spritesProg.setMat(modelSprite);
 		point.draw(GL_POINTS);
 	}
 
@@ -281,12 +283,14 @@ struct App : public OpenGLApplication
 		float viewportAspect = getWindowAspect() * 2;
 
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre. C'est pour la forme extrudée dans le haut de la fenêtre.
-		projection->perspective(fovy, viewportAspect, 0.01f, 100.0f);
-		projection.updateProgram(extrudeSpikesProg);
+		projection.perspective(fovy, viewportAspect, 0.01f, 100.0f);
+		extrudeSpikesProg.use();
+		extrudeSpikesProg.setMat(projection);
 
 		// Appliquer une projection orthogonale en respectant l'aspect de la fenêtre. C'est pour les lutins dans le bas de la fenêtre.
-		projection->ortho(-1, 1, -1.0f / viewportAspect, 1.0f / viewportAspect, -1, 1);
-		projection.updateProgram(spritesProg);
+		projection.ortho(-1, 1, -1.0f / viewportAspect, 1.0f / viewportAspect, -1, 1);
+		spritesProg.use();
+		spritesProg.setMat(projection);
 	}
 
 	void loadShaders() {
@@ -318,10 +322,10 @@ struct App : public OpenGLApplication
 	ShaderProgram extrudeSpikesProg;
 	ShaderProgram spritesProg;
 
-	Uniform<TransformStack> modelExtrude = {"model"};
-	Uniform<TransformStack> modelSprite = {"model"};
-	Uniform<TransformStack> view = {"view"};
-	Uniform<TransformStack> projection = {"projection"};
+	TransformStack modelExtrude = {"model"};
+	TransformStack modelSprite = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
 
 	OrbitCamera camera = {5, 30, 30, 0};
 
