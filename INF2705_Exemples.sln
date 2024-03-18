@@ -25,6 +25,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex08_Geometrie", "Ex08_Geom
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex08_Tessellation", "Ex08_Tessellation\Ex08_Tessellation.vcxproj", "{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex09_Retroaction_TexRendu", "Ex09_Retroaction_TexRendu\Ex09_Retroaction_TexRendu.vcxproj", "{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex09_Retroaction_VBO", "Ex09_Retroaction_VBO\Ex09_Retroaction_VBO.vcxproj", "{5FB16B60-179F-4B38-9078-7E3D4A2C573E}"
 EndProject
 Global
@@ -123,6 +125,14 @@ Global
 		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Release|x64.Build.0 = Release|x64
 		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Release|x86.ActiveCfg = Release|Win32
 		{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}.Release|x86.Build.0 = Release|Win32
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Debug|x64.ActiveCfg = Debug|x64
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Debug|x64.Build.0 = Debug|x64
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Debug|x86.ActiveCfg = Debug|Win32
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Debug|x86.Build.0 = Debug|Win32
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Release|x64.ActiveCfg = Release|x64
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Release|x64.Build.0 = Release|x64
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Release|x86.ActiveCfg = Release|Win32
+		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Release|x86.Build.0 = Release|Win32
 		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x64.ActiveCfg = Debug|x64
 		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x64.Build.0 = Debug|x64
 		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x86.ActiveCfg = Debug|Win32
