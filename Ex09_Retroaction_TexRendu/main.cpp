@@ -41,6 +41,7 @@ struct App : public OpenGLApplication
 		glLineWidth(3.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
+		// On utilise les nuanceur de base qui échantillonent les textures, pas besoin de quoique ce soit de fancy.
 		loadShaders();
 
 		teapot = Mesh::loadFromWavefrontFile("teapot.obj")[0];
@@ -188,7 +189,7 @@ struct App : public OpenGLApplication
 	}
 
 	void drawScene() {
-		// Il ne se passe rien de spécial ici. En effet, une fois que le framebuffer et la texture de rendu sont configurée, on dessine la scène comme si de rien était, pas besoin d'un nuanceur différent (quoiqu'on pourrait choisir d'en utiliser un différent pour faire des effets). La seule petite particularité 
+		// Il ne se passe rien de spécial ici. En effet, une fois que le framebuffer et la texture de rendu sont configurée, on dessine la scène comme si de rien était, pas besoin d'un nuanceur différent (quoiqu'on pourrait choisir d'en utiliser un différent pour faire des effets). La seule petite particularité est la texture utilisée pour l'écran de la TV qui est en fait la texture de rendu.
 
 		basicProg.use();
 

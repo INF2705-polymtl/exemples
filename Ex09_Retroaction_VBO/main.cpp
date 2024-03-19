@@ -57,7 +57,7 @@ struct App : public OpenGLApplication
 
 		loadShaders();
 
-		constexpr size_t numParticles = 1'000'000;
+		constexpr size_t numParticles = 100'000;
 		particles.resize(numParticles);
 
 		// Générer l'état initial des particules. On applique une distribution normale (gaussienne) centrée en 0,0 pour la position et la vitesse et une distribution uniforme pour la masse.
@@ -91,7 +91,6 @@ struct App : public OpenGLApplication
 		glGenQueries(1, &reqParticles);
 		glGenTransformFeedbacks(1, &tfoComputation);
 
-
 		// Passer les données des particles dans le VBO d'entrée. On configure avec GL_DYNAMIC_COPY vu que ça va être souvent lu et modifié. Ce n'est qu'une suggestion au driver et celui-ci peut l'ignorer.
 		auto numBytes = (GLsizeiptr)particles.size() * sizeof(Particle);
 		glBindBuffer(GL_ARRAY_BUFFER, vboIn);
@@ -120,6 +119,7 @@ struct App : public OpenGLApplication
 		// glTransformFeedbackVaryings doit être appelée AVANT l'édition de lien du programme de nuanceurs.
 		computationProg.link();
 
+		// La vitesse max des particules.
 		speedMax = 20;
 		computationProg.setUniform(speedMax);
 		drawingProg.setUniform(speedMax);
@@ -181,8 +181,8 @@ struct App : public OpenGLApplication
 			break;
 
 		case Space:
-			speedFactor = 0.9f;
-			computationProg.setUniform(speedFactor);
+			globalSpeedFactor = 0.9f;
+			computationProg.setUniform(globalSpeedFactor);
 			break;
 
 		case F:
@@ -200,8 +200,8 @@ struct App : public OpenGLApplication
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case Space:
-			speedFactor = 1;
-			computationProg.setUniform(speedFactor);
+			globalSpeedFactor = 1;
+			computationProg.setUniform(globalSpeedFactor);
 			break;
 		}
 	}
@@ -383,7 +383,7 @@ struct App : public OpenGLApplication
 	Uniform<vec3> forceFieldPosition = {"forceFieldPosition"};
 	Uniform<float> forceFieldStrength = {"forceFieldStrength"};
 	Uniform<float> speedMax = {"speedMax"};
-	Uniform<float> speedFactor = {"speedFactor", 1};
+	Uniform<float> globalSpeedFactor = {"globalSpeedFactor", 1};
 
 	float orthoHeight = 50;
 	bool savingData = false;

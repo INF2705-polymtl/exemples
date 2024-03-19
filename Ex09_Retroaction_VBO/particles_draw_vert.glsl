@@ -15,7 +15,7 @@ out VertOut {
 
 
 void main() {
-	// Passer les données au nuanceur de géométrie. Tous les calculs seront faits dans celui-ci pour ne pas s'éparpiller.
+	// Passer les données au nuanceur de géométrie. Tous les calculs seront faits dans celui-ci pour ne pas s'éparpiller entre les nuanceurs dans le traitement.
 	outputs.position = a_position;
 	outputs.velocity = a_velocity;
 	outputs.mass = a_mass;
