@@ -1,0 +1,82 @@
+% L'exemple de fleur des notes de cours, mais plus paramétrisable que ce qu'il y a dans le code de base du Postscript Blue Book.
+% Basé sur https://gitlab.com/ozell/inf2705-exemples/-/blob/master/11-PostScript/PSBlueBook-prog_01.ps
+
+% wedge
+%     petal_angle wedge
+%
+% Crée un chemin pour une pétale de rayon 1 avec angle d'ouverture de `petal_angle`.
+/wedge {
+	% Début du dict des variables locales. Il faut donner une capacité au dictionnaire.
+	10 dict begin
+	
+	% Variable locale petal_angle égale au top de la pile avant l'appel (un peu comme un paramètre finalement).
+	/petal_angle exch def
+	
+	% Variable locale égale à la moitié de l'angle d'ouverture de la pétale voulu.
+	/half_angle petal_angle 2 div def
+	
+	% Créer le chemin de la pétale.
+	newpath
+	0 0 moveto
+	1 0 translate
+	half_angle rotate
+	0 half_angle sin translate
+	0 0 half_angle sin -90 90 arc
+	closepath
+	
+	% Fin du dict. Ça élimine toute les variables locales (angle, half_angle) qui ont été définies depuis dict begin.
+	end
+} def
+
+% draw_flower
+%     radius num_petals line_width draw_flower
+%
+% Dessiner une fleur de `num_petals` pétales et un rayon de `radius` points avec un trait de `line_width` points.
+/draw_flower {
+	10 dict begin
+	
+	/line_width exch def
+	/num_petals exch def
+	/radius exch def
+	
+	% Variable locale pour l'angle entre les pétales (360 / num_petals).
+	/petal_angle 360 num_petals div def
+	
+	gsave
+	
+	% Mise à l'échelle selon le rayon voulu puisque wedge crée un chemin pour une pétale de rayon 1.
+	radius radius scale
+	
+	% Pour chaque pétale (i=1 à i<=num_petals, i+=1 à chaque itération)
+	1 1 num_petals {
+		% À l'entrée du for, le top de la pile est la variable d'itération.
+		
+		% Sauvegarder l'état avant wedge qui modifie l'état.
+		gsave
+		% wedge avec l'angle voulu (360 / num_petals).
+		petal_angle wedge
+		% Les modifs apportées par wedge (besoin pour la ligne et le remplissage qui consomment chacun l'état).
+		gsave
+		% Remplir avec le gris i/num_petals, donc allant du gris foncé au blanc.
+		num_petals div setgray fill
+		% Restaurer l'état pour le contour
+		grestore
+		% Épaisseur de ligne = line_width/radius car l'épaisseur de ligne est affectée par le scale fait avant la boucle.
+		line_width radius div setlinewidth stroke
+		grestore
+		
+		% Rotation pour la prochaine pétale.
+		petal_angle rotate
+	} for
+	
+	grestore
+	end
+} def
+
+
+% Positioner le centre de la fleur sur la page.
+300 300 translate
+% Dessiner la fleur avec un rayon de 200 points, 12 pétales et un trait de 3 points.
+200 12 3 draw_flower
+
+showpage

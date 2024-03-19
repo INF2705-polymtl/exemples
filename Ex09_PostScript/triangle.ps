@@ -1,0 +1,25 @@
+% exemple :
+
+% Début du nouveau chemin
+newpath
+% Premier sommet du triangle
+100 200 moveto
+% Ligne allant du point précédant à la coord passée.
+200 250 lineto
+% Ligne allant du point précédant à la coord passée.
+120 300 lineto
+% Plutôt que d'ajouter un "100 200 lineto" Pour la 3e arête du triangle, on dit de boucler le chemin, ce qui fait une ligne entre le dernier et le premier point du chemin.
+closepath
+
+% Sauvegarder le chemin, car les instructions de dessin (stroke, fill) consomment l'état graphique courant.
+gsave
+% Remplir le chemin de gris
+0.5 setgray fill
+
+% Restaurer le chemin qui a été consommé par le fill précédent.
+grestore
+% Dessiner une ligne d'une épaisseur de 4 points sur le chemin du triangle.
+4 setlinewidth stroke
+
+% Afficher la page. On peut avoir plusieurs pages.
+showpage
