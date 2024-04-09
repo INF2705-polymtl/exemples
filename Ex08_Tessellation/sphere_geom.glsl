@@ -19,7 +19,7 @@ out vec2 texCoords;
 
 void main() {
 	// Calculer la matrice de transformation habituelle.
-	mat4 transformMat =  projection * view * model;
+	mat4 transformMat = projection * view * model;
 	// Pour chacun des sommets en entrée, l'émettre en appliquant les transformations aux positions qui sont en coordonnées d'objet. Les coords de textures sont passées telles-quelles à chaque sommet.
 	for (int i = 0; i < gl_in.length(); i++) {
 		gl_Position = transformMat * vec4(inputs[i].origPosition, 1);

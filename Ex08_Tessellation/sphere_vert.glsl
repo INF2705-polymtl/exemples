@@ -26,5 +26,4 @@ void main() {
 	// On passe les coordonnées d'objets (en attributs de sortie) en plus des positions normalisées dans gl_Position pour laisser plus d'options au nuanceur suivant dans le pipeline.
 	outputs.texCoords = a_texCoords;
 	outputs.origPosition = a_position;
-//	outputs.origPosition = vec3(model * vec4(a_position, 1));
 }

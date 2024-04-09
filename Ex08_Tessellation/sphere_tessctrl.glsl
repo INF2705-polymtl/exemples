@@ -19,7 +19,6 @@ out TessCtrlOut {
 
 void main() {
 	// Passer la position et les attributs. Il faut utiliser l'indice d'invocation qui est le numéro du sommet courant.
-	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 	outputs[gl_InvocationID].origPosition = inputs[gl_InvocationID].origPosition;
 	outputs[gl_InvocationID].texCoords = inputs[gl_InvocationID].texCoords;
 

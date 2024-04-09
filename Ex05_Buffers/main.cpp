@@ -169,7 +169,7 @@ struct App : public OpenGLApplication
 		// Dessiner un point au milieu de l'écran suffisamment gros pour couvrir l'écran.
 		glPointSize(500.0f);
 		points.draw(GL_POINTS);
-		// Attendre que les opérations soient compétées.
+		// Attendre que les opérations soient complétées.
 		glFinish();
 
 		// Lire les valeurs de buffers pour le fragment au milieu de l'écran.

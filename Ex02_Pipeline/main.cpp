@@ -98,7 +98,7 @@ struct App : public OpenGLApplication
 			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertexColors), pyramidVertexColors, GL_STATIC_DRAW);
 		else
 			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidFullColors), pyramidFullColors, GL_STATIC_DRAW);
-		// Configurer l'attribut à la position 1 avec 4 float (vec4, donc rgba) par élément.
+		// Configurer l'attribut à la position 1 avec 4 float (vec4, donc RGBA) par élément.
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 	}

@@ -70,7 +70,7 @@ struct OrbitCamera
 	}
 
 	void handleMouseMoveEvent(sf::Event::MouseMoveEvent move, const MouseState& mouse, float degsPerPixel = 1.0f) {
-		// Le bouton centrale (cliquer la roulette) bouge la caméra en glissant la souris.
+		// Le bouton central (cliquer la roulette) bouge la caméra en glissant la souris.
 		if (mouse.buttons[sf::Mouse::Middle] and mouse.isInsideWindow) {
 			float deltaLong = std::clamp(move.x * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
 			float deltaLat =  std::clamp(move.y * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
@@ -80,7 +80,7 @@ struct OrbitCamera
 	}
 
 	void applyToView(TransformStack& viewMatrix) const {
-		// L'ordre des opération est important. Il faut se rappeler que de modifier la caméra est l'inverse de modifier la scène au complet. 
+		// L'ordre des opération est important. Il faut se rappeler que de modifier la caméra est l'inverse de modifier la scène au complet.
 		viewMatrix.loadIdentity();
 		viewMatrix.translate({0, 0, -altitude});
 		viewMatrix.rotate(roll, {0, 0, 1});

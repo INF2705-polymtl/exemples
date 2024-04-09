@@ -111,7 +111,6 @@ void main() {
 		distFactor
 	);
 
-	
 	// On peut faire un genre de "cel-shading" (Celluloid shading) pour donner un effet de cartoon, un peu comme dans Zelda Wind Waker pour ceux qui s'en rappellent. Généralement on va seulement appliquer le cel-shading sur la réflection diffuse.
 	if (numCelShadingBands > 1)
 		reflections.diffuse = floor(reflections.diffuse * numCelShadingBands) / numCelShadingBands;

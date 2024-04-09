@@ -123,7 +123,7 @@ struct App : public OpenGLApplication
 		drawFragments();
 		// Dessiner une grille par-dessus les fragments pour les différencier.
 		drawGrid();
-		// Dessiner les lignes de référence par-dessus les autre
+		// Dessiner les lignes de référence par-dessus les autres éléments.
 		drawReferenceLines();
 	}
 
@@ -195,7 +195,7 @@ struct App : public OpenGLApplication
 			std::swap(x1, y1);
 			std::swap(x2, y2);
 		}
-		// Si le deuxième point (x2,y2) est à gauche, inverser l'ordre des points
+		// Si le deuxième point (x2,y2) est à gauche, inverser l'ordre des points.
 		if (x2 < x1) {
 			std::swap(x1, x2);
 			std::swap(y1, y2);

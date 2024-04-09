@@ -134,7 +134,7 @@ struct App : public OpenGLApplication
 			else
 				tessLevelInner += 1;
 			tessLevelInner = std::max(tessLevelInner.get(), 1);
-			tessLevelInner.updateProgram(sphereProg);
+			sphereProg.setUniform(tessLevelInner);
 			break;
 		case O:
 			if (key.shift)
@@ -142,7 +142,7 @@ struct App : public OpenGLApplication
 			else
 				tessLevelOuter += 1;
 			tessLevelOuter = std::max(tessLevelOuter.get(), 1);
-			tessLevelOuter.updateProgram(sphereProg);
+			sphereProg.setUniform(tessLevelOuter);
 			break;
 		}
 	}

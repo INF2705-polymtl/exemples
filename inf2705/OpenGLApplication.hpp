@@ -314,7 +314,7 @@ protected:
 };
 
 
-void printGLError(std::string_view sourceFile = "", int sourceLine = -1) {
+inline void printGLError(std::string_view sourceFile = "", int sourceLine = -1) {
 	static const std::unordered_map<GLenum, std::string> codeToName = {
 		{GL_NO_ERROR, "GL_NO_ERROR"},
 		{GL_INVALID_ENUM, "GL_INVALID_ENUM"},

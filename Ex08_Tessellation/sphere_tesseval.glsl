@@ -19,7 +19,7 @@ out TessEvalOut {
 
 
 vec4 weightedMix(vec4 v0, vec4 v1, vec4 v2) {
-	// L'inteporlation qu'on fait une moyenne pondérée où les coordonnées barycentriques sont les poids des valeurs à chaque sommet.
+	// L'inteporlation qu'on fait est une moyenne pondérée où les coordonnées barycentriques sont les poids des valeurs à chaque sommet.
 	return gl_TessCoord[0] * v0 + gl_TessCoord[1] * v1 + gl_TessCoord[2] * v2;
 }
 
@@ -37,12 +37,7 @@ float weightedMix(float v0, float v1, float v2) {
 
 
 void main() {
-	// Calculer la moyenne pondérée des positions (gl_Position et coords d'objets) et des coords de textures.
-	gl_Position = weightedMix(
-		gl_in[0].gl_Position,
-		gl_in[1].gl_Position,
-		gl_in[2].gl_Position
-	);
+	// Calculer la moyenne pondérée des positions (en coords d'objets) et des coords de textures.
 	outputs.origPosition = weightedMix(
 		inputs[0].origPosition,
 		inputs[1].origPosition,
@@ -54,7 +49,7 @@ void main() {
 		inputs[2].texCoords
 	);
 
-	// Calculer le rayon moyen des trois sommets de la primitive. On veut créer une sphère, mais on ne connait pas son rayon. Assumer rayon=1 est une mauvaise idée. On pourrait le mettre en variable uniforme, mais c'est mieux de tout simplement de calculer le rayon local à la primitive.
+	// Calculer le rayon moyen des trois sommets de la primitive. On veut créer une sphère, mais on ne connait pas son rayon. Assumer rayon=1 est une mauvaise idée. On pourrait le mettre en variable uniforme, mais c'est mieux de tout simplement de calculer le rayon local à la primitive courante.
 	float avgRadius = weightedMix(
 		length(inputs[0].origPosition),
 		length(inputs[1].origPosition),
@@ -62,5 +57,4 @@ void main() {
 	);
 	// Repositionner le sommet en le projetant sur son vecteur en utilisant le rayon moyen comme longueur.
 	outputs.origPosition = avgRadius * normalize(outputs.origPosition);
-
 }

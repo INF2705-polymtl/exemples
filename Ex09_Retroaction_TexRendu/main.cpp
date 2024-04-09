@@ -236,11 +236,10 @@ struct App : public OpenGLApplication
 		// La théière qui bouge.
 		model.push(); {
 			float angle = 20 * sin(teapotValue / 5 * 2 * std::numbers::pi_v<float>);
-			model.translate({-3.9, 2.7, 5});
+			model.translate({-3.7, 2.9, 5});
 			model.rotate(90, {0, 1, 0});
 			model.rotate(angle, {1, 0, 0});
 			model.translate({0, -0.3, 1.5});
-			model.scale({0.5, 0.5, 0.5});
 			basicProg.setMat(model);
 		} model.pop();
 		texRock.bindToTextureUnit(0);
@@ -255,7 +254,7 @@ struct App : public OpenGLApplication
 		texRust.bindToTextureUnit(0);
 		pole.draw();
 
-		// La sphere autour de laquelle l'oeil tourne.
+		// La sphère autour de laquelle l'oeil tourne.
 		model.push(); {
 			model.translate({0, 6, -10});
 			basicProg.setMat(model);

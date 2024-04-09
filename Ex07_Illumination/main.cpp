@@ -431,7 +431,7 @@ void runDiffuseModelTest(const std::string& filename, vec3 posL, vec3 n1, vec3 n
 	float c2 = dot(n2, normalize(posL - p2));
 	for (float x : xs) {
 		float xValue = (x - p1.x) / (p2.x - p1.x);
-		float diffuse = glm::mix(c1, c2, xValue);
+		float diffuse = mix(c1, c2, xValue);
 		gouraud.push_back(std::clamp(diffuse, 0.0f, 1.0f));
 	}
 
@@ -441,8 +441,8 @@ void runDiffuseModelTest(const std::string& filename, vec3 posL, vec3 n1, vec3 n
 	vec3 l2 = posL - p2;
 	for (float x : xs) {
 		float xValue = (x - p1.x) / (p2.x - p1.x);
-		vec3 l = normalize(glm::mix(l1, l2, xValue));
-		vec3 n = glm::mix(n1, n2, xValue);
+		vec3 l = normalize(mix(l1, l2, xValue));
+		vec3 n = normalize(mix(n1, n2, xValue));
 		float diffuse = dot(n, l);
 		phong.push_back(std::clamp(diffuse, 0.0f, 1.0f));
 	}
