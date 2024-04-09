@@ -32,6 +32,89 @@ vec4 brightYellow = {1.0f, 1.0f, 0.2f, 1.0f};
 
 struct App : public OpenGLApplication
 {
+	// Détermine si on utilise l'exemple avec glDrawArrays ou glDrawElements.
+	bool usingElements = true;
+	// Détermine si on utilise le buffer de données combinées.
+	bool usingSingleDataBuffer = true;
+
+	// Les données de la pyramide
+	vec3 top = {0.0f,  0.2f,  0.0f};
+	vec3 bottomR = {-0.3f, -0.2f, -0.1f};
+	vec3 bottomL = {0.3f, -0.2f, -0.1f};
+	vec3 bottomF = {0.0f, -0.2f,  0.7f};
+	vec3 pyramidVertexPositions[4] = {
+		top,
+		bottomR,
+		bottomL,
+		bottomF,
+	};
+	vec4 pyramidVertexColors[4] = {
+		brightYellow,
+		brightGreen,
+		brightRed,
+		brightBlue,
+	};
+	GLuint pyramidIndices[4 * 3] = {
+		// Dessous
+		1, 2, 3,
+		// Face "tribord"
+		1, 3, 0,
+		// Face "babord"
+		3, 2, 0,
+		// Face arrière
+		2, 1, 0,
+	};
+	vec3 pyramidFullPositions[4 * 3] = {
+		// Dessous
+		bottomR, bottomL, bottomF,
+		// Face "tribord"
+		bottomR, bottomF, top,
+		// Face "babord"
+		bottomF, bottomL, top,
+		// Face arrière
+		bottomL, bottomR, top,
+	};
+	vec4 pyramidFullColors[4 * 3] = {
+		// Dessous
+		brightGreen, brightRed, brightBlue,
+		// Face "tribord"
+		brightGreen, brightBlue, brightYellow,
+		// Face "babord"
+		brightBlue, brightRed, brightYellow,
+		// Face arrière
+		brightRed, brightGreen, brightYellow,
+	};
+	struct Data
+	{
+		vec3 position;
+		vec4 color;
+	};
+	Data pyramidVertices[4] = {
+		{top, brightYellow},
+		{bottomR, brightGreen},
+		{bottomL, brightRed},
+		{bottomF, brightBlue},
+	};
+
+	// Les ID d'objets OpenGL
+	GLuint pyramidVao = 0;
+	GLuint pyramidPositionVbo = 0;
+	GLuint pyramidColorVbo = 0;
+	GLuint pyramidEbo = 0;
+	GLuint pyramidDataVbo = 0;
+
+	// Les nuanceurs
+	GLuint shaderProgram = 0;
+	GLuint vertexShader = 0;
+	GLuint fragmentShader = 0;
+
+	// Les matrices de tranformation
+	mat4 model = mat4(1.0f);
+	mat4 view = mat4(1.0f);
+	mat4 projection = mat4(1.0f);
+
+	float brightness = 1.0f;
+
 	void init() override {
 		// Config de contexte OpenGL assez de base.
 		glEnable(GL_DEPTH_TEST);
@@ -201,89 +284,6 @@ struct App : public OpenGLApplication
 		else
 			glDrawArrays(GL_TRIANGLES, 0, (GLint)std::size(pyramidFullPositions));
 	}
-
-	// Détermine si on utilise l'exemple avec glDrawArrays ou glDrawElements.
-	bool usingElements = true;
-	// Détermine si on utilise le buffer de données combinées.
-	bool usingSingleDataBuffer = true;
-
-	// Les données de la pyramide
-	vec3 top =     { 0.0f,  0.2f,  0.0f};
-	vec3 bottomR = {-0.3f, -0.2f, -0.1f};
-	vec3 bottomL = { 0.3f, -0.2f, -0.1f};
-	vec3 bottomF = { 0.0f, -0.2f,  0.7f};
-	vec3 pyramidVertexPositions[4] = {
-		top,
-		bottomR,
-		bottomL,
-		bottomF,
-	};
-	vec4 pyramidVertexColors[4] = {
-		brightYellow,
-		brightGreen,
-		brightRed,
-		brightBlue,
-	};
-	GLuint pyramidIndices[4 * 3] = {
-		// Dessous
-		1, 2, 3,
-		// Face "tribord"
-		1, 3, 0,
-		// Face "babord"
-		3, 2, 0,
-		// Face arrière
-		2, 1, 0,
-	};
-	vec3 pyramidFullPositions[4 * 3] = {
-		// Dessous
-		bottomR, bottomL, bottomF,
-		// Face "tribord"
-		bottomR, bottomF, top,
-		// Face "babord"
-		bottomF, bottomL, top,
-		// Face arrière
-		bottomL, bottomR, top,
-	};
-	vec4 pyramidFullColors[4 * 3] = {
-		// Dessous
-		brightGreen, brightRed, brightBlue,
-		// Face "tribord"
-		brightGreen, brightBlue, brightYellow,
-		// Face "babord"
-		brightBlue, brightRed, brightYellow,
-		// Face arrière
-		brightRed, brightGreen, brightYellow,
-	};
-	struct Data
-	{
-		vec3 position;
-		vec4 color;
-	};
-	Data pyramidVertices[4] = {
-		{top, brightYellow},
-		{bottomR, brightGreen},
-		{bottomL, brightRed},
-		{bottomF, brightBlue},
-	};
-
-	// Les ID d'objets OpenGL
-	GLuint pyramidVao = 0;
-	GLuint pyramidPositionVbo = 0;
-	GLuint pyramidColorVbo = 0;
-	GLuint pyramidEbo = 0;
-	GLuint pyramidDataVbo = 0;
-
-	// Les nuanceurs
-	GLuint shaderProgram = 0;
-	GLuint vertexShader = 0;
-	GLuint fragmentShader = 0;
-
-	// Les matrices de tranformation
-	mat4 model = mat4(1.0f);
-	mat4 view = mat4(1.0f);
-	mat4 projection = mat4(1.0f);
-
-	float brightness = 1.0f;
 };
 
 

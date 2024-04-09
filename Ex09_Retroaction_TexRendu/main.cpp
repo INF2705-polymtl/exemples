@@ -29,6 +29,38 @@ using namespace glm;
 
 struct App : public OpenGLApplication
 {
+	Mesh floor;
+	Mesh teapot;
+	Mesh cube;
+	Mesh pole;
+	Mesh sphere;
+	Mesh eye;
+	Mesh quad;
+	Mesh tv;
+	Texture texSteel;
+	Texture texRust;
+	Texture texEye;
+	Texture texConcrete;
+	Texture texBox;
+	Texture texBuilding;
+	Texture texRock;
+
+	Texture texRender;
+	GLuint camFrameBuffer;
+	GLuint camZBuffer;
+
+	ShaderProgram basicProg;
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	OrbitCamera camera = {10, 15, 30, 0};
+	float scanValue = 0;
+	float scanAngle = 0;
+	bool scanPaused = false;
+	float teapotValue = 0;
+
 	// Appelée avant la première trame.
 	void init() override {
 		glEnable(GL_DEPTH_TEST);
@@ -298,38 +330,6 @@ struct App : public OpenGLApplication
 		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
 		basicProg.link();
 	}
-
-	Mesh floor;
-	Mesh teapot;
-	Mesh cube;
-	Mesh pole;
-	Mesh sphere;
-	Mesh eye;
-	Mesh quad;
-	Mesh tv;
-	Texture texSteel;
-	Texture texRust;
-	Texture texEye;
-	Texture texConcrete;
-	Texture texBox;
-	Texture texBuilding;
-	Texture texRock;
-
-	Texture texRender;
-	GLuint camFrameBuffer;
-	GLuint camZBuffer;
-
-	ShaderProgram basicProg;
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	OrbitCamera camera = {10, 15, 30, 0};
-	float scanValue = 0;
-	float scanAngle = 0;
-	bool scanPaused = false;
-	float teapotValue = 0;
 };
 
 

@@ -36,6 +36,26 @@ vec4 brightYellow = {1.0f, 1.0f, 0.2f, 1.0f};
 
 struct App : public OpenGLApplication
 {
+	Mesh pyramid;
+	Mesh cubeBox;
+	Mesh cubeWire;
+	GLuint pyramidColorVbo = 0;
+	ShaderProgram coloredVertexShaders;
+	ShaderProgram solidColorShaders;
+
+	TransformStack model;
+	TransformStack view;
+	TransformStack projection;
+
+	bool perspectiveCamera = true;
+	float perspectiveVerticalFov = 50;
+	float cameraDistance = 5;
+	float cameraRoll = 0;
+	float cameraLatitude = 0;
+	float cameraLongitude = 0;
+
+	float rotatingAngle = 0;
+
 	void init() override {
 		// Config de base, pas de cull, lignes assez visibles.
 		glEnable(GL_DEPTH_TEST);
@@ -391,26 +411,6 @@ struct App : public OpenGLApplication
 		solidColorShaders.use();
 		solidColorShaders.setMat(name, matrix);
 	}
-
-	Mesh pyramid;
-	Mesh cubeBox;
-	Mesh cubeWire;
-	GLuint pyramidColorVbo = 0;
-	ShaderProgram coloredVertexShaders;
-	ShaderProgram solidColorShaders;
-
-	TransformStack model;
-	TransformStack view;
-	TransformStack projection;
-
-	bool perspectiveCamera = true;
-	float perspectiveVerticalFov = 50;
-	float cameraDistance = 5;
-	float cameraRoll = 0;
-	float cameraLatitude = 0;
-	float cameraLongitude = 0;
-
-	float rotatingAngle = 0;
 };
 
 

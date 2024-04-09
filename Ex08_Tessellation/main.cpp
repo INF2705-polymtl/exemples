@@ -28,6 +28,24 @@ using namespace glm;
 
 struct App : public OpenGLApplication
 {
+	Mesh d20;
+	Texture texBox;
+
+	ShaderProgram uniColorProg;
+	ShaderProgram sphereProg;
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	OrbitCamera camera = {5, 30, 30, 0};
+
+	bool wireframeMode = false;
+	bool cullMode = true;
+	bool showingOriginalShape = false;
+	Uniform<int> tessLevelInner = {"tessLevelInner", 1};
+	Uniform<int> tessLevelOuter = {"tessLevelOuter", 1};
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Config de base, pas de cull, lignes assez visibles.
@@ -190,24 +208,6 @@ struct App : public OpenGLApplication
 		sphereProg.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
 		sphereProg.link();
 	}
-
-	Mesh d20;
-	Texture texBox;
-
-	ShaderProgram uniColorProg;
-	ShaderProgram sphereProg;
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	OrbitCamera camera = {5, 30, 30, 0};
-
-	bool wireframeMode = false;
-	bool cullMode = true;
-	bool showingOriginalShape = false;
-	Uniform<int> tessLevelInner = {"tessLevelInner", 1};
-	Uniform<int> tessLevelOuter = {"tessLevelOuter", 1};
 };
 
 

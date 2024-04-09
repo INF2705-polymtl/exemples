@@ -27,6 +27,30 @@ using namespace glm;
 
 struct App : public OpenGLApplication
 {
+	Mesh teapot;
+	Mesh cube;
+	Mesh road;
+	Mesh quad;
+	Texture texBox;
+	Texture texBuilding;
+	Texture texDrywall;
+	Texture texRoad;
+	Texture texScopeReticle;
+	Texture texScopeMask;
+
+	ShaderProgram basicProg;
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	OrbitCamera camera = {10, 30, -30, 0};
+
+	bool showingScope = false;
+	float scopeZoom = 1;
+	bool showingScopeWireframe = false;
+	bool showingScopeNegative = false;
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Config de base, pas de cull, lignes assez visibles.
@@ -309,30 +333,6 @@ struct App : public OpenGLApplication
 		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "frag.glsl");
 		basicProg.link();
 	}
-
-	Mesh teapot;
-	Mesh cube;
-	Mesh road;
-	Mesh quad;
-	Texture texBox;
-	Texture texBuilding;
-	Texture texDrywall;
-	Texture texRoad;
-	Texture texScopeReticle;
-	Texture texScopeMask;
-
-	ShaderProgram basicProg;
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	OrbitCamera camera = {10, 30, -30, 0};
-
-	bool showingScope = false;
-	float scopeZoom = 1;
-	bool showingScopeWireframe = false;
-	bool showingScopeNegative = false;
 };
 
 

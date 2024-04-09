@@ -27,6 +27,26 @@ using namespace glm;
 
 struct App : public OpenGLApplication
 {
+	Mesh cube;
+	Mesh quad;
+	Texture texBox;
+	Texture texDrywall;
+	Texture texWindow;
+	ShaderProgram basicProg;
+	ShaderProgram fogProg;
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	OrbitCamera camera = {5, 30, -30, 0};
+
+	bool showingGlassQuad = false;
+	bool showingGlassCube = false;
+	bool showingFog = false;
+	float fogNear = 2;
+	float fogFar = 7;
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Config de base, pas de cull, lignes assez visibles.
@@ -235,26 +255,6 @@ struct App : public OpenGLApplication
 		fogProg.setMat("projection", projection);
 		projection.pop();
 	}
-
-	Mesh cube;
-	Mesh quad;
-	Texture texBox;
-	Texture texDrywall;
-	Texture texWindow;
-	ShaderProgram basicProg;
-	ShaderProgram fogProg;
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	OrbitCamera camera = {5, 30, -30, 0};
-
-	bool showingGlassQuad = false;
-	bool showingGlassCube = false;
-	bool showingFog = false;
-	float fogNear = 2;
-	float fogFar = 7;
 };
 
 

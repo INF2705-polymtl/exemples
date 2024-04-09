@@ -27,6 +27,26 @@ using namespace glm;
 
 struct App : public OpenGLApplication
 {
+	Mesh cubeBox;
+	Mesh cubeRoad;
+	ShaderProgram allPrograms[2] = {};
+	ShaderProgram& progBasic = allPrograms[0];
+	ShaderProgram& progCompositing = allPrograms[1];
+
+	GLuint texBlank = 0;
+	GLuint texBoxBG = 0;
+	GLuint texBoxText = 0;
+	GLuint texAsphalt = 0;
+	GLuint texLevels = 0;
+
+	TransformStack model;
+	TransformStack view;
+	TransformStack projection;
+
+	OrbitCamera camera = {5, 30, -30, 0};
+
+	int mode = 1;
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Config de base: pas de cull, lignes assez visibles.
@@ -289,26 +309,6 @@ struct App : public OpenGLApplication
 			prog.setMat(name, matrix);
 		}
 	}
-
-	Mesh cubeBox;
-	Mesh cubeRoad;
-	ShaderProgram allPrograms[2] = {};
-	ShaderProgram& progBasic = allPrograms[0];
-	ShaderProgram& progCompositing = allPrograms[1];
-
-	GLuint texBlank = 0;
-	GLuint texBoxBG = 0;
-	GLuint texBoxText = 0;
-	GLuint texAsphalt = 0;
-	GLuint texLevels = 0;
-
-	TransformStack model;
-	TransformStack view;
-	TransformStack projection;
-
-	OrbitCamera camera = {5, 30, -30, 0};
-
-	int mode = 1;
 };
 
 

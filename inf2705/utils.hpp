@@ -42,7 +42,9 @@ inline std::string trim(std::string_view str) {
 }
 
 template <typename T>
-inline constexpr GLenum getTypeGLenum() {
+inline constexpr gl::GLenum getTypeGLenum() {
+	using namespace gl;
+
 	if constexpr (std::is_same_v<T, GLbyte>)
 		return GL_BYTE;
 	else if constexpr (std::is_same_v<T, GLubyte>)
@@ -64,7 +66,7 @@ inline constexpr GLenum getTypeGLenum() {
 }
 
 template <typename T>
-constexpr GLenum getTypeGLenum_v = getTypeGLenum<T>();
+constexpr gl::GLenum getTypeGLenum_v = getTypeGLenum<T>();
 
 template <typename T1, typename T2, typename... Ts>
 inline constexpr bool isTypeOneOf() {

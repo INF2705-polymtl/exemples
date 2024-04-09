@@ -41,6 +41,32 @@ inline uint32_t vec4ToUInt(vec4 v) {
 
 struct App : public OpenGLApplication
 {
+	Mesh meshBoard;
+	Mesh meshTeapot;
+	Texture texRock;
+	Texture texRockDark;
+	Texture texCheckers;
+
+	std::unordered_map<unsigned, SceneObject> objects;
+	std::unordered_map<unsigned, SceneObject*> pieces;
+	SceneObject* board = nullptr;
+
+	ShaderProgram basicProg;
+	ShaderProgram selectionProg;
+	ShaderProgram flashingProg;
+	ShaderProgram* programs[3] = {&basicProg, &selectionProg, &flashingProg};
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	OrbitCamera camera = {10, 90, 180, 0};
+
+	sf::Event::MouseButtonEvent lastMouseBtnEvent = {};
+	bool selecting = false;
+	unsigned selectedObjectID = 0;
+	float flashingValue = 0;
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Config de base, pas de cull, lignes assez visibles.
@@ -318,32 +344,6 @@ struct App : public OpenGLApplication
 		}
 		projection.pop();
 	}
-
-	Mesh meshBoard;
-	Mesh meshTeapot;
-	Texture texRock;
-	Texture texRockDark;
-	Texture texCheckers;
-
-	std::unordered_map<unsigned, SceneObject> objects;
-	std::unordered_map<unsigned, SceneObject*> pieces;
-	SceneObject* board = nullptr;
-
-	ShaderProgram basicProg;
-	ShaderProgram selectionProg;
-	ShaderProgram flashingProg;
-	ShaderProgram* programs[3] = {&basicProg, &selectionProg, &flashingProg};
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	OrbitCamera camera = {10, 90, 180, 0};
-
-	sf::Event::MouseButtonEvent lastMouseBtnEvent = {};
-	bool selecting = false;
-	unsigned selectedObjectID = 0;
-	float flashingValue = 0;
 };
 
 

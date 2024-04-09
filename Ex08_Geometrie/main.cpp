@@ -70,6 +70,29 @@ struct SpriteSheet
 
 struct App : public OpenGLApplication
 {
+	Mesh point;
+	Mesh line;
+	Mesh d20;
+	Texture texRust;
+	SpriteSheet spriteLink;
+	SpriteSheet spriteSword;
+
+	ShaderProgram uniColorProg;
+	ShaderProgram extrudeSpikesProg;
+	ShaderProgram spritesProg;
+
+	TransformStack modelExtrude = {"model"};
+	TransformStack modelSprite = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	OrbitCamera camera = {5, 30, 30, 0};
+
+	int swingStartFrame = -1;
+	int swordStartFrame = -1;
+	Uniform<float> extrudeLength = {"extrudeLength", 0.0f};
+	Uniform<bool> usingWorldPositions = {"usingWorldPositions", false};
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Config de base, pas de cull, lignes assez visibles.
@@ -310,29 +333,6 @@ struct App : public OpenGLApplication
 		spritesProg.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
 		spritesProg.link();
 	}
-
-	Mesh point;
-	Mesh line;
-	Mesh d20;
-	Texture texRust;
-	SpriteSheet spriteLink;
-	SpriteSheet spriteSword;
-
-	ShaderProgram uniColorProg;
-	ShaderProgram extrudeSpikesProg;
-	ShaderProgram spritesProg;
-
-	TransformStack modelExtrude = {"model"};
-	TransformStack modelSprite = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	OrbitCamera camera = {5, 30, 30, 0};
-
-	int swingStartFrame = -1;
-	int swordStartFrame = -1;
-	Uniform<float> extrudeLength = {"extrudeLength", 0.0f};
-	Uniform<bool> usingWorldPositions = {"usingWorldPositions", false};
 };
 
 

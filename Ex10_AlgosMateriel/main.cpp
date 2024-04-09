@@ -28,6 +28,25 @@ using namespace glm;
 
 struct App : public OpenGLApplication
 {
+	static constexpr int gridSize = 30;
+
+	Mesh gridLines;
+	Mesh gridPoints;
+	Mesh referenceLines;
+	Mesh quad;
+	bool fragments[gridSize][gridSize] = {};
+
+	ShaderProgram globalColorProg;
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	Uniform<vec4> globalColor = {"globalColor", vec4(1, 1, 1, 1)};
+	int currentLine = 0;
+	bool usingBresenham = true;
+	bool drawingCircles = false;
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Pas de test de profondeur pour aujourd'hui, on fait tout en 2D.
@@ -356,25 +375,6 @@ struct App : public OpenGLApplication
 		globalColorProg.attachSourceFile(GL_FRAGMENT_SHADER, "uniform_frag.glsl");
 		globalColorProg.link();
 	}
-
-	static constexpr int gridSize = 30;
-
-	Mesh gridLines;
-	Mesh gridPoints;
-	Mesh referenceLines;
-	Mesh quad;
-	bool fragments[gridSize][gridSize] = {};
-
-	ShaderProgram globalColorProg;
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	Uniform<vec4> globalColor = {"globalColor", vec4(1, 1, 1, 1)};
-	int currentLine = 0;
-	bool usingBresenham = true;
-	bool drawingCircles = false;
 };
 
 

@@ -76,6 +76,39 @@ struct LightModel
 
 struct App : public OpenGLApplication
 {
+	Mesh shapeFlat;
+	Mesh normalsFlat;
+	Mesh shapeSmooth;
+	Mesh normalsSmooth;
+	Mesh lightBulb;
+
+	UniformBlock<Material> material;
+	UniformBlock<LightSource> light;
+	UniformBlock<LightModel> lightModel;
+
+	ShaderProgram uniformProg;
+	ShaderProgram lambertProg;
+	ShaderProgram gouraudProg;
+	ShaderProgram phongProg;
+	ShaderProgram* programs[4] = {&uniformProg, &lambertProg, &gouraudProg, &phongProg};
+	ShaderProgram* currentProg = &lambertProg;
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	OrbitCamera camera = {10, 30, 30, 0};
+
+	int drawMode = 2;
+	Uniform<bool> showingAmbientReflection = {"showingAmbientReflection", true};
+	Uniform<bool> showingDiffuseReflection = {"showingDiffuseReflection", true};
+	Uniform<bool> showingSpecularReflection = {"showingSpecularReflection", true};
+	Uniform<bool> usingSmoothNormals = {"usingSmoothNormals", false};
+	Uniform<bool> usingBlinnFormula = {"usingBlinnFormula", true};
+	Uniform<int> numCelShadingBands = {"numCelShadingBands", 1};
+	Uniform<mat3> normalTransformMat = {"normalTransformMat"};
+	Uniform<vec4> globalColor = {"globalColor"};
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Config de base, pas de cull, lignes assez visibles.
@@ -381,39 +414,6 @@ struct App : public OpenGLApplication
 		normalsSmooth.setup();
 		normalsFlat.setup();
 	}
-
-	Mesh shapeFlat;
-	Mesh normalsFlat;
-	Mesh shapeSmooth;
-	Mesh normalsSmooth;
-	Mesh lightBulb;
-
-	UniformBlock<Material> material;
-	UniformBlock<LightSource> light;
-	UniformBlock<LightModel> lightModel;
-
-	ShaderProgram uniformProg;
-	ShaderProgram lambertProg;
-	ShaderProgram gouraudProg;
-	ShaderProgram phongProg;
-	ShaderProgram* programs[4] = {&uniformProg, &lambertProg, &gouraudProg, &phongProg};
-	ShaderProgram* currentProg = &lambertProg;
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	OrbitCamera camera = {10, 30, 30, 0};
-
-	int drawMode = 2;
-	Uniform<bool> showingAmbientReflection = {"showingAmbientReflection", true};
-	Uniform<bool> showingDiffuseReflection = {"showingDiffuseReflection", true};
-	Uniform<bool> showingSpecularReflection = {"showingSpecularReflection", true};
-	Uniform<bool> usingSmoothNormals = {"usingSmoothNormals", false};
-	Uniform<bool> usingBlinnFormula = {"usingBlinnFormula", true};
-	Uniform<int> numCelShadingBands = {"numCelShadingBands", 1};
-	Uniform<mat3> normalTransformMat = {"normalTransformMat"};
-	Uniform<vec4> globalColor = {"globalColor"};
 };
 
 

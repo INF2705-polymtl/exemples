@@ -46,6 +46,30 @@ struct Particle
 
 struct App : public OpenGLApplication
 {
+	std::vector<Particle> particles;
+	GLuint vaoDrawing = 0;
+	GLuint vaoComputation = 0;
+	GLuint vboIn = 0;
+	GLuint vboOut = 0;
+	GLuint tfoComputation = 0;
+	GLuint reqParticles = 0;
+
+	ShaderProgram computationProg;
+	ShaderProgram drawingProg;
+
+	TransformStack model = {"model"};
+	TransformStack view = {"view"};
+	TransformStack projection = {"projection"};
+
+	Uniform<float> deltaTime = {"deltaTime"};
+	Uniform<vec3> forceFieldPosition = {"forceFieldPosition"};
+	Uniform<float> forceFieldStrength = {"forceFieldStrength"};
+	Uniform<float> speedMax = {"speedMax"};
+	Uniform<float> globalSpeedFactor = {"globalSpeedFactor", 1};
+
+	float orthoHeight = 50;
+	bool savingData = false;
+
 	// Appelée avant la première trame.
 	void init() override {
 		// Vu que l'affichage et le traitement vont être un peu plus lourd, on active le cull et désactive le blend et z-test.
@@ -363,30 +387,6 @@ struct App : public OpenGLApplication
 		computationProg.attachSourceFile(GL_VERTEX_SHADER, "particles_compute_vert.glsl");
 		// L'édition de lien (le linking) pour le prog de calcul est faite plus tard après avoir fait glTransformFeedbackVaryings.
 	}
-
-	std::vector<Particle> particles;
-	GLuint vaoDrawing = 0;
-	GLuint vaoComputation = 0;
-	GLuint vboIn = 0;
-	GLuint vboOut = 0;
-	GLuint tfoComputation = 0;
-	GLuint reqParticles = 0;
-
-	ShaderProgram computationProg;
-	ShaderProgram drawingProg;
-
-	TransformStack model = {"model"};
-	TransformStack view = {"view"};
-	TransformStack projection = {"projection"};
-
-	Uniform<float> deltaTime = {"deltaTime"};
-	Uniform<vec3> forceFieldPosition = {"forceFieldPosition"};
-	Uniform<float> forceFieldStrength = {"forceFieldStrength"};
-	Uniform<float> speedMax = {"speedMax"};
-	Uniform<float> globalSpeedFactor = {"globalSpeedFactor", 1};
-
-	float orthoHeight = 50;
-	bool savingData = false;
 };
 
 

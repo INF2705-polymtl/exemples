@@ -40,6 +40,12 @@ inline std::ostream& operator<< (std::ostream& out, const Buffers& buffers) {
 
 struct App : public OpenGLApplication
 {
+	Mesh points;
+
+	ShaderProgram basicProg;
+
+	bool firstRun = true;
+
 	// Appelée avant la première trame.
 	void init() override {
 		glPointSize(500.0f);
@@ -203,12 +209,6 @@ struct App : public OpenGLApplication
 		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
 		basicProg.link();
 	}
-
-	Mesh points;
-
-	ShaderProgram basicProg;
-
-	bool firstRun = true;
 };
 
 
