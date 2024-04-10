@@ -285,7 +285,7 @@ struct App : public OpenGLApplication
 		computationProg.setUniform(forceFieldPosition);
 
 		glBindVertexArray(vaoComputation);
-		// Configurer le VBO d'entrée pour les données de sommets. Il faut répéter les configurations d'attributs quand on bind un différent de VBO.
+		// Configurer le VBO d'entrée pour les données de sommets. Il faut répéter les configurations d'attributs quand on bind un différent VBO.
 		glBindBuffer(GL_ARRAY_BUFFER, vboIn);
 		Particle::setAttribs();
 		// Configurer le VBO de sortie pour contenir les résultats de calculs.
@@ -342,7 +342,7 @@ struct App : public OpenGLApplication
 		);
 		auto dataCopy = particles;
 
-		// Dans notre exemple, on peut facilement gérer des millions de particules. Formater et écrire sur le disque autant de données peut prendre plusieurs secondes. On fait donc cette écriture dans un fil d'exécution (thread) séparé en lui  une copie des données de particules. Ça permet de moins ralentir le fil principal qui fait l'affichage.
+		// Dans notre exemple, on peut facilement gérer des millions de particules. Formater et écrire sur le disque autant de données peut prendre plusieurs secondes. On fait donc cette écriture dans un fil d'exécution (thread) séparé en lui passant une copie des données de particules. Ça permet de moins ralentir le fil principal qui fait l'affichage.
 		// On note la capture par copie des variables `filename` et `dataCopy`.
 		std::thread savingThread([=]() {
 			std::ofstream file(filename);

@@ -103,7 +103,7 @@ struct App : public OpenGLApplication
 		// Créer un tampon de trame (frame buffer);
 		glGenFramebuffers(1, &camFrameBuffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, camFrameBuffer);
-		// Formatter les données de la texture de rendu en RGBA (RGB aurait aussi été suffisant). Comme avec les VBO de sortie, on peut passer nullptr comme données ou passer une image de départ pour le déboguage.
+		// Formatter les données de la texture de rendu en RGBA (RGB aurait aussi été suffisant). Comme avec les VBO de sortie, on peut passer nullptr comme données ou passer une image de départ pour le débogage.
 		texRender.setPixelData(GL_RGBA, nullptr);
 		// Configurer la texture pour les filtres usuels et pas de répétition.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -114,7 +114,7 @@ struct App : public OpenGLApplication
 		glGenRenderbuffers(1, &camZBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, camZBuffer);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, camZBuffer);
-		// Définir ce tampon tampon comme tampon de profondeur.
+		// Définir ce tampon comme tampon de profondeur.
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, texRender.size.x, texRender.size.y);
 		// Lier le framebuffer à la texture de rendu.
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texRender.id, 0);
