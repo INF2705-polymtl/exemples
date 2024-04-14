@@ -18,7 +18,7 @@ out vec4 color;
 
 void main() {
 	color = a_color;
-	// Combiner les matrices de transformation en les multipliant dans l'odre inverse de leur étape dans le pipeline de transformation.
+	// Combiner les matrices de transformation en les multipliant dans l'ordre inverse de leur étape dans le pipeline de transformation.
 	// On fait donc Projection * Visualisation * Modélisation. On se rappelle que la multiplication matricielle est associative, mais pas commutative.
 	mat4 transform = projection * view * model;
 	// Appliquer la matrice de transformation à la position du sommet. Il faut ajouter une coordonnée virtuelle W=1 au vecteur XYZ.

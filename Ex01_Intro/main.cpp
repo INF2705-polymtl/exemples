@@ -93,17 +93,17 @@ int main(int argc, char* argv[]) {
 	// Créer la fenêtre et initialiser le contexte OpenGL.
 	sf::Window window;
 	window.create(
-		{800, 800},             // Dimensions de la fenêtre
-		"Exemple Semaine 1",    // Titre
-		sf::Style::Default,     // Style de fenêtre (avec barre de titre et boutons).
-		sf::ContextSettings(24) // Taille du tampon de profondeur. 24 bit est pas mal le standard.
+		{800, 800},                 // Dimensions de la fenêtre
+		"Exemple Semaine 1: Intro", // Titre
+		sf::Style::Default,         // Style de fenêtre (avec barre de titre et boutons).
+		sf::ContextSettings(24)     // Taille du tampon de profondeur. 24 bit est pas mal le standard.
 	);
 	window.setFramerateLimit(30); // Le FPS d'affichage.
 	window.setActive(true);
 	glbinding::Binding::initialize(nullptr, true); // La résolution des fonctions d'OpenGL.
 
 	// La caméra qui nous permet de visualiser la profondeur avec une perspective.
-	// les détails ne sont pas importants pour aujourd'hui.
+	// Les détails ne sont pas importants pour aujourd'hui.
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glFrustum(-2./3, 2./3, -2./3, 2./3, 4, 8);

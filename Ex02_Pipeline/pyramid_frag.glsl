@@ -11,6 +11,6 @@ out vec4 fragColor;
 
 
 void main() {
-	// Affecter la couleur interpollée venant des sommets à la couleur du fragment.
+	// Affecter la couleur interpolée venant des sommets à la couleur du fragment.
 	fragColor = color;
 }

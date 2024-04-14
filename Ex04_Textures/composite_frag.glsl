@@ -28,7 +28,8 @@ void main() {
 	vec4 texel2 = texture(tex1, texCoords);
 
 	// Appliquer la composition (texel2 par-dessus texel1 par-dessus texel0).
-	fragColor = composite(texel1, texel0);
+	fragColor = texel0;
+	fragColor = composite(texel1, fragColor);
 	fragColor = composite(texel2, fragColor);
 
 	// Si le pixel est très transparent, on s'en débarasse. Ça nous évite d'avoir à penser à l'ordre d'affichage des primitives transparentes. Si vous voulez voir de quel problème je parle, chargez "blank.png" dans texBoxBG (dans la méthode loadTextures). Essayer ensuite le programme en commentant/décommentant le discard suivant.

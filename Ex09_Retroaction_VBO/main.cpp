@@ -72,9 +72,8 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
-		// Vu que l'affichage et le traitement vont être un peu plus lourd, on active le cull et désactive le blend et z-test.
+		// Vu que l'affichage et le traitement vont être un peu plus lourd, on désactive le blend et z-test.
 		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
@@ -145,7 +144,9 @@ struct App : public OpenGLApplication
 
 		// La vitesse max des particules.
 		speedMax = 20;
+		computationProg.use();
 		computationProg.setUniform(speedMax);
+		drawingProg.use();
 		drawingProg.setUniform(speedMax);
 
 		applyOrtho();
@@ -206,6 +207,7 @@ struct App : public OpenGLApplication
 
 		case Space:
 			globalSpeedFactor = 0.9f;
+			computationProg.use();
 			computationProg.setUniform(globalSpeedFactor);
 			break;
 
@@ -215,6 +217,7 @@ struct App : public OpenGLApplication
 			break;
 		}
 
+		drawingProg.use();
 		drawingProg.setUniform(view);
 		applyOrtho();
 	}
@@ -225,6 +228,7 @@ struct App : public OpenGLApplication
 		switch (key.code) {
 		case Space:
 			globalSpeedFactor = 1;
+			computationProg.use();
 			computationProg.setUniform(globalSpeedFactor);
 			break;
 		}
@@ -236,11 +240,13 @@ struct App : public OpenGLApplication
 		// Bouton droit appuyé : champs répulsif
 		auto& mouse = getMouse();
 		// Mettre à jour l'intensité du champs de force selon les boutons de la souris.
+		computationProg.use();
 		computationProg.setUniform(forceFieldStrength);
 		if (mouseBtn.button == sf::Mouse::Left)
 			forceFieldStrength = 10;
 		if (mouseBtn.button == sf::Mouse::Right)
 			forceFieldStrength = -10;
+		computationProg.use();
 		computationProg.setUniform(forceFieldStrength);
 	}
 
@@ -251,6 +257,7 @@ struct App : public OpenGLApplication
 			forceFieldStrength = 0;
 		else if (mouseBtn.button == sf::Mouse::Right)
 			forceFieldStrength = 0;
+		computationProg.use();
 		computationProg.setUniform(forceFieldStrength);
 	}
 
@@ -274,7 +281,7 @@ struct App : public OpenGLApplication
 		computationProg.setUniform(deltaTime);
 
 		// Mettre à jour l'origine du champs de force avec la souris.
-		// Pour obtenir la position de la souris dans la scène (on a juste une scène 2D dans notre cas donc on assume z=0) on applique l'inverse de la matrice projection * visualisation aux coordonnées d'écrans normarlisées de la souris.
+		// Pour obtenir la position de la souris dans la scène (on a juste une scène 2D dans notre cas donc on assume z=0) on applique l'inverse de la matrice projection * visualisation aux coordonnées d'écrans normalisées de la souris.
 		// En effet, si prend les coordonnées de la souris relatives au centre de la fenêtre et normalisées dans [-1,1], on a l'équivalent des coordonnées normalisées d'OpenGL. En appliquant l'inverse des matrices de proj et visu (pas modèle), on obtient donc les coordonnées de scène.
 		// P·V·M·A = A′          où A est un vecteur de position et A′ est sa coords normalisées
 		//     M·A = (P·V)⁻¹·A′  or M·A est la coordonnées de scène (ou universelle).
@@ -375,6 +382,7 @@ struct App : public OpenGLApplication
 			-1,
 			1
 		);
+		drawingProg.use();
 		drawingProg.setUniform(projection);
 	}
 

@@ -186,7 +186,7 @@ struct App : public OpenGLApplication
 			break;
 		}
 
-		// Appliquer la translation à l'objet sélectionner si aplicable.
+		// Appliquer la translation à l'objet sélectionné si aplicable.
 		auto it = objects.find(selectedObjectID);
 		auto* selectedObject = it != objects.end() ? &it->second : nullptr;
 		if (selectedObject != nullptr)

@@ -40,7 +40,7 @@ void main() {
 	// Calculer la position du pic en additionnant le centroïde et la normale étirée. 
 	vec3 spikeTip = faceCentroidPos + extrudeLength * faceNormal;
 
-	// Cacluler les coordonnées finales du pic. Si on a extrudé en utilisant les coords de scène, on applique les matrices de proj et visu, sinon on applique les trois matrices.
+	// Calculer les coordonnées finales du pic. Si on a extrudé en utilisant les coords de scène, on applique les matrices de proj et visu, sinon on applique les trois matrices.
 	mat4 transformMat = (usingWorldPositions) ? projection * view : projection * view * model;
 	vec4 spikeTipNormPos = transformMat * vec4(spikeTip, 1);
 

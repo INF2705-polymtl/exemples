@@ -78,6 +78,14 @@ struct App : public OpenGLApplication
 
 		loadTextures();
 
+		// Affecter l'unité 0 à la variable uniforme tex0 et ainsi de suite. Le sampler avec la valeur 0 lit de l'unité de texture GL_TEXTURE0.
+		for (auto& prog : allPrograms) {
+			prog.use();
+			progCompositing.setTextureUnit("tex0", 0);
+			progCompositing.setTextureUnit("tex1", 1);
+			progCompositing.setTextureUnit("tex2", 2);
+		}
+
 		bindBoxTextures();
 	}
 
@@ -120,18 +128,16 @@ struct App : public OpenGLApplication
 			break;
 		case Num2: // 2: Exemple de route avec texture qui se répète.
 			progBasic.use();
-			// Lier la texture d'asphalte à l'unité de texture 0 et l'unité 0 à la variable uniforme tex0.
+			// Lier la texture d'asphalte à l'unité de texture 0.
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texAsphalt);
-			progBasic.setTextureUnit("tex0", 0);
 			mode = 2;
 			break;
 		case Num3: // 3: Exemple de Mipmap manuel.
 			progBasic.use();
-			// Lier la texture de niveaux à l'unité de texture 0 et l'unité 0 à la variable uniforme tex0.
+			// Lier la texture de niveaux à l'unité de texture 0.
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texLevels);
-			progBasic.setTextureUnit("tex0", 0);
 			mode = 3;
 			break;
 		}
@@ -186,7 +192,7 @@ struct App : public OpenGLApplication
 	}
 
 	GLuint loadTextureFromFile(const std::string& filename, bool generateMipmap = true) {
-		// Lire les pixels de l'image. SFML (la bibliothèque qu'on utilise pour gérer la fenêtre) a déjà une fonctionnalité de chargement d'images. Une alternatives plus légère est stb_image.
+		// Lire les pixels de l'image. SFML (la bibliothèque qu'on utilise pour gérer la fenêtre) a déjà une fonctionnalité de chargement d'images. Une alternative plus légère est stb_image.
 		sf::Image texImg;
 		texImg.loadFromFile(filename);
 		// Beaucoup de bibliothèques importent les images avec x=0,y=0 (donc premier pixel du tableau) au coin haut-gauche de l'image. C'est la convention en graphisme, mais les textures en OpenGL ont leur origine au coin bas-gauche.
@@ -268,18 +274,15 @@ struct App : public OpenGLApplication
 
 	void bindBoxTextures() {
 		progCompositing.use();
-		// Lier la texture de carton à l'unité de texture 0 et l'unité 0 à la variable uniforme tex0.
+		// Lier la texture de carton à l'unité de texture 0.
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texBoxBG);
-		progCompositing.setTextureUnit("tex0", 0);
-		// Lier la texture de texte à l'unité de texture 1 et l'unité 1 à la variable uniforme tex1.
+		// Lier la texture de texte à l'unité de texture 1.
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texBoxText);
-		progCompositing.setTextureUnit("tex1", 1);
-		// Lier la texture transparente à l'unité de texture 2 et l'unité 2 à la variable uniforme tex2.
+		// Lier la texture transparente à l'unité de texture 2.
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, texBlank);
-		progCompositing.setTextureUnit("tex2", 2);
 	}
 
 	void updateCamera() {
@@ -315,7 +318,7 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	// Pour des fins pédagogiques on désactive l'antialias automatique de OpenGL pour mieux illustrer les filtrage des textures.
+	// Pour des fins pédagogiques on désactive l'antialias automatique de OpenGL pour mieux illustrer le filtrage des textures.
 	settings.context.antialiasingLevel = 0;
 
 	App app;

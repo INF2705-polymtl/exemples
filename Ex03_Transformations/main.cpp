@@ -93,26 +93,30 @@ struct App : public OpenGLApplication
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		// Les touches + et - servent à rapprocher et éloigner la caméra orbitale.
+		// Les touches + et - avec Shift servent à réduire/élargir le champs de vision (FOV).
 		case Add:
-			cameraDistance -= 0.5f;
-			if (not perspectiveCamera)
-				// Avec une projection orthogonale, changer la distance de la caméra ne change pas le champs de vision, car celui-ci est contrôlé par la boîte de projection. Il faut donc changer la boîte de projection quand on change la distance de la caméra orbitale.
-				applyOrtho();
+			if (key.shift) {
+				perspectiveVerticalFov -= 5.0f;
+				if (perspectiveCamera)
+					applyPerspective();
+				break;
+			} else {
+				cameraDistance -= 0.5f;
+				if (not perspectiveCamera)
+					// Avec une projection orthogonale, changer la distance de la caméra ne change pas le champs de vision, car celui-ci est contrôlé par la boîte de projection. Il faut donc changer la boîte de projection quand on change la distance de la caméra orbitale.
+					applyOrtho();
+			}
 			break;
 		case Subtract:
-			cameraDistance += 0.5f;
-			if (not perspectiveCamera)
-				applyOrtho();
-			break;
-		case Multiply:
-			perspectiveVerticalFov -= 5.0f;
-			if (perspectiveCamera)
-				applyPerspective();
-			break;
-		case Divide:
-			perspectiveVerticalFov += 5.0f;
-			if (perspectiveCamera)
-				applyPerspective();
+			if (key.shift) {
+				perspectiveVerticalFov += 5.0f;
+				if (perspectiveCamera)
+					applyPerspective();
+			} else {
+				cameraDistance += 0.5f;
+				if (not perspectiveCamera)
+					applyOrtho();
+			}
 			break;
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		case Up:

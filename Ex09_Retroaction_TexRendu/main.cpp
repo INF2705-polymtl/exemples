@@ -73,7 +73,7 @@ struct App : public OpenGLApplication
 		glLineWidth(3.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
-		// On utilise les nuanceur de base qui échantillonent les textures, pas besoin de quoique ce soit de fancy.
+		// On utilise les nuanceurs de base qui échantillonnent les textures, pas besoin de quoique ce soit de fancy.
 		loadShaders();
 
 		teapot = Mesh::loadFromWavefrontFile("teapot.obj")[0];
@@ -150,12 +150,12 @@ struct App : public OpenGLApplication
 		} view.pop();
 		// Lier le framebuffer de la caméra secondaire.
 		glBindFramebuffer(GL_FRAMEBUFFER, camFrameBuffer);
-		// Il faut faire le glClear() pour chaque buffer (il s'applique sur le buffer de trame actuel, qui est lié par glBindFramebuffer).
-		// On peut choisir une couleur de fond différent pour le rendu de la caméra secondaire.
+		// Il faut faire le glClear() pour chaque buffer, car il s'applique sur le buffer de trame actuel, qui est lié par glBindFramebuffer.
+		// On peut choisir une couleur de fond différente pour le rendu de la caméra secondaire.
 		glClearColor(0.2f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Lire le viewport actuel pour le restaurer plus tard.
-		struct { GLint x, y, width, height; } viewport;
+		struct { GLint x, y, width, height; } viewport = {};
 		glGetIntegerv(GL_VIEWPORT, (GLint*)&viewport);
 		// Établir un viewport qui a les mêmes dimensions que la texture de rendu.
 		glViewport(0, 0, texRender.size.x, texRender.size.y);
@@ -172,9 +172,9 @@ struct App : public OpenGLApplication
 		glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
 		// Restaurer la perspective habituelle.
 		basicProg.setMat(projection);
-		// Délier le framebuffer, donc utiliser le framebuffer de base qui est celui qu'on utilise habituellement.
+		// Délier le framebuffer, donc utiliser le framebuffer de base qui est celui de la fenêtre.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		// Faire le clear avec le turquoise foncé qu'on utilise depuis le début de la session.
+		// Faire le glClear avec le turquoise foncé qu'on utilise depuis le début de la session.
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Dessiner la scène normalement.

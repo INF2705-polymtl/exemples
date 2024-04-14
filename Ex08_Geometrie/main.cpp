@@ -223,8 +223,8 @@ struct App : public OpenGLApplication
 		}
 
 		// Mettre à jour les variables uniformes.
-		extrudeLength.updateProgram(extrudeSpikesProg);
-		usingWorldPositions.updateProgram(extrudeSpikesProg);
+		extrudeSpikesProg.setUniform(extrudeLength);
+		extrudeSpikesProg.setUniform(usingWorldPositions);
 	}
 
 	// Appelée lors d'un mouvement de souris.

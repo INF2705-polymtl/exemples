@@ -41,7 +41,7 @@ void main() {
 	velocity *= globalSpeedFactor;
 
 	vec3 velocityDir = normalize(velocity);
-	// Encore là, normalisation peut faire de NaN si la vitesse est nulle. On force donc la direction vers l'origine du champs de force.
+	// Encore là, la normalisation peut faire de NaN si la vitesse est nulle. On force donc la direction vers l'origine du champs de force.
 	if (any(isnan(velocityDir)))
 		velocityDir = forceFieldDir;
 	// Borner la vitesse.

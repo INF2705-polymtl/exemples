@@ -200,7 +200,7 @@ public:
 
 	template <typename T>
 	void setUniform(Uniform<T>& uniValue) {
-		uniValue.updateProgram(*this);
+		setUniform(uniValue.getLoc(*this), uniValue.get());
 	}
 
 	void setUniform(const TransformStack& val) {
@@ -275,8 +275,8 @@ public:
 	const std::string& getName() const { return name_; }
 
 	void setName(const std::string& name) {
-		// Changer le nom de la variable invalide les localisations.
 		name_ = name;
+		// Changer le nom de la variable invalide les localisations.
 		auto oldLocs = std::move(locs_);
 		locs_.clear();
 		for (auto&& [progObj, loc] : oldLocs)
@@ -305,12 +305,6 @@ public:
 		return it->second;
 	}
 
-	virtual void updateProgram(ShaderProgram& prog) {
-		// Mettre à jour la variable uniforme en utilisant
-		prog.use();
-		prog.setUniform(getLoc(prog), value_);
-	}
-
 	virtual GLuint queryUniformLocation(const ShaderProgram& prog) const {
 		return prog.getUniformLocation(name_);
 	}
@@ -321,7 +315,7 @@ protected:
 	std::unordered_map<GLuint, GLuint> locs_;
 };
 
-// Un bloc de données uniforme. C'est une variable uniforme mais chargé avec dans buffer (un Uniform Buffer Object, ou UBO) et un index plutôt qu'avec des glUniform*. On hérite de Uniform<T> pour réutiliser les fonctionnalités de sauvegarde de localisation.
+// Un bloc de données uniforme. C'est une variable uniforme mais chargé dans un buffer (un Uniform Buffer Object, ou UBO) et un index plutôt qu'avec des glUniform*. On hérite de Uniform<T> pour réutiliser les fonctionnalités de sauvegarde de localisation.
 template <typename T>
 class UniformBlock : public Uniform<T>
 {
@@ -364,11 +358,6 @@ public:
 	void bindToProgram(ShaderProgram& prog) {
 		prog.use();
 		prog.bindUniformBlock(this->getLoc(prog), bindingIndex_);
-	}
-
-	void updateProgram(ShaderProgram& prog) override {
-		updateBuffer();
-		bindToProgram(prog);
 	}
 
 	GLuint queryUniformLocation(const ShaderProgram& prog) const override {

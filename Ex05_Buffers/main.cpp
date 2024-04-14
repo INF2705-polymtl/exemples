@@ -30,7 +30,7 @@ struct Buffers
 };
 
 inline std::ostream& operator<< (std::ostream& out, const Buffers& buffers) {
-	return out << std::format("{:.2f} | {:.2f} {:.2f} {:.2f} {:.2f} | {}",
+	return out << std::format("{:.2f} | {:.2f} {:.2f} {:.2f} {:.2f} | {:3}",
 		buffers.z,
 		buffers.color.r, buffers.color.g, buffers.color.b, buffers.color.a,
 		buffers.stencil
@@ -185,9 +185,11 @@ struct App : public OpenGLApplication
 		glReadPixels(100, 100, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &result.stencil);
 
 		// Afficher les buffers.
-		std::cout << "  frag    " << frag << "\n"
-		          << "  init    " << init << "\n"
-		          << "  result  " << result << "\n"
+		std::cout << "             Z  |    Color Buffer     | Stencil" << "\n"
+		          << "----------------+---------------------+----------" << "\n"
+		          << "  frag     " << frag << "\n"
+		          << "  init     " << init << "\n"
+		          << "  result   " << result << "\n"
 		          << std::endl;
 	}
 
@@ -205,7 +207,7 @@ struct App : public OpenGLApplication
 
 	void loadShaders() {
 		basicProg.create();
-		basicProg.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
+		basicProg.attachSourceFile(GL_VERTEX_SHADER, "manual_vert.glsl");
 		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
 		basicProg.link();
 	}
