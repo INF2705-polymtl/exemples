@@ -164,6 +164,7 @@
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
     <None Include="composite_frag.glsl" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

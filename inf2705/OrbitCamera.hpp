@@ -90,7 +90,6 @@ struct OrbitCamera
 	}
 
 	void updateProgram(ShaderProgram& prog, std::string_view uniformName, TransformStack& viewMatrix) {
-		prog.use();
 		updateProgram(prog, viewMatrix);
 	}
 

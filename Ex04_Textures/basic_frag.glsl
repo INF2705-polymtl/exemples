@@ -1,11 +1,13 @@
 #version 410
 
 
+// L'unité de texture à échantillonner. Dans le programme principal, c'est un glUniformi qu'il faut faire pour l'affecter.
+uniform sampler2D tex0;
+
+
 // Les coordonnées de texture interpolées pour le fragment.
 in vec2 texCoords;
 
-// L'unité de texture à échantillonner. Dans le programme principal, c'est un glUniformi qu'il faut faire pour l'affecter.
-uniform sampler2D tex0;
 
 out vec4 fragColor;
 

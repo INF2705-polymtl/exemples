@@ -126,7 +126,7 @@ public:
 
 	void printKeybinds() const {
 		if (not keybindMessage_.empty())
-			std::cout << "Raccourcis clavier:" << "\n"
+			std::cout << "\n" << "Raccourcis clavier:" << "\n"
 			          << keybindMessage_ << "\n" << std::endl;
 	}
 

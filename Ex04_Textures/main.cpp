@@ -49,15 +49,23 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
-		// Config de base: pas de cull, lignes assez visibles.
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"1 : Boîte en carton avec du texte compositionné." "\n"
+			"2 : Exemple de route avec texture qui se répète." "\n"
+			"3 : Exemple de Mipmap manuel." "\n"
+		);
+
 		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POINT_SMOOTH);
-		glPointSize(3.0f);
-		glLineWidth(3.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
 		// On peut demander le nombre maximal d'unités de texture (les glActiveTexture). Le standard demande au moins 80.
@@ -76,14 +84,26 @@ struct App : public OpenGLApplication
 		cubeBox = Mesh::loadFromWavefrontFile("cube_box.obj")[0];
 		cubeRoad = Mesh::loadFromWavefrontFile("cube_road.obj")[0];
 
-		loadTextures();
+		// Charger les textures. On peut expérimenter avec la génération automatique de mipmaps (deuxième paramètre de la fonction).
+		texBlank = loadTextureFromFile("blank.png", false);
+		texBoxBG = loadTextureFromFile("box_bg.png", true);
+		texBoxText = loadTextureFromFile("box_text.png", false);
+
+		texAsphalt = loadTextureFromFile("asphalt.png", false);
+		// Ici, vous pouvez expérimenter avec le mode de dépassement des coordonnées de textures.
+		// Les valeurs possibles sont GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, ou GL_MIRROR_CLAMP_TO_EDGE.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		// Le "{}" dans le nom du fichier sera remplacé par le numéro de détail (on a donc "lvl0.png", "lvl1.png", ..., "lvl5.png").
+		texLevels = loadMipmapFromFiles("lvl{}.png", 6);
 
 		// Affecter l'unité 0 à la variable uniforme tex0 et ainsi de suite. Le sampler avec la valeur 0 lit de l'unité de texture GL_TEXTURE0.
 		for (auto& prog : allPrograms) {
 			prog.use();
-			progCompositing.setTextureUnit("tex0", 0);
-			progCompositing.setTextureUnit("tex1", 1);
-			progCompositing.setTextureUnit("tex2", 2);
+			progCompositing.setInt("tex0", 0);
+			progCompositing.setInt("tex1", 1);
+			progCompositing.setInt("tex2", 2);
 		}
 
 		bindBoxTextures();
@@ -162,33 +182,6 @@ struct App : public OpenGLApplication
 	void onResize(const sf::Event::SizeEvent& event) override {
 		// Mettre à jour la matrice de projection avec le nouvel aspect de fenêtre après le redimensionnement.
 		applyPerspective();
-	}
-
-	void loadShaders() {
-		progBasic.create();
-		progBasic.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
-		progBasic.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
-		progBasic.link();
-
-		progCompositing.create();
-		progCompositing.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
-		progCompositing.attachSourceFile(GL_FRAGMENT_SHADER, "composite_frag.glsl");
-		progCompositing.link();
-	}
-
-	void loadTextures() {
-		texBlank = loadTextureFromFile("blank.png", false);
-		texBoxBG = loadTextureFromFile("box_bg.png", true);
-		texBoxText = loadTextureFromFile("box_text.png", true);
-
-		texAsphalt = loadTextureFromFile("asphalt.png", false);
-		// Ici, vous pouvez expérimenter avec le mode de dépassement des coordonnées de textures.
-		// Les valeurs possibles sont GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, ou GL_MIRROR_CLAMP_TO_EDGE.
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-
-		// Le "{}" dans le nom du fichier sera remplacé par le numéro de détail (on a donc "lvl0.png", "lvl1.png", ..., "lvl5.png").
-		texLevels = loadMipmapFromFiles("lvl{}.png", 6);
 	}
 
 	GLuint loadTextureFromFile(const std::string& filename, bool generateMipmap = true) {
@@ -311,6 +304,18 @@ struct App : public OpenGLApplication
 			prog.use();
 			prog.setMat(name, matrix);
 		}
+	}
+
+	void loadShaders() {
+		progBasic.create();
+		progBasic.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
+		progBasic.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
+		progBasic.link();
+
+		progCompositing.create();
+		progCompositing.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
+		progCompositing.attachSourceFile(GL_FRAGMENT_SHADER, "composite_frag.glsl");
+		progCompositing.link();
 	}
 };
 

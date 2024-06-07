@@ -1,13 +1,15 @@
 #version 410
 
 
-// Les coordonnées de texture interpolées pour le fragment.
-in vec2 texCoords;
-
 // Les unités de texture à échantillonner. tex2 est la texture du dessus, tex1 le milieu et tex0 en-dessous.
 uniform sampler2D tex0;
 uniform sampler2D tex1;
 uniform sampler2D tex2;
+
+
+// Les coordonnées de texture interpolées pour le fragment.
+in vec2 texCoords;
+
 
 out vec4 fragColor;
 
