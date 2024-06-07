@@ -27,12 +27,10 @@ struct SceneObject
 	TransformStack modelMat; // La matrice de modélisation propre à l'objet
 
 	void draw(ShaderProgram& prog) {
-		static Uniform<mat4> uniform = {"model", mat4(1)};
-
 		prog.use();
 		for (auto&& tex : textures)
 			tex.bindToProgram(prog);
-		prog.setMat(uniform.getLoc(prog), modelMat);
+		prog.setMat(modelMat);
 		mesh->draw();
 	}
 };

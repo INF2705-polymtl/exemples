@@ -150,17 +150,15 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\inf2705\Mesh.hpp" />
     <ClInclude Include="..\inf2705\OpenGLApplication.hpp" />
     <ClInclude Include="..\inf2705\sfml_utils.hpp" />
     <ClInclude Include="..\inf2705\utils.hpp" />
-    <ClInclude Include="..\inf2705\ShaderProgram.hpp" />
-    <ClInclude Include="..\inf2705\TransformStack.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pyramid_frag.glsl" />
     <None Include="pyramid_brightness_frag.glsl" />
     <None Include="pyramid_vert.glsl" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakeLists.txt" />

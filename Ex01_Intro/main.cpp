@@ -17,12 +17,12 @@ using namespace gl;
 
 
 // Quelques couleurs en format RGB réel (0 à 1).
-float grey[] =         {0.5f, 0.5f, 0.5f};
-float white[] =        {1.0f, 1.0f, 1.0f};
-float brightRed[] =    {1.0f, 0.2f, 0.2f};
-float brightGreen[] =  {0.2f, 1.0f, 0.2f};
-float brightBlue[] =   {0.2f, 0.2f, 1.0f};
-float brightYellow[] = {1.0f, 1.0f, 0.2f};
+const float grey[] =   {0.5f, 0.5f, 0.5f};
+const float white[] =  {1.0f, 1.0f, 1.0f};
+const float red[] =    {1.0f, 0.2f, 0.2f};
+const float green[] =  {0.2f, 1.0f, 0.2f};
+const float blue[] =   {0.2f, 0.2f, 1.0f};
+const float yellow[] = {1.0f, 1.0f, 0.2f};
 
 
 void drawWhiteTriangle() {
@@ -33,6 +33,7 @@ void drawWhiteTriangle() {
 
 	glColor3fv(white);
 	glBegin(GL_TRIANGLES); {
+		// Notez l'ordre de dessin des sommets.
 		glVertex3f( 0.0f,  0.5f, 0.0f);
 		glVertex3f(-0.5f, -0.5f, 0.0f);
 		glVertex3f( 0.5f, -0.5f, 0.0f);
@@ -42,21 +43,21 @@ void drawWhiteTriangle() {
 void drawColoredTriangle() {
 	// Ici, en mettant une couleur avant chaque sommet on peut observer l'interpolation des attributs de sommet.
 	glBegin(GL_TRIANGLES); {
-		glColor3fv(brightRed);
+		glColor3fv(red);
 		glVertex3f( 0.0f,  0.5f,  0.0f);
-		glColor3fv(brightGreen);
+		glColor3fv(green);
 		glVertex3f(-0.5f, -0.5f,  0.0f);
-		glColor3fv(brightBlue);
+		glColor3fv(blue);
 		glVertex3f( 0.5f, -0.5f,  0.0f);
 	} glEnd();
 }
 
 void drawPyramid() {
 	// On va s'éviter de la répétition de code en se déclarant des variables pour nos sommets.
-	static float top[] =     { 0.0f,  0.2f,  0.0f};
-	static float bottom1[] = {-0.3f, -0.2f, -0.1f};
-	static float bottom2[] = { 0.3f, -0.2f, -0.1f};
-	static float bottom3[] = { 0.0f, -0.2f,  0.7f};
+	static float top[] =     { 0.0f,  0.5f,  0.0f};
+	static float bottom1[] = {-0.5f, -0.2f, -0.2f};
+	static float bottom2[] = { 0.5f, -0.2f, -0.2f};
+	static float bottom3[] = { 0.0f, -0.2f,  0.8f};
 
 	// Il faut faire attention à la cohérence de l'ordre de traçage des sommets.
 	// Par défaut, les faces "avant" sont les faces dessinées en sens antihoraire (configurable avec glFrontFace).
@@ -69,19 +70,19 @@ void drawPyramid() {
 		glVertex3fv(bottom3);
 
 		// Face "tribord"
-		glColor3fv(brightGreen);
+		glColor3fv(green);
 		glVertex3fv(bottom1);
 		glVertex3fv(bottom3);
 		glVertex3fv(top);
 
 		// Face "babord"
-		glColor3fv(brightRed);
+		glColor3fv(red);
 		glVertex3fv(bottom3);
 		glVertex3fv(bottom2);
 		glVertex3fv(top);
 
 		// Face arrière
-		glColor3fv(brightBlue);
+		glColor3fv(blue);
 		glVertex3fv(bottom2);
 		glVertex3fv(bottom1);
 		glVertex3fv(top);
@@ -137,7 +138,7 @@ int main(int argc, char* argv[]) {
 		// On efface ce qui a dans le tampon.
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Commentez/décommentez pour tester la rotation.
+		// Commentez/décommentez pour tester la rotation en continue. Ça permet entre autre d'observer la face arrière de la forme dessinée.
 		glRotatef(1, 0, 1, 0);
 
 		// Commentez/décommentez chacune des lignes pour tester chaque affichage.
@@ -146,11 +147,13 @@ int main(int argc, char* argv[]) {
 		drawPyramid();
 
 		// SFML fait le rafraîchissement de la fenêtre ainsi que le contrôle du framerate pour nous.
+		// La fonction display fait le buffer swap (comme glutSwapBuffers) et attend à la prochaine trame selon le FPS qu'on a spécifié avec setFramerateLimit.
 		window.display();
-		// On pourrait gérer les évènements de fenêtre (clavier, redimensionnement, fermeture, etc).
+
+		// On pourrait gérer les évènements de fenêtre (clavier, redimensionnement, fermeture, etc), mais pour aujourd'hui on va juste traiter l'événement de fermeture de fenêtre.
 		sf::Event e;
 		while (window.pollEvent(e)) {
-			// On arrête si l'utilisateur appuie sur le X de la fenêtre.
+			// On arrête si l'utilisateur appuie sur le X de la fenêtre (ou le raccourci clavier associé tel que Alt+F4 sur Windows).
 			if (e.type == sf::Event::EventType::Closed)
 				window.close();
 		}

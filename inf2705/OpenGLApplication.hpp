@@ -46,59 +46,60 @@ class OpenGLApplication
 public:
 	virtual ~OpenGLApplication() = default;
 
-	const sf::Window& getWindow() const { return window_; }
-
 	void run(int& argc, char* argv[], std::string_view title = "OpenGL Application", const WindowSettings& settings = {}) {
+		// On pourrait avoir besoin des arguments de ligne de commande. Ça donne entre autre le nom de l'exécutable.
 		argc_ = argc;
 		argv_ = argv;
+
 		settings_ = settings;
 
-		startTime_ = std::chrono::system_clock::now();
 
+		// Créer la fenêtre et afficher les infos du contexte OpenGL.
 		createWindowAndContext(title);
 		printGLInfo();
 		std::cout << std::endl;
 
 		init(); // À surcharger
 
+		// Commencer le chronomètre qui mesure le temps des trames. C'est des fois plus pratique d'avoir le temps depuis la dernière trame que le numéro de trame.
+		startTime_ = std::chrono::system_clock::now();
 		lastFrameTime_ = std::chrono::high_resolution_clock::now();
 		deltaTime_ = 1.0f / settings_.fps;
+
+		// État initial de la souris avant la première trame.
 		currentMouseState_ = lastMouseState_ = getMouseState(window_);
 
+		// Compteur de trames effectuées.
+		frame_ = 0;
+
+		// Tant que la fenêtre est ouverte (mis à jour dans la gestion d'événements) :
 		while (window_.isOpen()) {
 			drawFrame(); // À surcharger
+
+			// SFML fait le rafraîchissement de la fenêtre ainsi que le contrôle du framerate pour nous.
+			// La fonction display fait le buffer swap (comme glutSwapBuffers) et attend à la prochaine trame selon le FPS qu'on a spécifié avec setFramerateLimit.
 			window_.display();
 
 			handleEvents();
 			updateDeltaTime();
+
 			frame_++;
 		}
 	}
 
-	void printGLInfo() {
-		// Afficher les informations de base de la carte graphique et de la version OpenGL des drivers.
-		auto openglVersion = glGetString(GL_VERSION);
-		auto openglVendor = glGetString(GL_VENDOR);
-		auto openglRenderer = glGetString(GL_RENDERER);
-		auto glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-		auto& sfmlSettings = window_.getSettings();
-		printf("OpenGL       %s\n", openglVersion);
-		printf("GPU          %s, %s\n", openglRenderer, openglVendor);
-		printf("GLSL         %s\n", glslVersion);
-		printf("SFML Context %i.%i\n", sfmlSettings.majorVersion, sfmlSettings.minorVersion);
-		printf("Depth bits   %i\n", sfmlSettings.depthBits);
-		printf("Stencil bits %i\n", sfmlSettings.stencilBits);
-	}
+	const sf::Window& getWindow() const { return window_; }
 
-	// Obtenir l'état de la souris (mis à jour une fois par trame avant la gestion d'événements).
+	// État de la souris (mis à jour une fois par trame avant la gestion d'événements).
 	const MouseState& getMouse() const {
 		return currentMouseState_;
 	}
 
+	// Numéro de la trame courante (première trame = 0).
 	int getCurrentFrameNumber() const {
 		return frame_;
 	}
 
+	// Temps de puis la dernière trame (mis à jour entre les trame).
 	float getFrameDeltaTime() const {
 		return deltaTime_;
 	}
@@ -118,6 +119,21 @@ public:
 		std::time_t timestamp = std::chrono::system_clock::to_time_t(startTime_);
 		auto locTime = localtime(&timestamp);
 		return (std::stringstream() << std::put_time(locTime, format.c_str())).str();
+	}
+
+	void printGLInfo() {
+		// Afficher les informations de base de la carte graphique et de la version OpenGL des drivers.
+		auto openglVersion = glGetString(GL_VERSION);
+		auto openglVendor = glGetString(GL_VENDOR);
+		auto openglRenderer = glGetString(GL_RENDERER);
+		auto glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+		auto& sfmlSettings = window_.getSettings();
+		printf("OpenGL         %s\n", openglVersion);
+		printf("GPU            %s, %s\n", openglRenderer, openglVendor);
+		printf("GLSL           %s\n", glslVersion);
+		printf("SFML Context   %i.%i\n", sfmlSettings.majorVersion, sfmlSettings.minorVersion);
+		printf("Depth bits     %i\n", sfmlSettings.depthBits);
+		printf("Stencil bits   %i\n", sfmlSettings.stencilBits);
 	}
 
 	sf::Image captureCurrentFrame() {
@@ -144,29 +160,32 @@ public:
 	}
 
 	void saveScreenshot(const std::string& folder = "screenshots", const std::string& filename = "") {
+		using namespace std::filesystem;
+
 		// Capturer la trame actuelle.
 		sf::Image frameImage = captureCurrentFrame();
 
+		// Si le dossier cible n'existe pas, le créer.
+		path folderPath(folder);
+		if (not folder.empty())
+			create_directory(folderPath);
+
+		// Les éléments du nom de fichier.
 		int frameNumber = frame_;
 		std::string dateTimeStr = formatStartTime("%Y%m%d_%H%M%S");
 		std::string execFilename = argv_[0];
+
 		// Faire l'écriture dans le fichier dans un fil parallèle pour moins ralentir le fil principal avec une écriture sur le disque. La capture (avec glReadPixels) doit être faite dans le fil principal, mais l'écriture sur le disque peut être faite en parallèle sans causer de problème de synchronisation. On remarque la capture par copie.
 		std::thread savingThread([=]() {
-			using namespace std::filesystem;
-
-			path folderPath(folder);
-			if (not folder.empty())
-				create_directory(folderPath);
-
 			std::string filePathStr;
 			if (not filename.empty()) {
-				filePathStr = (folderPath / path(filename)).make_preferred().string();
+				filePathStr = (folderPath/path(filename)).make_preferred().string();
 			} else {
 				// Si aucun nom de fichier est fourni, construire un nom avec le nom de l'exécutable, l'heure de démarrage de l'application et le numéro de la trame actuelle.
-				path execPath = path(execFilename).stem();
+				path execName = path(execFilename).stem();
 				filePathStr = std::format(
 					"{}_{}_{}.png",
-					(folderPath / execPath).make_preferred().string(),
+					(folderPath/execName).make_preferred().string(),
 					dateTimeStr,
 					frameNumber
 				);
@@ -176,6 +195,8 @@ public:
 		// Détacher le fil pour qu'il se gère tout seul, donc pas besoin de join() ou de garder la variable vivante.
 		savingThread.detach();
 	}
+
+	// Les méthodes virtuelles suivantes sont à surcharger.
 
 	// Appelée avant la première trame.
 	virtual void init() { }

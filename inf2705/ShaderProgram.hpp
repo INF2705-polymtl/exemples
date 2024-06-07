@@ -177,8 +177,12 @@ public:
 	template <typename T>
 	void setUniform(GLuint loc, const T& val) {
 		// Du beau C++ pour choisir à la compilation quelle méthode choisir pour mettre à jour une variable uniforme selon le type de valeur.
-		if constexpr (std::is_same_v<T, bool>) {
-			setBool(loc, val);
+		if constexpr (isTypeOneOf_v<T, vec2, vec3, vec4, ivec2, ivec3, ivec4, uvec2, uvec3, uvec4>) {
+			setVec(loc, val);
+		} else if constexpr (isTypeOneOf_v<T, mat2, mat3, mat4, TransformStack>) {
+			setMat(loc, val);
+		} else if constexpr (std::is_same_v<T, bool>) {
+			setBool(loc, (bool)val);
 		} else if constexpr (std::is_integral_v<T>) {
 			if constexpr (std::is_signed_v<T>)
 				setInt(loc, (int)val);
@@ -186,10 +190,6 @@ public:
 				setUint(loc, (unsigned)val);
 		} else if constexpr (std::is_floating_point_v<T>) {
 			setFloat(loc, (float)val);
-		} else if constexpr (isTypeOneOf_v<T, vec2, vec3, vec4, ivec2, ivec3, ivec4, uvec2, uvec3, uvec4>) {
-			setVec(loc, val);
-		} else if constexpr (isTypeOneOf_v<T, mat2, mat3, mat4, TransformStack>) {
-			setMat(loc, val);
 		}
 	}
 

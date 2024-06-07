@@ -38,6 +38,7 @@ inline std::string getKeyDescription(sf::Event::KeyEvent key) {
 	return std::string(sf::Keyboard::getDescription(key.scancode));
 }
 
+// Obtenir le nom (string) d'une touche de clavier par son code (enum).
 inline std::string getKeyEnumName(sf::Keyboard::Key key) {
 	using enum sf::Keyboard::Key;
 	static const std::unordered_map<sf::Keyboard::Key, std::string> keyToName = {
@@ -149,6 +150,7 @@ inline std::string getKeyEnumName(sf::Keyboard::Key key) {
 	return it != keyToName.end() ? it->second : "";
 }
 
+// Obtenir le code (enum) d'une touche de clavier par son nom (string).
 inline sf::Keyboard::Key getKeyEnum(const std::string& name) {
 	using enum sf::Keyboard::Key;
 	static const std::unordered_map<std::string, sf::Keyboard::Key> nameToKey = {
