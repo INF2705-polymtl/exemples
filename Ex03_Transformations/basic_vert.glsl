@@ -1,24 +1,34 @@
 #version 410
 
 
+// Les matrices de transformations. Oui, on peut donner des valeurs par défaut aux variables uniformes. C'est la valeurs qu'elles ont si aucun glUniform* n'est fait dans le programme principal.
+uniform mat4 model = mat4(1);
+uniform mat4 view = mat4(1);
+uniform mat4 projection = mat4(1);
+
+
 // Les attributs 0, 1, 2 sont les attributs définis par la classe Mesh et sont les propriétés de base d'un sommet.
 layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec3 a_normal;
 layout(location = 2) in vec2 a_texCoords;
-// L'attribut 3 est la couleur définie dans un autre VBO. On n'est pas obligé de s'en servir. Dans notre code, on ne définit pas de VBO pour la couleur par sommet dans le VAO du cube. a_color va donc être initialisé par défaut pour les cubes, puis non utilisé dans le nuanceur de fragment qui utilise une couleur globale.
+// L'attribut 3 est la couleur définie dans un autre VBO. On n'est pas obligé de s'en servir. Dans notre code, on ne définit pas de VBO pour la couleur par sommet dans le VAO du cube (on le fait seulement pour la pyramide). a_color va donc être initialisé par défaut pour les cubes, puis non utilisé dans le nuanceur de fragments qui utilise une couleur globale.
 layout(location = 3) in vec4 a_color;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
 
 out vec4 color;
 
 
 void main() {
-	// On pourrait passer la matrice de transformation (MVP) déjà calculée sur le CPU comme variable uniforme. C'est aussi une bonne idée d'avoir les trois matrices séparées dans le nuanceur de sommets pour garder plus de contrôle sur les calculs faits.
+	// Combiner les matrices de transformation en les multipliant dans l'ordre inverse de leur étape dans le pipeline de transformation.
+	// On fait donc Projection * Visualisation * Modélisation. On se rappelle que la multiplication matricielle est associative, mais pas commutative.
 	mat4 transform = projection * view * model;
-	vec4 position = transform * vec4(a_position, 1.0);
-	gl_Position = position;
+	// Appliquer la matrice de transformation à la position du sommet. Il faut ajouter une coordonnée virtuelle W=1 au vecteur XYZ.
+	vec4 coords = transform * vec4(a_position, 1.0);
+	// gl_Position est une variable de sortie « built-in » dans laquelle on met la position transformée du sommet.
+	gl_Position = coords;
+
+	// On pourrait passer la matrice de transformation (MVP) déjà calculée sur le CPU comme variable uniforme. C'est aussi une bonne idée d'avoir les trois matrices séparées dans le nuanceur de sommets pour garder plus de contrôle sur les calculs faits.
+	
+	// Affecter la couleur telle-quelle. Elle sera interpolée entre les sommets pour le nuanceur de fragments.
 	color = a_color;
 }

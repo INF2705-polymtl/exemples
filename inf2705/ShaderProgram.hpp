@@ -51,7 +51,7 @@ public:
 		programObject_ = glCreateProgram();
 	}
 
-	// Associer le contenu du fichier au nuanceur spécifié.
+	// Associer le contenu d'un fichier au nuanceur spécifié.
 	GLuint attachSourceFile(GLenum type, std::string_view filename) {
 		if (programObject_ == 0)
 			create();

@@ -41,6 +41,15 @@ inline std::string trim(std::string_view str) {
 	return ltrim(rtrim(str));
 }
 
+inline std::string replaceAll(std::string str, const std::string& oldSubStr, const std::string& newSubStr) {
+	size_t pos = 0;
+	while ((pos = str.find(oldSubStr, pos)) != std::string::npos) {
+		str.replace(pos, oldSubStr.length(), newSubStr);
+		pos += newSubStr.length();
+	}
+	return str;
+}
+
 template <typename T>
 inline constexpr gl::GLenum getTypeGLenum() {
 	using namespace gl;

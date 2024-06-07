@@ -158,6 +158,7 @@
     <ClInclude Include="..\inf2705\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="solid_color_frag.glsl" />
     <None Include="vertex_color_frag.glsl" />
     <None Include="basic_vert.glsl" />

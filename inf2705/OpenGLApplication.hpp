@@ -26,6 +26,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "sfml_utils.hpp"
+#include "utils.hpp"
 
 
 using namespace gl;
@@ -71,6 +72,8 @@ public:
 
 		// Compteur de trames effectuées.
 		frame_ = 0;
+
+		printKeybinds();
 
 		// Tant que la fenêtre est ouverte (mis à jour dans la gestion d'événements) :
 		while (window_.isOpen()) {
@@ -119,6 +122,18 @@ public:
 		std::time_t timestamp = std::chrono::system_clock::to_time_t(startTime_);
 		auto locTime = localtime(&timestamp);
 		return (std::stringstream() << std::put_time(locTime, format.c_str())).str();
+	}
+
+	void printKeybinds() const {
+		if (not keybindMessage_.empty())
+			std::cout << "Raccourcis clavier:" << "\n"
+			          << keybindMessage_ << "\n" << std::endl;
+	}
+
+	void setKeybindMessage(std::string_view msg) {
+		keybindMessage_ = trim(msg);
+		if (not keybindMessage_.empty())
+			keybindMessage_ = "    " + replaceAll(trim(msg), "\n", "\n    ");
 	}
 
 	void printGLInfo() {
@@ -332,6 +347,7 @@ protected:
 	int argc_ = 0;
 	char** argv_ = nullptr;
 	WindowSettings settings_;
+	std::string keybindMessage_;
 };
 
 

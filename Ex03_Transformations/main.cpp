@@ -36,13 +36,18 @@ vec4 brightYellow = {1.0f, 1.0f, 0.2f, 1.0f};
 
 struct App : public OpenGLApplication
 {
+	// Les maillages des formes. Notez qu'on a deux maillages différent pour les cubes. En effet, si on ne veut pas voir les triangles des faces d'un cube en wireframe, il faut un autre maillage qui est dessiné avec des GL_LINES et qui dessine juste les arêtes du cube.
 	Mesh pyramid;
 	Mesh cubeBox;
 	Mesh cubeWire;
+	// On se fait un autre VBO pour les couleurs par sommet de la pyramide (les cubes ont des couleurs uniformes, pas par sommet).
 	GLuint pyramidColorVbo = 0;
+
+	// Les deux programmes : un pour les couleurs par sommet (pyramide), un pour les couleurs uniformes (cubes).
 	ShaderProgram coloredVertexShaders;
 	ShaderProgram solidColorShaders;
 
+	// Les matrices de transformations.
 	TransformStack model;
 	TransformStack view;
 	TransformStack projection;
@@ -56,40 +61,58 @@ struct App : public OpenGLApplication
 
 	float rotatingAngle = 0;
 
+	// Appelée avant la première trame.
 	void init() override {
-		// Config de base, pas de cull, lignes assez visibles.
+		// Le message expliquant les touches de clavier.
+		setKeybindMessage(
+			"+ et - : rapprocher et éloigner la caméra orbitale." "\n"
+			"+ et - avec Shift : réduire/élargir le champs de vision (FOV)." "\n"
+			"haut/bas : changer l'élévation ou la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"R : Réinitialiser la position de la caméra." "\n"
+			"1 : Projection perspective" "\n"
+			"2 : Projection orthogonale" "\n"
+		);
+
+		// Config de base.
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
-		glDisable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		// Mettre des lignes assez visibles.
 		glEnable(GL_POINT_SMOOTH);
 		glPointSize(3.0f);
 		glLineWidth(3.0f);
+		// La couleur de fond.
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
 		loadShaders();
 		initPyramid();
 		initCube();
 
-		//setupSquareCamera();
 		applyPerspective();
 	}
 
+	// Appelée à chaque trame. Le buffer swap est fait juste après.
 	void drawFrame() override {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// On veut une caméra qui orbite autour de l'origine et contrôlée par les touches de clavier.
 		setupOrbitCamera();
+
+		// Dessiner les trois cubes transformés.
 		drawCubeScene();
 
+		// Dessiner la pyramide qui tourne autour des z.
 		drawRotatingPyramid();
 
+		// Mettre à jour la rotation du cube rouge et de la pyramide.
 		rotatingAngle += 2;
 	}
 
+	// Appelée lors d'une touche de clavier.
 	void onKeyPress(const sf::Event::KeyEvent& key) override {
-		//std::cout << getKeyEnumName(key.code) << "\n";
-		
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		// Les touches + et - servent à rapprocher et éloigner la caméra orbitale.
@@ -143,6 +166,7 @@ struct App : public OpenGLApplication
 			cameraDistance = 5;
 			cameraLatitude = 0;
 			cameraLongitude = 0;
+			cameraRoll = 0;
 			perspectiveVerticalFov = 50;
 			updateProjection();
 			break;
@@ -151,37 +175,22 @@ struct App : public OpenGLApplication
 		case Numpad1:
 			perspectiveCamera = true;
 			updateProjection();
+			std::cout << "Proj perspective" << "\n";
 			break;
 		// 2 : Projection orthogonale
 		case Num2:
 		case Numpad2:
 			perspectiveCamera = false;
 			updateProjection();
+			std::cout << "Proj ortho" << "\n";
 			break;
 		}
 	}
 
+	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
 	void onResize(const sf::Event::SizeEvent& event) override {
 		// Mettre à jour la matrice de projection avec le nouvel aspect de fenêtre après le redimensionnement.
 		updateProjection();
-	}
-
-	void loadShaders() {
-		// Créer le programme nuanceur pour les couleurs par sommet.
-		coloredVertexShaders.create();
-		// Compiler et attacher le nuanceur de sommets. Il sera réutilisé
-		auto basicVertexShader = coloredVertexShaders.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
-		// Compiler et attacher le nuanceur de fragments qui utilise une couleur d'entrée.
-		coloredVertexShaders.attachSourceFile(GL_FRAGMENT_SHADER, "vertex_color_frag.glsl");
-		coloredVertexShaders.link();
-
-		// Créer le programme nuanceur pour les couleurs solides.
-		solidColorShaders.create();
-		// Attacher le nuanceur de sommets précédent pour ne pas avoir à le recompiler.
-		solidColorShaders.attachExistingShader(GL_VERTEX_SHADER, basicVertexShader);
-		// Compiler et attacher le nuanceur de fragments qui utilise une couleur uniforme.
-		solidColorShaders.attachSourceFile(GL_FRAGMENT_SHADER, "solid_color_frag.glsl");
-		solidColorShaders.link();
 	}
 
 	void initPyramid() {
@@ -223,6 +232,7 @@ struct App : public OpenGLApplication
 		// Configurer l'attribut 3 avec des vec4.
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(3);
+		pyramid.unbindVao();
 	}
 
 	void drawRotatingPyramid() {
@@ -267,22 +277,22 @@ struct App : public OpenGLApplication
 		cubeBox.indices = {
 			// Faces arrière
 			0, 1, 3,
-			0, 2, 3,
+			0, 3, 2,
 			// Faces droite
 			4, 5, 1,
-			4, 0, 1,
+			4, 1, 0,
 			// Faces gauche
 			2, 3, 7,
-			2, 6, 7,
+			2, 7, 6,
 			// Faces avant
 			6, 7, 5,
-			6, 4, 5,
+			6, 5, 4,
 			// Faces dessus
 			7, 3, 1,
-			7, 5, 1,
+			7, 1, 5,
 			// Faces dessous
 			6, 4, 0,
-			6, 2, 0,
+			6, 0, 2,
 		};
 		cubeBox.setup();
 
@@ -347,19 +357,6 @@ struct App : public OpenGLApplication
 		cubeWire.draw(GL_LINES);
 	}
 
-	void setupSquareCamera() {
-		// Configuration de caméra qui donne une projection perspective où le plan z=0 a une boîte -1 à 1 en x, y.
-		// Ça ressemble donc à la projection par défaut (orthogonale dans une boîte -1 à 1) mais avec une perspective.
-
-		// La matrice de visualisation positionne la caméra dans l'espace.
-		view.lookAt({0.0f, 0.0f, 6.0f}, {0.0f, 0.0f, 0.0f}, {0, 1, 0});
-		// La matrice de projection contrôle comment la caméra observe la scène.
-		projection.frustum({-2.0f / 3, 2.0f / 3, -2.0f / 3, 2.0f / 3, 4.0f, 10.0f});
-
-		setMatrix("view", view);
-		setMatrix("projection", projection);
-	}
-
 	void setupOrbitCamera() {
 		view.pushIdentity();
 		// Comme pour le reste, l'ordre des opérations est important.
@@ -414,6 +411,24 @@ struct App : public OpenGLApplication
 		coloredVertexShaders.setMat(name, matrix);
 		solidColorShaders.use();
 		solidColorShaders.setMat(name, matrix);
+	}
+
+	void loadShaders() {
+		// Créer le programme nuanceur pour les couleurs par sommet.
+		coloredVertexShaders.create();
+		// Compiler et attacher le nuanceur de sommets. Il sera réutilisé
+		auto basicVertexShader = coloredVertexShaders.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
+		// Compiler et attacher le nuanceur de fragments qui utilise une couleur d'entrée.
+		coloredVertexShaders.attachSourceFile(GL_FRAGMENT_SHADER, "vertex_color_frag.glsl");
+		coloredVertexShaders.link();
+
+		// Créer le programme nuanceur pour les couleurs solides.
+		solidColorShaders.create();
+		// Attacher le nuanceur de sommets précédent pour ne pas avoir à le recompiler.
+		solidColorShaders.attachExistingShader(GL_VERTEX_SHADER, basicVertexShader);
+		// Compiler et attacher le nuanceur de fragments qui utilise une couleur uniforme.
+		solidColorShaders.attachSourceFile(GL_FRAGMENT_SHADER, "solid_color_frag.glsl");
+		solidColorShaders.link();
 	}
 };
 

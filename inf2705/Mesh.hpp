@@ -74,14 +74,16 @@ struct Mesh
 		if (ebo == 0)
 			glGenBuffers(1, &ebo);
 
+		// Mettre les données dans les tampons en mémoire graphique.
 		updateBuffers(usageMode);
+		// Configurer les attributs selon la struct VertexData.
 		setupAttribs();
 	}
 
 	void draw(GLenum drawMode = GL_TRIANGLES) {
 		bindVao();
 
-		// Avoir un tableau d'incices vide ou non indique si on veut dessiner avec le tableau directement ou avec les indices.
+		// Avoir un tableau d'indices vide ou non indique si on veut dessiner avec les données directement ou avec un tableau de connectivité.
 		if (not indices.empty())
 			drawElements(drawMode, (GLsizei)indices.size());
 		else

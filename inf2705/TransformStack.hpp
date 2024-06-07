@@ -16,8 +16,6 @@ using namespace gl;
 using namespace glm;
 
 
-class ShaderProgram;
-
 struct ProjectionBox
 {
 	float leftFace;
@@ -28,16 +26,15 @@ struct ProjectionBox
 	float farDist;
 };
 
+// Une pile de matrices de transformations (hérite de `std::stack`). Les tranformations (rotation, translation, etc.) s'opère sur le dessus de la pile. C'est un peu comme la classe `MatricePipeline` des notes de cours. On peut aussi la convertir implicitement en mat4 (ça prend le dessus de la pile) et faire des multiplication directement avec * et *=.
+// Les objets de cette classe seront souvent passées à des nuanceurs. Un TransformStack possède un nom correspondant à la variable uniforme qu'il représente. setName() et getName() manipule le nom et getLoc() permet d'obtenir la « localisation » de cette variable uniforme pour un programme OpenGL donné. La recherche de cet objet est fait une fois par programme et conservé par la suite pour éviter les appels répétés à glGetUniformLocation.
 class TransformStack : public std::stack<mat4>
 {
 public:
 	using stack<mat4>::stack;
 
-	TransformStack() {
+	TransformStack(const std::string& name = "") {
 		pushIdentity();
-	}
-
-	TransformStack(const std::string name) : TransformStack() {
 		setName(name);
 	}
 
@@ -61,6 +58,9 @@ public:
 	}
 	void rotate(float angleDegrees, const vec3& v) {
 		top() = glm::rotate(top(), radians(angleDegrees), v);
+	}
+	void invert() {
+		top() = glm::inverse(top());
 	}
 
 	void lookAt(const vec3& eye, const vec3& center, const vec3& up) {
@@ -87,7 +87,6 @@ public:
 	void ortho2D(float leftFace, float rightFace, float bottomFace, float topFace) {
 		ortho2D({leftFace, rightFace, bottomFace, topFace});
 	}
-
 
 	TransformStack& operator*= (const mat4& matrix) {
 		top() *= matrix;
@@ -119,7 +118,10 @@ public:
 	using stack<mat4>::pop;
 
 	void push() {
-		push(top());
+		if (empty())
+			pushIdentity();
+		else
+			push(top());
 	}
 
 	void pushIdentity() {
@@ -137,6 +139,7 @@ public:
 			getLoc(progObj);
 	}
 
+	// Obtenir la localisation pour un programme donné par son objet (son identifiant).
 	GLuint getLoc(GLuint prog) const {
 		auto it = locs_.find(prog);
 		if (it != locs_.end())
@@ -146,6 +149,7 @@ public:
 			return glGetUniformLocation(prog, name_.c_str());
 	}
 
+	// Obtenir la localisation pour un programme donné par son objet (son identifiant).
 	GLuint getLoc(GLuint prog) {
 		auto it = locs_.find(prog);
 		// Si le programme nuanceur n'est pas reconnu, chercher la localisation et la sauvegarder.
