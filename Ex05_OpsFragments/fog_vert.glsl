@@ -1,13 +1,15 @@
 #version 410
 
 
+uniform mat4 model = mat4(1);
+uniform mat4 view = mat4(1);
+uniform mat4 projection = mat4(1);
+
+
 layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec3 a_normal;
 layout(location = 2) in vec2 a_texCoords;
 
-uniform mat4 model = mat4(1);
-uniform mat4 view = mat4(1);
-uniform mat4 projection = mat4(1);
 
 out vec2 texCoords;
 // Ajouter une variable de sortie passé au nuanceur de fragments pour avoir la distance entre la caméra et le sommet. Cette distance est interpolées pour les fragments comme toute variable de sortie.

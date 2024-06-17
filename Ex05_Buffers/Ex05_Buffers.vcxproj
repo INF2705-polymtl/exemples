@@ -161,10 +161,11 @@
     <ClInclude Include="..\inf2705\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="basic_frag.glsl" />
+    <None Include="manual_frag.glsl" />
     <None Include="manual_vert.glsl" />
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

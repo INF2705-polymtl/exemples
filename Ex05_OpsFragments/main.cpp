@@ -49,12 +49,24 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
-		// Config de base, pas de cull, lignes assez visibles.
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"1 : activer/désactiver le carré de vitre." "\n"
+			"2 : activer/désactiver le cube de vitre." "\n"
+			"3 : activer/désactiver le brouillard." "\n"
+			"Z, X : rapprocher/éloigner la distance du début du fondu du brouillard." "\n"
+			"C, V : rapprocher/éloigner la distance du début du brouillard total." "\n"
+			"B : réinitialiser les limites du brouillard." "\n"
+		);
+
+		// Pas de cull
 		glDisable(GL_CULL_FACE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POINT_SMOOTH);
-		glPointSize(3.0f);
-		glLineWidth(3.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
 		// Activer le test de profondeur.
@@ -88,6 +100,8 @@ struct App : public OpenGLApplication
 		texBox = Texture::loadFromFile("box.png", 5);
 		texDrywall = Texture::loadFromFile("drywall.png", 5);
 		texWindow = Texture::loadFromFile("window.png", 5);
+		basicProg.setInt("texMain", 0);
+		fogProg.setInt("texMain", 0);
 
 		camera.updateProgram(basicProg, view);
 		camera.updateProgram(fogProg, view);
@@ -108,7 +122,7 @@ struct App : public OpenGLApplication
 		// Activer l'écriture dans le tampon de profondeur.
 		glDepthMask(GL_TRUE);
 		// Lier la texture de plâtre
-		texDrywall.bindToTextureUnit(0, currentProg, "texMain");
+		texDrywall.bindToTextureUnit(0);
 		// Positionner le paneau applati.
 		model.push(); {
 			model.translate({0, -1, 0});
@@ -119,7 +133,7 @@ struct App : public OpenGLApplication
 		cube.draw();
 
 		// Lier la texture de carton imprimés.
-		texBox.bindToTextureUnit(0, currentProg, "texMain");
+		texBox.bindToTextureUnit(0);
 		// Positionner la boîte de carton.
 		model.push(); {
 			model.translate({0, 0, -1});
@@ -132,7 +146,7 @@ struct App : public OpenGLApplication
 		// Désactiver l'écriture dans le tampon de profondeur. Le test de profondeur va quand même s'effectuer, mais le tampon ne sera pas modifié.
 		glDepthMask(GL_FALSE);
 		// Lier la texture de vitre givrée.
-		texWindow.bindToTextureUnit(0, currentProg, "texMain");
+		texWindow.bindToTextureUnit(0);
 
 		// Dessiner le cube de vitre si applicable.
 		if (showingGlassCube) {
@@ -148,7 +162,7 @@ struct App : public OpenGLApplication
 		if (showingGlassQuad) {
 			model.push(); {
 				model.rotate(-90, {0, 1, 0});
-				model.rotate(-45, {1, 0, 0});
+				model.rotate(-15, {1, 0, 0});
 				model.translate({0, 0, 3});
 				model.scale({1.5f, 1.5f, 1.5f});
 				currentProg.setMat(model);
@@ -159,7 +173,7 @@ struct App : public OpenGLApplication
 		// Réactiver l'écriture dans le tampon. Oui, c'est un peu redondant vu qu'on le fait au début de la fonction, mais c'est bon pour la paix d'esprit.
 		glDepthMask(GL_TRUE);
 
-		// Malgré nos précautions, on observe quand même une aberration si on regarde le cube devant le carré (en regardant d'en dessous). Ça donne l'impression que le carré est devant le cube. Il n'y a pas de façon magique de régler ce problème juste en manipulant les tampons. Il faut soit changer l'ordre d'affichage (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poid. De nos jours, la tendance est définitivement vers le ray-tracing (pas matière à INF2705) pour gérer les problèmes de transparence/réflexion/réfraction.
+		// Malgré nos précautions, on observe quand même une aberration si on regarde le cube de vitre devant le carré de vitre. Ça donne l'impression que le carré est devant le cube. Il n'y a pas de façon magique de régler ce problème juste en manipulant le tampon de pronfondeur. Il faut soit changer l'ordre d'affichage (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poid ou un tampon de profondeur auxilliaire. De nos jours, la tendance est définitivement vers le ray-tracing (pas matière à INF2705) pour gérer les problèmes de transparence/réflexion/réfraction.
 	}
 
 	// Appelée lors d'une touche de clavier.
@@ -190,19 +204,25 @@ struct App : public OpenGLApplication
 
 		case Z:
 			fogNear -= 0.5f;
+			std::cout << "Fog near Z : " << fogNear << "\n";
 			break;
 		case X:
 			fogNear += 0.5f;
+			std::cout << "Fog near Z : " << fogNear << "\n";
 			break;
 		case C:
 			fogFar -= 0.5f;
+			std::cout << "Fog far Z : " << fogFar << "\n";
 			break;
 		case V:
 			fogFar += 0.5f;
+			std::cout << "Fog far Z : " << fogFar << "\n";
 			break;
 		case B:
 			fogNear = 2;
-			fogFar = 10;
+			fogFar = 7;
+			std::cout << "Fog near Z : " << fogNear << ", "
+			          << "Fog far Z : " << fogFar << "\n";
 			break;
 		}
 

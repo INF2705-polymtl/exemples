@@ -22,13 +22,15 @@ using namespace gl;
 using namespace glm;
 
 
+// Les trois tampons qui nous intéresse.
 struct Buffers
 {
-	float z;
-	vec4 color;
-	uint8_t stencil;
+	float z; // Tampon de profondeur (juste une dimension).
+	vec4 color; // Tampon de couleur (RGBA).
+	uint8_t stencil; // Tampon de stencil (typiquement 8 bit entier).
 };
 
+// Afficher les tampons.
 inline std::ostream& operator<< (std::ostream& out, const Buffers& buffers) {
 	return out << std::format("{:.2f} | {:.2f} {:.2f} {:.2f} {:.2f} | {:3}",
 		buffers.z,
@@ -53,6 +55,7 @@ struct App : public OpenGLApplication
 		loadShaders();
 		basicProg.use();
 
+		// Juste un point. Les données sont ignorées par le nuanceur de toute façon.
 		points.vertices = {{}};
 		points.setup();
 	}
@@ -65,89 +68,102 @@ struct App : public OpenGLApplication
 			return;
 		firstRun = false;
 
-		// Exemples pris d'un ancien examen.
+		// Exemples pris d'un ancien examen (intra hiver 2018).
 
 		runTest("a",
-			{0.5, {0.8, 0.8, 0.8, 0.3}, 0},
-			{0.7, {0.4, 0.4, 0.4, 0.4}, 0},
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 0},
 			[]() {
 				glDisable(GL_STENCIL_TEST);
-				glDisable(GL_DEPTH_TEST);
-				glDisable(GL_BLEND);
-			}
-		);
-
-		runTest("b",
-			{0.5, {0.8, 0.8, 0.8, 0.3}, 0},
-			{0.7, {0.4, 0.4, 0.4, 0.4}, 0},
-			[]() {
-				glDisable(GL_STENCIL_TEST);
-				glEnable(GL_DEPTH_TEST);
-				glDepthFunc(GL_GREATER);
-				glDisable(GL_BLEND);
-			}
-		);
-
-		runTest("c",
-			{0.5, {0.8, 0.8, 0.8, 0.3}, 0},
-			{0.7, {0.4, 0.4, 0.4, 0.4}, 2},
-			[]() {
-				glEnable(GL_STENCIL_TEST);
-				glStencilFunc(GL_GEQUAL, 1, 3);
-				glStencilOp(GL_KEEP, GL_INCR, GL_REPLACE);
 				glEnable(GL_DEPTH_TEST);
 				glDepthFunc(GL_LEQUAL);
 				glDisable(GL_BLEND);
 			}
 		);
 
-		runTest("d",
-			{0.5, {0.8, 0.8, 0.8, 0.3}, 0},
-			{0.7, {0.4, 0.4, 0.4, 0.4}, 2},
+		runTest("b",
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 0},
+			[]() {
+				glDisable(GL_STENCIL_TEST);
+				glDisable(GL_DEPTH_TEST);
+				glDepthFunc(GL_GEQUAL);
+				glDisable(GL_BLEND);
+			}
+		);
+
+		runTest("c",
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 1},
 			[]() {
 				glEnable(GL_STENCIL_TEST);
-				glStencilFunc(GL_LESS, 1, 3);
-				glStencilOp(GL_KEEP, GL_INCR, GL_REPLACE);
+				glStencilFunc(GL_GEQUAL, 2, 3);
+				glStencilOp(GL_REPLACE, GL_DECR, GL_KEEP);
 				glEnable(GL_DEPTH_TEST);
-				glDepthFunc(GL_GREATER);
+				glDepthFunc(GL_LESS);
+				glDisable(GL_BLEND);
+			}
+		);
+
+		runTest("d",
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 1},
+			[]() {
+				glEnable(GL_STENCIL_TEST);
+				glStencilFunc(GL_LESS, 2, 3);
+				glStencilOp(GL_REPLACE, GL_DECR, GL_KEEP);
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GL_GEQUAL);
 				glDisable(GL_BLEND);
 			}
 		);
 
 		runTest("e",
-			{0.5, {0.8, 0.8, 0.8, 0.3}, 0},
-			{0.7, {0.4, 0.4, 0.4, 0.4}, 2},
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 1},
 			[]() {
 				glEnable(GL_STENCIL_TEST);
-				glStencilFunc(GL_GREATER, 1, 3);
-				glStencilOp(GL_KEEP, GL_INCR, GL_REPLACE);
+				glStencilFunc(GL_GREATER, 2, 3);
+				glStencilOp(GL_REPLACE, GL_DECR, GL_KEEP);
 				glEnable(GL_DEPTH_TEST);
-				glDepthFunc(GL_LESS);
+				glDepthFunc(GL_EQUAL);
 				glDisable(GL_BLEND);
 			}
 		);
 
 		runTest("f",
-			{0.5, {0.8, 0.8, 0.8, 0.3}, 0},
-			{0.7, {0.4, 0.4, 0.4, 0.4}, 0},
-			[]() {
-				glDisable(GL_STENCIL_TEST);
-				glEnable(GL_DEPTH_TEST);
-				glDepthFunc(GL_ALWAYS);
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			}
-		);
-
-		runTest("g",
-			{0.5, {0.8, 0.8, 0.8, 0.3}, 0},
-			{0.7, {0.4, 0.4, 0.4, 0.4}, 0},
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 0},
 			[]() {
 				glDisable(GL_STENCIL_TEST);
 				glEnable(GL_DEPTH_TEST);
 				glDepthFunc(GL_LESS);
 				glEnable(GL_BLEND);
-				glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+				glBlendFunc(GL_ONE, GL_ZERO);
+			}
+		);
+
+		runTest("g",
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 0},
+			[]() {
+				glDisable(GL_STENCIL_TEST);
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GL_GREATER);
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			}
+		);
+
+		runTest("h",
+			{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+			{0.6, {0.8, 0.8, 0.8, 0.8}, 0},
+			[]() {
+				glDisable(GL_STENCIL_TEST);
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GL_ALWAYS);
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 			}
 		);
 	}
@@ -172,8 +188,8 @@ struct App : public OpenGLApplication
 		basicProg.use();
 		basicProg.setFloat("vertexZ", frag.z);
 		basicProg.setVec("vertexColor", frag.color);
-		// Dessiner un point au milieu de l'écran suffisamment gros pour couvrir l'écran.
-		glPointSize(500.0f);
+		// Dessiner un point au milieu de l'écran.
+		glPointSize(10.0f);
 		points.draw(GL_POINTS);
 		// Attendre que les opérations soient complétées.
 		glFinish();
@@ -208,7 +224,7 @@ struct App : public OpenGLApplication
 	void loadShaders() {
 		basicProg.create();
 		basicProg.attachSourceFile(GL_VERTEX_SHADER, "manual_vert.glsl");
-		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
+		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "manual_frag.glsl");
 		basicProg.link();
 	}
 };

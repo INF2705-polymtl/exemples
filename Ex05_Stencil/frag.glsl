@@ -1,10 +1,12 @@
 #version 410
 
 
-in vec2 texCoords;
-
 uniform sampler2D texMain;
 uniform bool shouldDiscard = false;
+
+
+in vec2 texCoords;
+
 
 out vec4 fragColor;
 

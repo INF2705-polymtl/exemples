@@ -21,9 +21,9 @@ using namespace glm;
 
 struct Texture
 {
-	GLuint id = 0;
-	ivec2 size = {};
-	int numLevels = 0;
+	GLuint id = 0; // L'objet donné par OpenGL.
+	ivec2 size = {}; // La taille de l'image sous-jacente.
+	int numLevels = 0; // Le nombre de niveaux de détails (mipmap ou manuel).
 
 	void bindToTextureUnit(int textureUnit) {
 		glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -37,7 +37,7 @@ struct Texture
 	void bindToTextureUnit(int textureUnit, ShaderProgram& prog, GLuint loc) {
 		bindToTextureUnit(textureUnit);
 		prog.use();
-		prog.setTextureUnit(loc, textureUnit);
+		prog.setInt(loc, textureUnit);
 	}
 
 	void setPixelData(GLenum format, const void* data) {

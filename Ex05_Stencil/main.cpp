@@ -44,7 +44,7 @@ struct App : public OpenGLApplication
 	TransformStack view = {"view"};
 	TransformStack projection = {"projection"};
 
-	OrbitCamera camera = {10, 30, -30, 0};
+	OrbitCamera camera = {10, 30, -30, 0, {0, 1, 0}};
 
 	bool showingScope = false;
 	float scopeZoom = 1;
@@ -53,6 +53,19 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"1 : lunette" "\n"
+			"2 : wireframe à travers la lunette" "\n"
+			"3 : filtre négatif à travers la lunette" "\n"
+			"X et Z : zoom in/out dans la lunette" "\n"
+		);
+
 		// Config de base, pas de cull, lignes assez visibles.
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -84,8 +97,12 @@ struct App : public OpenGLApplication
 		texBuilding = Texture::loadFromFile("building.png");
 		texDrywall = Texture::loadFromFile("drywall.png");
 		texRoad = Texture::loadFromFile("asphalt.png");
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		// Activer la répétition pour la texture d'asphalte.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		basicProg.use();
+		basicProg.setInt("texMain", 0);
 
 		// La texture de cercle blanc va servir de masque (ou de pochoir) pour la scène avec grossissement.
 		texScopeMask = Texture::loadFromFile("scope_mask.png");
@@ -179,7 +196,7 @@ struct App : public OpenGLApplication
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
-		camera.handleKeyEvent(key, 5, 0.5f, {10, 30, -30, 0});
+		camera.handleKeyEvent(key, 5, 0.5f, {10, 30, -30, 0, {0, 1, 0}});
 		applyCamera();
 
 		// Touche 1 : La lunette
@@ -233,7 +250,7 @@ struct App : public OpenGLApplication
 
 		basicProg.use();
 
-		texRoad.bindToTextureUnit(0, basicProg, "texMain");
+		texRoad.bindToTextureUnit(0);
 		model.push(); {
 			model.translate({0, -1, 0});
 			model.scale({4, 1, 4});
@@ -242,14 +259,14 @@ struct App : public OpenGLApplication
 		} model.pop();
 		road.draw();
 
-		texBuilding.bindToTextureUnit(0, basicProg, "texMain");
+		texBuilding.bindToTextureUnit(0);
 		model.push(); {
 			model.translate({2, 0, 0});
 			basicProg.setMat(model);
 		} model.pop();
 		cube.draw();
 
-		texBuilding.bindToTextureUnit(0, basicProg, "texMain");
+		texBuilding.bindToTextureUnit(0);
 		model.push(); {
 			model.translate({-2, 1, 3});
 			model.rotate(90, {0, 1, 0});
@@ -258,7 +275,7 @@ struct App : public OpenGLApplication
 		} model.pop();
 		cube.draw();
 
-		texBox.bindToTextureUnit(0, basicProg, "texMain");
+		texBox.bindToTextureUnit(0);
 		model.push(); {
 			model.translate({0, 2, -10});
 			model.scale({2.5f, 3, 2.5f});
@@ -266,7 +283,7 @@ struct App : public OpenGLApplication
 		} model.pop();
 		cube.draw();
 
-		texDrywall.bindToTextureUnit(0, basicProg, "texMain");
+		texDrywall.bindToTextureUnit(0);
 		model.push(); {
 			model.translate({0, 1, -10});
 			model.scale({3.2f, 3.2f, 3.2f});
@@ -288,7 +305,7 @@ struct App : public OpenGLApplication
 		// Activer l'élimination de pixels invisibles. Voir commentaire dans le nuanceur de fragments.
 		basicProg.setBool("shouldDiscard", true);
 		// Dessiner le quad avec sa texture.
-		texScopeMask.bindToTextureUnit(0, basicProg, "texMain");
+		texScopeMask.bindToTextureUnit(0);
 		quad.draw();
 		// Rétablir l'état et les matrices.
 		basicProg.setBool("shouldDiscard", false);
@@ -304,7 +321,7 @@ struct App : public OpenGLApplication
 		basicProg.setMat(model);
 		basicProg.setMat("view", mat4(1));
 		basicProg.setMat("projection", mat4(1));
-		texScopeReticle.bindToTextureUnit(0, basicProg, "texMain");
+		texScopeReticle.bindToTextureUnit(0);
 		quad.draw();
 		model.pop();
 		basicProg.setMat(view);
@@ -313,9 +330,8 @@ struct App : public OpenGLApplication
 
 	void applyCamera() {
 		view.loadIdentity();
-		view.translate({0, -2, 0});
-		basicProg.use();
 		camera.applyToView(view);
+		basicProg.use();
 		basicProg.setMat(view);
 	}
 
