@@ -10,16 +10,16 @@ Par exemple, voici une question d'examen, le code pour la simuler et la sortie o
 
 ```c++
 runTest("e",
-	{0.2, {0.9, 0.7, 0.5, 0.3}, 0},
-	{0.6, {0.8, 0.8, 0.8, 0.8}, 1},
-	[]() {
-		glEnable(GL_STENCIL_TEST);
-		glStencilFunc(GL_GREATER, 2, 3);
-		glStencilOp(GL_REPLACE, GL_DECR, GL_KEEP);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_EQUAL);
-		glDisable(GL_BLEND);
-	}
+    {0.2, {0.9, 0.7, 0.5, 0.3}, 0},
+    {0.6, {0.8, 0.8, 0.8, 0.8}, 1},
+    []() {
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_GREATER, 2, 3);
+        glStencilOp(GL_REPLACE, GL_DECR, GL_KEEP);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_EQUAL);
+        glDisable(GL_BLEND);
+    }
 );
 ```
 
@@ -32,5 +32,5 @@ e)
   result   0.60 | 0.80 0.80 0.80 0.80 |   0
 ```
 
-Les situations dans l'exemples sont prises de la [deuxième question de l'intra hiver 2018](doc/intra_h18_q2.pdf).
+Les situations dans l'exemple sont prises de la [deuxième question de l'intra hiver 2018](doc/intra_h18_q2.pdf).
 
