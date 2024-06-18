@@ -102,7 +102,7 @@ public:
 		return frame_;
 	}
 
-	// Temps de puis la dernière trame (mis à jour entre les trame).
+	// Temps de puis la dernière trame (mis à jour entre les trames).
 	float getFrameDeltaTime() const {
 		return deltaTime_;
 	}
@@ -126,7 +126,7 @@ public:
 
 	void printKeybinds() const {
 		if (not keybindMessage_.empty())
-			std::cout << "\n" << "Raccourcis clavier:" << "\n"
+			std::cout << "\n" << "Raccourcis clavier" << "\n"
 			          << keybindMessage_ << "\n" << std::endl;
 	}
 

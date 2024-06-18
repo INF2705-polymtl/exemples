@@ -69,15 +69,23 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
-		// Config de base, pas de cull, lignes assez visibles.
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"WASD : contrôler la théière sélectionnée." "\n"
+			"clic gauche : sélectionner l'objet sous le curseur (théières seulement)." "\n"
+			"clic droit et espace : annuler la sélection." "\n"
+		);
+
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glDisable(GL_CULL_FACE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POINT_SMOOTH);
-		glPointSize(3.0f);
-		glLineWidth(3.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
 		loadShaders();
@@ -98,7 +106,7 @@ struct App : public OpenGLApplication
 
 		// Appliquer la caméra synthétique et la projection perspective.
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 		applyPerspective();
 	}
 
@@ -194,7 +202,7 @@ struct App : public OpenGLApplication
 
 		// Mettre à jour la caméra.
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 	}
 
 	// Appelée lors d'un bouton de souris appuyé.
@@ -221,7 +229,7 @@ struct App : public OpenGLApplication
 		auto mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f/30));
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 	}
 
 	// Appelée lors d'un défilement de souris.
@@ -229,7 +237,7 @@ struct App : public OpenGLApplication
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
 		for (auto&& prog : programs)
-			camera.updateProgram(*prog, "view", view);
+			camera.updateProgram(*prog, view);
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
@@ -273,7 +281,7 @@ struct App : public OpenGLApplication
 					"Piece",
 					&meshTeapot,
 					{{(j == 0) ? &texRock : &texRockDark, {"texMain", 0}}},
-					{}
+					{"model"}
 				};
 				// L'origine est au centre du damier.
 				if (j == 1)
@@ -297,7 +305,7 @@ struct App : public OpenGLApplication
 			"Board",
 			&meshBoard,
 			{{&texCheckers, {"texMain", 0}}},
-			{}
+			{"model"}
 		};
 		board = &objects.at(1);
 		board->modelMat.translate({0, -0.5f, 0});

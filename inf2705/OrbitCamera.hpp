@@ -89,10 +89,6 @@ struct OrbitCamera
 		viewMatrix.translate(-origin);
 	}
 
-	void updateProgram(ShaderProgram& prog, std::string_view uniformName, TransformStack& viewMatrix) {
-		updateProgram(prog, viewMatrix);
-	}
-
 	void updateProgram(ShaderProgram& prog, TransformStack& viewMatrix) {
 		prog.use();
 		applyToView(viewMatrix);

@@ -166,6 +166,7 @@
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
     <None Include="flashing_frag.glsl" />
+    <None Include="README.md" />
     <None Include="selection_frag.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
