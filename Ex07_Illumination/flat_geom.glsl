@@ -1,4 +1,4 @@
-// Dans le modèle de Lambert, les calculs sont effectués une fois par primitive, donc dans le nuanceur de géométrie. Les résultats sont passés également à tous les fragments de la primitive.
+// Dans le modèle plat, les calculs sont effectués une fois par primitive, donc dans le nuanceur de géométrie. Les résultats sont passés également à tous les fragments de la primitive.
 
 #version 410
 
@@ -6,12 +6,6 @@
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-
-in Attribs {
-	vec3 origPosition;
-	vec2 texCoords;
-	vec3 normal;
-} inAttribs[];
 
 uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
@@ -22,6 +16,7 @@ uniform bool showingAmbientReflection = true;
 uniform bool showingDiffuseReflection = true;
 uniform bool showingSpecularReflection = true;
 
+// Les matériaux, sources lumineuses et modèle d'éclairage sont des struct dans le C++ et chargées comme des blocs uniformes. C'est plus commode et efficace que plein de variables uniformes.
 layout(std140) uniform Material
 {
 	vec4 emissionColor;
@@ -50,6 +45,14 @@ layout(std140) uniform LightModel
 	vec4 ambientColor;
 	bool localViewer;
 } lightModel;
+
+
+in VertexOut {
+	vec3 origPosition;
+	vec2 texCoords;
+	vec3 normal;
+} inputs[];
+
 
 out vec2 texCoords;
 out vec4 color;
@@ -104,13 +107,13 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 
 
 void main() {
-	texCoords = inAttribs[0].texCoords;
-
-	// Calculer la normale de la primitive avec un sommet quelconque (le premier disons) vu qu'ils sont tous supposés être égaux dans le modèle de Lambert.
-	vec3 normal = normalTransformMat * inAttribs[0].normal;
+	// Calculer la normale de la primitive en faisant le produit croisé des tangentes de la primitive.
+	vec3 tangent01 = inputs[1].origPosition - inputs[0].origPosition;
+	vec3 tangent02 = inputs[2].origPosition - inputs[0].origPosition;
+	vec3 normal = normalTransformMat * cross(tangent01, tangent02);
 
 	// Calculer le centroïde géométrique de la face en faisant la moyenne des trois sommets.
-	vec3 faceCentroid = (inAttribs[0].origPosition + inAttribs[1].origPosition + inAttribs[2].origPosition) / 3.0;
+	vec3 faceCentroid = (inputs[0].origPosition + inputs[1].origPosition + inputs[2].origPosition) / 3.0;
 
 	// La position du point dans le référentiel de la caméra (donc coords de visualisation).
 	vec3 pos = vec3(view * model * vec4(faceCentroid, 1));
@@ -118,7 +121,7 @@ void main() {
 	// Calculer la position de la lumière en coords de visualisation (light.position est en coordonnées de scène).
 	vec3 lightDir = (view * light.position).xyz - pos;
 
-	// Calculer le vecteur de direction de l'observateur. On peut optimiser en prenant z = 1 plutôt que de faire l'opposée de la coords de visualisation. C'est n'est pas l'optimisation la plus importante considérant tous les calculs qui sont faits autour. On se laisse cette option pour des raisons historiques (c'est dans le vieux modèle d'OpenGL) même si se sont des économies de bouts de chandelle.
+	// Calculer le vecteur de direction de l'observateur. On peut optimiser en prenant z = 1 plutôt que de faire l'opposée de la coords de visualisation. C'est n'est pas l'optimisation la plus importante considérant tous les calculs qui sont faits autour. On se laisse cette option pour des raisons historiques (c'est dans le vieux modèle d'OpenGL) même si ce sont des économies de bouts de chandelle.
 	vec3 observerDir = (lightModel.localViewer) ? -pos : vec3(0, 0, 1);
 	
 	// Appliquer la couleur d'émission du matériau. C'est indépendant des sources lumineuses.
@@ -127,7 +130,7 @@ void main() {
 	// Calculer le facteur d'atténuation selon la distance.
 	float dist = length(lightDir);
 	float distFactor = 1.0 / (light.fadeCst + light.fadeLin * dist + light.fadeQuad * dist*dist);
-	distFactor = min(1, distFactor);
+	distFactor = clamp(distFactor, 0, 1);
 	
 	// Calculer les réflexions.
 	Reflections reflections = computeReflection(
@@ -153,9 +156,11 @@ void main() {
 		gl_Position = gl_in[i].gl_Position;
 		// Affecter la couleur de la face (la même pour tous les sommets).
 		color = faceColor;
+		// Affecter les coords de textures (même si on ne s'en sert pas aujourd'hui).
+		texCoords = inputs[i].texCoords;
 		// Émettre le sommet.
 		EmitVertex();
 	}
 
-	// Le nuanceur de fragments pour Lambert fait juste prendre en entrée la couleur et l'affecter telle-quelle en sortie. On réutilise donc le nuanceur de fragments de Gouraud.
+	// Le nuanceur de fragments pour le flat shading fait juste prendre en entrée la couleur et l'affecter telle-quelle en sortie. On réutilise donc le nuanceur de fragments de Gouraud.
 }

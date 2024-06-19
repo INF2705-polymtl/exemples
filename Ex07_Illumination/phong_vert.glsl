@@ -3,16 +3,12 @@
 #version 410
 
 
-layout(location = 0) in vec3 a_position;
-layout(location = 1) in vec3 a_normal;
-layout(location = 2) in vec2 a_texCoords;
-
-
 uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
 uniform mat3 normalTransformMat = mat3(1);
 
+// Les matériaux, sources lumineuses et modèle d'éclairage sont des struct dans le C++ et chargées comme des blocs uniformes. C'est plus commode et efficace que plein de variables uniformes.
 layout(std140) uniform Material
 {
 	vec4 emissionColor;
@@ -41,6 +37,11 @@ layout(std140) uniform LightModel
 	vec4 ambientColor;
 	bool localViewer;
 } lightModel;
+
+
+layout(location = 0) in vec3 a_position;
+layout(location = 1) in vec3 a_normal;
+layout(location = 2) in vec2 a_texCoords;
 
 
 // Les valeurs de sortie seront interpolés pour les fragments et le nuanceur de fragment fera les calculs d'éclairage pour chaque fragments.

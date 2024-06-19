@@ -3,11 +3,6 @@
 #version 410
 
 
-layout(location = 0) in vec3 a_position;
-layout(location = 1) in vec3 a_normal;
-layout(location = 2) in vec2 a_texCoords;
-
-
 uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
@@ -18,7 +13,6 @@ uniform bool showingDiffuseReflection = true;
 uniform bool showingSpecularReflection = true;
 
 // Les matériaux, sources lumineuses et modèle d'éclairage sont des struct dans le C++ et chargées comme des blocs uniformes. C'est plus commode et efficace que plein de variables uniformes.
-
 layout(std140) uniform Material
 {
 	vec4 emissionColor;
@@ -47,6 +41,11 @@ layout(std140) uniform LightModel
 	vec4 ambientColor;
 	bool localViewer;
 } lightModel;
+
+
+layout(location = 0) in vec3 a_position;
+layout(location = 1) in vec3 a_normal;
+layout(location = 2) in vec2 a_texCoords;
 
 
 out vec2 texCoords;
@@ -120,7 +119,7 @@ void main() {
 	// Calculer la position de la lumière en coords de visualisation (light.position est en coordonnées de scène).
 	vec3 lightDir = (view * light.position).xyz - pos;
 
-	// Calculer le vecteur de direction de l'observateur. On peut optimiser en prenant z = 1 plutôt que de faire l'opposée de la coords de visualisation. C'est n'est pas l'optimisation la plus importante considérant tous les calculs qui sont faits autour. On se laisse cette option pour des raisons historiques (c'est dans le vieux modèle d'OpenGL) même si se sont des économies de bouts de chandelle.
+	// Calculer le vecteur de direction de l'observateur. On peut optimiser en prenant z = 1 plutôt que de faire l'opposée de la coords de visualisation. C'est n'est pas l'optimisation la plus importante considérant tous les calculs qui sont faits autour. On se laisse cette option pour des raisons historiques (c'est dans le vieux modèle d'OpenGL) même si ce sont des économies de bouts de chandelle.
 	vec3 observerDir = (lightModel.localViewer) ? -pos : vec3(0, 0, 1);
 
 	// Appliquer la couleur d'émission du matériau. C'est indépendant des sources lumineuses.

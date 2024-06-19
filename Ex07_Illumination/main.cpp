@@ -70,7 +70,7 @@ struct LightModel
 	// La couleur ambiante de la scène, indépendamment des sources lumineuses présentes.
 	vec4 ambientColor;
 	// Le modèle de calcul du vecteur de l'observateur. Allez voir les détails dans les nuanceurs.
-	// C'est un bool dans les nuanceurs et un int ici. Le modèle de données d'OpenGL (std140) aligne les booléens sur 4 octect
+	// C'est un bool dans les nuanceurs et un int ici. Le modèle de données d'OpenGL (std140) aligne les booléens sur 4 octects.
 	uint32_t localViewer;
 };
 
@@ -82,16 +82,16 @@ struct App : public OpenGLApplication
 	Mesh normalsSmooth;
 	Mesh lightBulb;
 
-	UniformBlock<Material> material;
-	UniformBlock<LightSource> light;
-	UniformBlock<LightModel> lightModel;
+	UniformBlock<Material> material = {"Material", 0};
+	UniformBlock<LightSource> light = {"LightSource", 1};
+	UniformBlock<LightModel> lightModel = {"LightModel", 2};
 
 	ShaderProgram uniformProg;
-	ShaderProgram lambertProg;
+	ShaderProgram flatProg;
 	ShaderProgram gouraudProg;
 	ShaderProgram phongProg;
-	ShaderProgram* programs[4] = {&uniformProg, &lambertProg, &gouraudProg, &phongProg};
-	ShaderProgram* currentProg = &lambertProg;
+	ShaderProgram* programs[4] = {&uniformProg, &flatProg, &gouraudProg, &phongProg};
+	ShaderProgram* currentProg = &flatProg;
 
 	TransformStack model = {"model"};
 	TransformStack view = {"view"};
@@ -111,6 +111,29 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"1 : Démo des modèles de calcul de normales" "\n"
+			"2 : Modèle plat ou flat shading (calculs par primitive)" "\n"
+			"3 : Modèle de Gouraud (calculs par sommet)" "\n"
+			"4 : Modèle de Phong (calculs par fragment)" "\n"
+			"W et S : Bouger la lumière sur l'axe des Z" "\n"
+			"A et D : Tourner la sphère autour de l'axe des Y" "\n"
+			"N : Changer le types de normales" "\n"
+			"      - 'smooth' : interpolées aux sommets" "\n"
+			"      - 'flat' : perpendiculaire à la face" "\n"
+			"B : Changer la formule de calcul spéculaire entre Blinn et Phong" "\n"
+			"J : Activer/désactiver la réflexion ambiante" "\n"
+			"K : Activer/désactiver la réflexion diffuse" "\n"
+			"L : Activer/désactiver la réflexion spéculaire" "\n"
+			"U : Augmenter le nombre de bande de cel-shading" "\n"
+			"I : Diminuer le nombre de bande de cel-shading (0 = pas de cel-shading)" "\n"
+		);
 		// Config de base, pas de cull, lignes assez visibles.
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -124,48 +147,41 @@ struct App : public OpenGLApplication
 
 		loadShaders();
 
-		// On a deux sphères dont les géométries sont identiques, mais dont les normales sont calculées différemment. "smooth" veut dire normales interpolées aux sommets et "flat" veut dire normales perpendiculaires à la surface des primitives.
+		// On a deux sphères dont les géométries sont identiques, mais dont les normales sont calculées différemment. "smooth" veut dire normales interpolées aux sommets et "flat" veut dire normales perpendiculaires à la surface des primitives. Cette information est précaculée (par Blender par exemple) et encodée dans le mesh lui-même (VertexData::normal).
 		shapeFlat = Mesh::loadFromWavefrontFile("sphere_flat.obj")[0];
 		shapeSmooth = Mesh::loadFromWavefrontFile("sphere_smooth.obj")[0];
 		buildNormalLines(0.5f);
 
 		// Initialiser le matériau.
-		material.reset(
-			"Material", 0, {
-				{0.0, 0.1, 0.0, 1.0},
-				{0.2, 0.1, 0.1, 1.0},
-				{0.3, 0.7, 0.3, 1.0},
-				{0.5, 0.5, 1.0, 1.0},
-				50
-			}
-		);
+		material = Material{
+			{0.0, 0.1, 0.0, 1.0},
+			{0.2, 0.1, 0.1, 1.0},
+			{0.3, 0.7, 0.3, 1.0},
+			{0.5, 0.5, 1.0, 1.0},
+			50
+		};
 		material.setup();
 
 		// Initialiser la lumière.
-		light.reset(
-			"LightSource", 1, {
-				{0.0, 0.0, 5.0, 1.0},
-				{1.0, 1.0, 1.0, 1.0},
-				{1.0, 1.0, 1.0, 1.0},
-				{1.0, 1.0, 1.0, 1.0},
-				0.001,
-				0.005,
-				0.01,
-				{0, 0, -1, 1},
-				20,
-				1,
-			}
-		);
+		light = LightSource{
+			{0.0, 0.0, 5.0, 1.0},
+			{1.0, 1.0, 1.0, 1.0},
+			{1.0, 1.0, 1.0, 1.0},
+			{1.0, 1.0, 1.0, 1.0},
+			0.001,
+			0.005,
+			0.01,
+			{0, 0, -1, 1},
+			20,
+			1,
+		};
 		light.setup();
 
 		// Initialiser le modèle d'éclairage. dans ce cas on n'utilise pas de couleur ambiante (c'est la source lumineuse qui l'a).
-		lightModel.reset(
-			"LightModel", 2,
-			{{0, 0, 0, 1}, true}
-		);
+		lightModel = LightModel{{0, 0, 0, 1}, true};
 		lightModel.setup();
 
-		// On lie chacun des blocs uniformes aux variables uniforme des nuanceurs.
+		// Lier chacun des blocs uniformes aux variables uniformes des nuanceurs.
 		for (auto&& prog : programs) {
 			material.bindToProgram(*prog);
 			light.bindToProgram(*prog);
@@ -229,10 +245,12 @@ struct App : public OpenGLApplication
 		// W et S : Bouger la lumière sur l'axe des Z
 		// A et D : Tourner la sphère autour de l'axe des Y
 		// 1 : Démo des modèles de calcul de normales
-		// 2 : Modèle de Lambert (calculs par primitive)
+		// 2 : Modèle plat ou flat shading (calculs par primitive)
 		// 3 : Modèle de Gouraud (calculs par sommet)
 		// 4 : Modèle de Phong (calculs par fragment)
-		// N : Changer le types de normales ("smooth" - par sommet, ou "flat" - par face)
+		// N : Changer le types de normales
+		//       - "smooth" : interpolées aux sommets
+		//       - "flat" : perpendiculaire à la face)
 		// B : Changer la formule de calcul spéculaire entre Blinn et Phong
 		// J : Activer/désactiver la réflexion ambiante
 		// K : Activer/désactiver la réflexion diffuse
@@ -265,48 +283,60 @@ struct App : public OpenGLApplication
 			break;
 
 		case Num1:
+			drawMode = 1;
 			currentProg = &uniformProg;
+			std::cout << "Démo des normales" << "\n";
 			break;
 		case Num2:
-			// Dans le modèle de Lambert, les calculs sont effectués une fois par primitive, donc dans le nuanceur de géométrie. Les résultats sont passés également à tous les fragments de la primitive.
-			currentProg = &lambertProg;
+			// Dans le modèle plat, les calculs sont effectués une fois par primitive, donc dans le nuanceur de géométrie. Les résultats sont passés également à tous les fragments de la primitive.
+			drawMode = 2;
+			currentProg = &flatProg;
+			std::cout << "Modèle plat (flat shading)" << "\n";
 			break;
 		case Num3:
 			// Dans le modèle de Gouraud, les calculs sont effectués une fois par sommet, donc dans le nuanceur de sommets. Les résultats (couleurs) sont passés en sortie des sommets et donc interpolés aux fragments.
+			drawMode = 3;
 			currentProg = &gouraudProg;
+			std::cout << "Modèle de Gouraud" << "\n";
 			break;
 		case Num4:
 			// Dans le modèle de Phong, les calculs géométriques (positions, directions, normales) sont faits dans le nuanceur de sommet et interpolés aux fragments. C'est ensuite dans chaque fragment que sont effectués les calculs d'éclairage avec les vecteurs interpolés en entrée.
+			drawMode = 4;
 			currentProg = &phongProg;
+			std::cout << "Modèle de Phong" << "\n";
 			break;
 
 		case N:
 			usingSmoothNormals ^= 1;
+			std::cout << (usingSmoothNormals ? "Normales lisses" : "Normales plates") << "\n";
 			break;
 		case B:
 			usingBlinnFormula ^= 1;
+			std::cout << (usingBlinnFormula ? "Formule de Blinn" : "Formule de Phong") << "\n";
 			break;
 
 		case J:
 			showingAmbientReflection ^= 1;
+			std::cout << "Réflexion ambiante " << (showingAmbientReflection ? "ON" : "OFF") << "\n";
 			break;
 		case K:
 			showingDiffuseReflection ^= 1;
+			std::cout << "Réflexion diffuse " << (showingDiffuseReflection ? "ON" : "OFF") << "\n";
 			break;
 		case L:
 			showingSpecularReflection ^= 1;
+			std::cout << "Réflexion spéculaire " << (showingSpecularReflection ? "ON" : "OFF") << "\n";
 			break;
 
 		case U:
 			numCelShadingBands = std::max(1, numCelShadingBands + 1);
+			std::cout << "Cel-shading : " << numCelShadingBands << "\n";
 			break;
 		case I:
 			numCelShadingBands = std::max(1, numCelShadingBands - 1);
+			std::cout << "Cel-shading : " << numCelShadingBands << "\n";
 			break;
 		}
-
-		if (Num0 <= key.code and key.code <= Num9)
-			drawMode = key.code - Num0;
 
 		for (auto&& prog : programs)
 			camera.updateProgram(*prog, view);
@@ -340,12 +370,12 @@ struct App : public OpenGLApplication
 		uniformProg.attachSourceFile(GL_FRAGMENT_SHADER, "uniform_frag.glsl");
 		uniformProg.link();
 
-		// Le nuanceur de fragments pour Lambert prend en entrée la couleur (venant du nuanceur de géométrie) et l'affecte telle-quelle en sortie. On réutilise donc le nuanceur de fragments de Gouraud.
-		lambertProg.create();
-		lambertProg.attachSourceFile(GL_VERTEX_SHADER, "lambert_vert.glsl");
-		lambertProg.attachSourceFile(GL_GEOMETRY_SHADER, "lambert_geom.glsl");
-		lambertProg.attachSourceFile(GL_FRAGMENT_SHADER, "gouraud_frag.glsl");
-		lambertProg.link();
+		// Le nuanceur de fragments pour le flat shading prend en entrée la couleur (venant du nuanceur de géométrie) et l'affecte telle-quelle en sortie. On réutilise donc le nuanceur de fragments de Gouraud.
+		flatProg.create();
+		flatProg.attachSourceFile(GL_VERTEX_SHADER, "flat_vert.glsl");
+		flatProg.attachSourceFile(GL_GEOMETRY_SHADER, "flat_geom.glsl");
+		flatProg.attachSourceFile(GL_FRAGMENT_SHADER, "gouraud_frag.glsl");
+		flatProg.link();
 
 		gouraudProg.create();
 		gouraudProg.attachSourceFile(GL_VERTEX_SHADER, "gouraud_vert.glsl");

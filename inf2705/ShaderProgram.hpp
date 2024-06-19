@@ -241,7 +241,7 @@ private:
 	std::unordered_map<GLenum, std::unordered_set<GLuint>> shadersByType_; // Les nuanceurs.
 };
 
-// Une variable uniforme qui se rappelle de ses localisations pour chaque programme nuanceur. On peut accéder à la valeur sous-jacente avec getValue() ou comme un pointeur avec * et ->.
+// Une variable uniforme qui se rappelle de ses localisations pour chaque programme nuanceur. On peut accéder à la valeur sous-jacente avec get() ou comme un pointeur avec * et ->.
 template <typename T>
 class Uniform
 {

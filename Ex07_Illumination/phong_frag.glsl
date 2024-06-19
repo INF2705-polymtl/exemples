@@ -3,18 +3,11 @@
 #version 410
 
 
-in vec2 texCoords;
-in vec3 normal;
-in vec3 observerDir;
-in vec3 lightDir;
-
-
 uniform bool usingBlinnFormula = true;
 uniform bool showingAmbientReflection = true;
 uniform bool showingDiffuseReflection = true;
 uniform bool showingSpecularReflection = true;
 uniform int numCelShadingBands = 0;
-
 
 layout(std140) uniform Material
 {
@@ -44,6 +37,12 @@ layout(std140) uniform LightModel
 	vec4 ambientColor;
 	bool localViewer;
 } lightModel;
+
+
+in vec2 texCoords;
+in vec3 normal;
+in vec3 observerDir;
+in vec3 lightDir;
 
 
 out vec4 fragColor;
@@ -98,11 +97,13 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 
 
 void main() {
+	// Émission du matériau (ne dépend pas des sources lumineuses).
 	fragColor = material.emissionColor;
 	
+	// Calcul de l'atténuation selon la distance.
 	float dist = length(lightDir);
 	float distFactor = 1.0 / (light.fadeCst + light.fadeLin * dist + light.fadeQuad * dist*dist);
-	distFactor = min(1, distFactor);
+	distFactor = clamp(distFactor, 0, 1);
 
 	Reflections reflections = computeReflection(
 		normalize(lightDir),

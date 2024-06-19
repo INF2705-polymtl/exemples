@@ -161,14 +161,15 @@
     <ClInclude Include="..\inf2705\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="uniform_frag.glsl" />
     <None Include="basic_vert.glsl" />
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
     <None Include="gouraud_frag.glsl" />
     <None Include="gouraud_vert.glsl" />
-    <None Include="lambert_geom.glsl" />
-    <None Include="lambert_vert.glsl" />
+    <None Include="flat_geom.glsl" />
+    <None Include="flat_vert.glsl" />
     <None Include="phong_frag.glsl" />
     <None Include="phong_vert.glsl" />
   </ItemGroup>
