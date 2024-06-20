@@ -21,8 +21,8 @@ void main() {
 	// Calculer la matrice de transformation.
 	mat4 transform = projection * view * model;
 	// Calculer et affecter les coordonnées normalisées du sommet.
-	vec4 position = transform * vec4(a_position, 1.0);
-	gl_Position = position;
+	vec4 clipPosition = transform * vec4(a_position, 1.0);
+	gl_Position = clipPosition;
 	// Passer les coordonnées de texture en sortie.
 	texCoords = a_texCoords;
 }

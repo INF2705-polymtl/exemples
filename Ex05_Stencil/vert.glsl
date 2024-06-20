@@ -15,11 +15,11 @@ out vec2 texCoords;
 
 
 void main() {
-	// Les manipulations habituelles, on n'a pas besoin d'un nuanceur de sommets particulier pour faire la sélection.
+	// Appliquer les transformations usuelles.
 	vec4 worldPosition = model * vec4(a_position, 1.0);
 	vec4 viewPosition = view * worldPosition;
-	vec4 normPosition = projection * viewPosition;
+	vec4 clipPosition = projection * viewPosition;
 
-	gl_Position = normPosition;
+	gl_Position = clipPosition;
 	texCoords = a_texCoords;
 }

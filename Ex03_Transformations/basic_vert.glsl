@@ -23,11 +23,15 @@ void main() {
 	// On fait donc Projection * Visualisation * Modélisation. On se rappelle que la multiplication matricielle est associative, mais pas commutative.
 	mat4 transform = projection * view * model;
 	// Appliquer la matrice de transformation à la position du sommet. Il faut ajouter une coordonnée virtuelle W=1 au vecteur XYZ.
-	vec4 coords = transform * vec4(a_position, 1.0);
+	vec4 clipCoords = transform * vec4(a_position, 1.0);
 	// gl_Position est une variable de sortie « built-in » dans laquelle on met la position transformée du sommet.
-	gl_Position = coords;
+	gl_Position = clipCoords;
 
-	// On pourrait passer la matrice de transformation (MVP) déjà calculée sur le CPU comme variable uniforme. C'est aussi une bonne idée d'avoir les trois matrices séparées dans le nuanceur de sommets pour garder plus de contrôle sur les calculs faits.
+	// On pourrait passer la matrice de transformation (MVP) déjà calculée sur le CPU comme variable uniforme. C'est aussi une bonne idée d'avoir les trois matrices séparées dans le nuanceur de sommets pour garder plus de contrôle sur les calculs faits. Par exemple,on pourrait aussi séparer nos étapes de transformation pour obtenir les coordonnées de scène (model * a_position), les coords de visualisation (view * model * position) et coordonnées de projection (projection * view * model * position).
+	//vec4 worldPosition = model * vec4(a_position, 1.0);
+	//vec4 viewPosition = view * worldPosition;
+	//vec4 clipPosition = projection * viewPosition;
+	//gl_Position = clipPosition;
 	
 	// Affecter la couleur telle-quelle. Elle sera interpolée entre les sommets pour le nuanceur de fragments.
 	color = a_color;

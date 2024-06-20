@@ -17,13 +17,12 @@ out float distanceToCamera;
 
 
 void main() {
-	// Les coordonnées d'objets, de scène (ou univers), de visualisation et normalisées.
+	// Appliquer les transformations usuelles.
 	vec4 worldPosition = model * vec4(a_position, 1.0);
 	vec4 viewPosition = view * worldPosition;
-	vec4 normPosition = projection * viewPosition;
+	vec4 clipPosition = projection * viewPosition;
 
-	// Faire les trucs habituels.
-	gl_Position = normPosition;
+	gl_Position = clipPosition;
 	texCoords = a_texCoords;
 
 	// Calculer la distance du sommet à la caméra en utilisant les coodonnées de visualisation.

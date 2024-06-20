@@ -18,8 +18,8 @@ void main() {
 	// Appliquer les transformations habituelles.
 	vec4 worldPosition = model * vec4(a_position, 1.0);
 	vec4 viewPosition = view * worldPosition;
-	vec4 normPosition = projection * viewPosition;
+	vec4 clipPosition = projection * viewPosition;
 
-	gl_Position = normPosition;
+	gl_Position = clipPosition;
 	texCoords = a_texCoords;
 }

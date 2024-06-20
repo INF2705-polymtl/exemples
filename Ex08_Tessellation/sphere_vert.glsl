@@ -19,9 +19,9 @@ void main() {
 	// Appliquer les transformations habituelles.
 	vec4 worldPosition = model * vec4(a_position, 1.0);
 	vec4 viewPosition = view * worldPosition;
-	vec4 normPosition = projection * viewPosition;
+	vec4 clipPosition = projection * viewPosition;
 
-	gl_Position = normPosition;
+	gl_Position = clipPosition;
 
 	// On passe les coordonnées d'objets (en attributs de sortie) en plus des positions normalisées dans gl_Position pour laisser plus d'options au nuanceur suivant dans le pipeline.
 	outputs.texCoords = a_texCoords;
