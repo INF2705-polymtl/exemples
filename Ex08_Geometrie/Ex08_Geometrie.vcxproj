@@ -166,7 +166,8 @@
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
     <None Include="extrude_vert.glsl" />
-    <None Include="spikes_geom.glsl" />
+    <None Include="README.md" />
+    <None Include="extrude_geom.glsl" />
     <None Include="sprites_geom.glsl" />
     <None Include="uniform_frag.glsl" />
   </ItemGroup>

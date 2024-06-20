@@ -134,6 +134,7 @@ struct App : public OpenGLApplication
 			"U : Augmenter le nombre de bande de cel-shading" "\n"
 			"I : Diminuer le nombre de bande de cel-shading (0 = pas de cel-shading)" "\n"
 		);
+
 		// Config de base, pas de cull, lignes assez visibles.
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);

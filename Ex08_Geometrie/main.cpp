@@ -26,6 +26,7 @@ using namespace gl;
 using namespace glm;
 
 
+// Un spritesheet est une vielle méthode d'animation numérique. C'est à la base une image contient plusieurs sprites (lutins). Ces sprites sont de petites images qui, ensemble, forment les trames d'une animation. Chaque sprite dans le spritesheet est placé dans une disposition régulière (horizontalement dans notre cas). On utilise ensuite un index dans le spritesheet pour afficher le sprite correct à l'écran.
 struct SpriteSheet
 {
 	sf::Image originalImg;
@@ -95,10 +96,25 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
-		// Config de base, pas de cull, lignes assez visibles.
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"U : Augmenter l'extrusion." "\n"
+			"I : Diminuer l'extrusion." "\n"
+			"O : Appliquer l'extrusion sur les coordonnées de scène ou d'objet." "\n"
+			"W et S : Étirer/compresser le d20 en Y." "\n"
+			"A et D : Étirer/compresser le d20 en XZ." "\n"
+			"Espace : Coup d'épée (début d'animation)." "\n"
+		);
+
+		// Config de base, lignes assez visibles.
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
-		glDisable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_POINT_SMOOTH);
@@ -108,7 +124,7 @@ struct App : public OpenGLApplication
 
 		loadShaders();
 
-		// Le D20 qui sera extrudé.
+		// Le d20 qui sera extrudé.
 		d20 = Mesh::loadFromWavefrontFile("d20.obj")[0];
 		// La ligne séparant les deux viewports.
 		line.vertices = {
@@ -139,9 +155,9 @@ struct App : public OpenGLApplication
 		// Les liaisons et variables uniformes constantes.
 		texRust.bindToTextureUnit(0);
 		extrudeSpikesProg.use();
-		extrudeSpikesProg.setTextureUnit("texMain", 0);
+		extrudeSpikesProg.setInt("texMain", 0);
 		spritesProg.use();
-		spritesProg.setTextureUnit("texMain", 1);
+		spritesProg.setInt("texMain", 1);
 		uniColorProg.use();
 		uniColorProg.setVec("globalColor", vec4(1, 0.7f, 0.7f, 1));
 
@@ -185,8 +201,8 @@ struct App : public OpenGLApplication
 		// U : Augmenter l'extrusion.
 		// I : Diminuer l'extrusion.
 		// O : Appliquer l'extrusion sur les coordonnées de scène ou d'objet.
-		// W et S : Étirer/compresser le D20 en Y
-		// A et D : Étirer/compresser le D20 en XZ
+		// W et S : Étirer/compresser le d20 en Y
+		// A et D : Étirer/compresser le d20 en XZ
 		// Espace : Coup d'épée (début d'animation).
 
 		camera.handleKeyEvent(key, 5, 0.5, {5, 30, 30, 0});
@@ -323,7 +339,7 @@ struct App : public OpenGLApplication
 
 		// Pour les deux programmes utilisant des textures (extrusions et sprites), on peut utiliser le nuanceur de fragments de base qui échantillonne simplement une texture avec des coordonnées en entrée.
 		extrudeSpikesProg.attachSourceFile(GL_VERTEX_SHADER, "extrude_vert.glsl");
-		extrudeSpikesProg.attachSourceFile(GL_GEOMETRY_SHADER, "spikes_geom.glsl");
+		extrudeSpikesProg.attachSourceFile(GL_GEOMETRY_SHADER, "extrude_geom.glsl");
 		extrudeSpikesProg.attachSourceFile(GL_FRAGMENT_SHADER, "basic_frag.glsl");
 		extrudeSpikesProg.link();
 
