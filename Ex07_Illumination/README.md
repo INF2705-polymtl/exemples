@@ -2,7 +2,7 @@
 
 ## Encapsulation des variables et blocs uniformes
 
-Dans cet exemple, on passe les données de matériau et de source lumineuse uniformément. Ça ferait beaucoup de variables uniformes. On va plutôt les passer dans des blocs uniformes, à l'aide de *uniform buffer objects* (UBO). Ceux-ci fonctionne comme un mélange de variables uniformes et de VBO. Les détails ne sont pas importants, on les a encapsulés dans la classe `UniformBlock` (dans le fichier [ShaderProgram.hpp](../inf2705/ShaderProgram.hpp))
+Dans cet exemple, on passe les données de matériau et de source lumineuse uniformément. Ça ferait beaucoup de variables uniformes. On va plutôt les passer dans des blocs uniformes, à l'aide de *uniform buffer objects* (UBO). Ceux-ci fonctionnent comme un mélange de variables uniformes et de VBO. Les détails ne sont pas importants, on les a encapsulés dans la classe `UniformBlock` (dans le fichier [ShaderProgram.hpp](../inf2705/ShaderProgram.hpp))
 
 ```c++
 // Une struct qui aura son équivalent dans les nuanceurs.
@@ -36,7 +36,7 @@ On peut choisir d'utiliser des normales qui sont interpolées aux sommets (lisse
 
 ## Formats de normales
 
-En sélectionnant le mode d'affichage 1, on peut voir de quoi on l'air les normales selon le modèle lisse ou plat dans les données du maillage. Les normales plates sont tout simplement perpendiculaires à la primitive à laquelle appartient le sommet. La normale *lisse* pour un sommet est la moyenne des normales des primitives qui se croise à ce sommet.
+En sélectionnant le mode d'affichage 1, on peut voir de quoi ont l'air les normales selon le modèle lisse ou plat dans les données du maillage. Les normales plates sont tout simplement perpendiculaires à la primitive à laquelle appartient le sommet. La normale *lisse* pour un sommet est la moyenne des normales des primitives qui se croise à ce sommet.
 
 Ces normales sont précalculées et incluses dans les données du maillage. On a donc deux maillages différents pour représenter la sphère : [sphere_flat.obj](sphere_flat.obj) et [sphere_smooth.obj](sphere_smooth.obj).
 
