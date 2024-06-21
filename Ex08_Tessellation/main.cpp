@@ -48,6 +48,22 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"Z : afficher en faces pleines ou wireframe." "\n"
+			"X : montrer ou cacher les arêtes de la forme originale (avant tessellation)." "\n"
+			"C : activer/désactiver le cull des faces arrières." "\n"
+			"W et S : étirer/compresser le d20 en Y." "\n"
+			"A et D : étirer/compresser le d20 en XZ." "\n"
+			"I et shift+I : augmenter/diminuer le niveau de tess intérieur." "\n"
+			"O et shift+O : augmenter/diminuer le niveau de tess extérieur." "\n"
+		);
+
 		// Config de base, pas de cull, lignes assez visibles.
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -67,7 +83,7 @@ struct App : public OpenGLApplication
 		texBox = Texture::loadFromFile("box_bg.png");
 		texBox.bindToTextureUnit(0);
 		sphereProg.use();
-		sphereProg.setTextureUnit("texMain", 0);
+		sphereProg.setInt("texMain", 0);
 
 		uniColorProg.use();
 		uniColorProg.setVec("globalColor", vec4(1, 1, 1, 1));
@@ -90,7 +106,7 @@ struct App : public OpenGLApplication
 			glDisable(GL_CULL_FACE);
 		// Configurer le nombre de sommets par patch. Ici on choisit 3 pour traiter chaque triangle comme un patch (plus simple pour ce qu'on veut faire).
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
-		// Dessiner le D20 en utilisant GL_PATCHES plutôt que le GL_TRIANGLES auquel on est habitué.
+		// Dessiner le d20 en utilisant GL_PATCHES plutôt que le GL_TRIANGLES auquel on est habitué.
 		d20.draw(GL_PATCHES);
 
 		// Dessiner la forme originale pour mieux illustrer la tessellation.
@@ -125,25 +141,32 @@ struct App : public OpenGLApplication
 		switch (key.code) {
 		case A:
 			model.scale({1.1f, 1, 1.1f});
+			//std::cout << "Scale XZ : " << model.top()[0][0] << "\n";
 			break;
 		case D:
 			model.scale({0.9f, 1, 0.9f});
+			//std::cout << "Scale XZ : " << model.top()[0][0] << "\n";
 			break;
 		case W:
 			model.scale({1, 1.1f, 1});
+			//std::cout << "Scale Y : " << model.top()[1][1] << "\n";
 			break;
 		case S:
 			model.scale({1, 0.9f, 1});
+			//std::cout << "Scale Y : " << model.top()[1][1] << "\n";
 			break;
 
 		case Z:
 			wireframeMode ^= 1;
+			std::cout << "Wireframe " << (wireframeMode ? "ON" : "OFF") << "\n";
 			break;
 		case X:
 			showingOriginalShape ^= 1;
+			std::cout << "Mesh original visible " << (showingOriginalShape ? "ON" : "OFF") << "\n";
 			break;
 		case C:
 			cullMode ^= 1;
+			std::cout << "Cull " << (cullMode ? "ON" : "OFF") << "\n";
 			break;
 
 		case I:
@@ -154,6 +177,10 @@ struct App : public OpenGLApplication
 			tessLevelInner = std::max(tessLevelInner.get(), 1);
 			sphereProg.use();
 			sphereProg.setUniform(tessLevelInner);
+			std::cout << std::format(
+				"Niveau tess intérieur={} extérieur={}",
+				tessLevelInner.get(), tessLevelOuter.get()
+			) << "\n";
 			break;
 		case O:
 			if (key.shift)
@@ -163,6 +190,10 @@ struct App : public OpenGLApplication
 			tessLevelOuter = std::max(tessLevelOuter.get(), 1);
 			sphereProg.use();
 			sphereProg.setUniform(tessLevelOuter);
+			std::cout << std::format(
+				"Niveau tess intérieur={} extérieur={}",
+				tessLevelInner.get(), tessLevelOuter.get()
+			) << "\n";
 			break;
 		}
 	}

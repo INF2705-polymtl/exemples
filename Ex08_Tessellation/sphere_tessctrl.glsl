@@ -3,13 +3,15 @@
 layout(vertices = 3) out;
 
 
-in VertOut {
+uniform int tessLevelInner = 1;
+uniform int tessLevelOuter = 1;
+
+
+in VertexOut {
 	vec3 origPosition;
 	vec2 texCoords;
 } inputs[];
 
-uniform int tessLevelInner = 1;
-uniform int tessLevelOuter = 1;
 
 out TessCtrlOut {
 	vec3 origPosition;

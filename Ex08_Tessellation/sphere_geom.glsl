@@ -5,14 +5,16 @@ layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
 
+uniform mat4 model = mat4(1);
+uniform mat4 view = mat4(1);
+uniform mat4 projection = mat4(1);
+
+
 in TessEvalOut {
 	vec3 origPosition;
 	vec2 texCoords;
 } inputs[];
 
-uniform mat4 model = mat4(1);
-uniform mat4 view = mat4(1);
-uniform mat4 projection = mat4(1);
 
 out vec2 texCoords;
 
