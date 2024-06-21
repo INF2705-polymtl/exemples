@@ -43,6 +43,12 @@ Ces normales sont précalculées et incluses dans les données du maillage. On a
 <img src="doc/normals_flat.png"/>
 <img src="doc/normals_smooth.png"/>
 
+## Cel-shading
+
+On peut aussi contrôler un effet de *cel-shading* (pensez à *Wind Waker* pour ceux qui s'en rappellent). Ça rend la réflexion diffuse moins lisse, en approximant l'intensité à un palier plus proche, créant des bandes distinctes. Ça donne un effet artistique plus proche d'une bande dessinée.
+
+<img src="doc/cel_shading.png"/>
+
 ## Contrôles
 
 * R : réinitialiser la position de la caméra.

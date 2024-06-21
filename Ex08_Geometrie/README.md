@@ -8,11 +8,11 @@ La fenêtre est séparée en deux sections. Un appel différent à `glViewport` 
 
 ## Extrusion de faces
 
-La moitié supérieur de la fenêtre montre un icosaèdre (un *d20* pour ceux qui aiment les jeux de société) texturé.
+La moitié supérieure de la fenêtre montre un icosaèdre (un *d20* pour ceux qui aiment les jeux de société) texturé.
 
 <img src="doc/d20_basic.png"/>
 
-En appuyant sur U et I, on change la variable uniforme `extrudeLength`. Dans le nuanceur de géométrie ([extrude_geom.glsl](extrude_geom.glsl)), des faces sont ajoutées à la forme sous la forme de pics extrudées des faces. Le maillage de base du d20 n'inclut pas ces faces additionnelles, elles sont générées par le nuanceur de géométrie.
+En appuyant sur U et I, on change la variable uniforme `extrudeLength`. Dans le nuanceur de géométrie ([extrude_geom.glsl](extrude_geom.glsl)), des faces sont ajoutées à la forme sous la forme de pics extrudés des faces. Le maillage de base du d20 n'inclut pas ces faces additionnelles, elles sont générées par le nuanceur de géométrie.
 
 <img src="doc/d20_extruded.png"/>
 

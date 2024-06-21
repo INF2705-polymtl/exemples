@@ -46,7 +46,7 @@ void main() {
 	mat4 transformMat = (usingWorldPositions) ? projection * view : projection * view * model;
 	vec4 spikeTipNormPos = transformMat * vec4(spikeTip, 1);
 
-	// Pour chacune des arêtes de la primitive, on génère un triangle dont l'arête original est la base et le pic calculée est le haut du triangle.
+	// Pour chacune des arêtes de la primitive, on génère un triangle dont l'arête originale est la base et le pic calculé est le haut du triangle.
 	for (int i = 0; i < 3; i++) {
 		// Le premier sommet de la base du pic.
 		gl_Position = gl_in[i].gl_Position;
@@ -58,7 +58,7 @@ void main() {
 		texCoords = inputs[1].texCoords;
 		EmitVertex();
 
-		// Le sommet du pic. On remarque l'ordre dans lequel les sommets sont générés pour garder l'ordre de la primitive originale. De cette façon, si la face original est une face avant, les faces extrudées seront aussi des faces avant.
+		// Le sommet du pic. On remarque l'ordre dans lequel les sommets sont générés pour garder l'ordre de la primitive originale. De cette façon, si la face originale est une face avant, les faces extrudées seront aussi des faces avant.
 		gl_Position = spikeTipNormPos;
 		texCoords = inputs[2].texCoords;
 		EmitVertex();

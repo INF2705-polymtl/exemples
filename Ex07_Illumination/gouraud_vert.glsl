@@ -76,10 +76,10 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 	if (dotProd > 0.0) {
 		// Calculer la réflexion diffuse. Elle dépend de la normale et de la position de la source lumineuse.
 		result.diffuse = material.diffuseColor * light.diffuseColor * dotProd;
-		// Appliquer le facteur d'atténuation selon la distance (c'est le même facteur pour la réflection diffuse et spéculaire).
+		// Appliquer le facteur d'atténuation selon la distance (c'est le même facteur pour la réflexion diffuse et spéculaire).
 		result.diffuse *= attenuation;
 
-		// Calculer l'intensité de la réflection spéculaire selon la formule de Blinn ou Phong. Elle dépend de la position de la lumière, de la normale et de la position de l'observateur.
+		// Calculer l'intensité de la réflexion spéculaire selon la formule de Blinn ou Phong. Elle dépend de la position de la lumière, de la normale et de la position de l'observateur.
 		float specIntensity = (usingBlinnFormula) ?
 			// Blinn utilise la bissectrice.
 			dot(normalize(l + o), n) :
