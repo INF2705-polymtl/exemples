@@ -6,7 +6,8 @@ layout(location = 1) in vec3 a_velocity;
 layout(location = 2) in float a_mass;
 layout(location = 3) in float a_miscValue;
 
-out VertOut {
+
+out VertexOut {
 	vec3 position;
 	vec3 velocity;
 	float mass;

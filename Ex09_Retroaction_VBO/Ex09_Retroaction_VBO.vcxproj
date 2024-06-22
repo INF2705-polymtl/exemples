@@ -167,6 +167,7 @@
     <None Include="particles_compute_vert.glsl" />
     <None Include="particles_draw_geom.glsl" />
     <None Include="particles_draw_vert.glsl" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

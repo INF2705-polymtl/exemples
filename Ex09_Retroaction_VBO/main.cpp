@@ -29,14 +29,16 @@ using namespace gl;
 using namespace glm;
 
 
+// Les données cinétiques d'une particle. C'est ce qui est chargé et modifié dans les VBO. On remarque que ce ne sont pas des données utiles au dessin (comme la classe Mesh par exemple). En effet, le dessin est fait par le nuanceur de géométrie qui utilise les propriétés physiques des particules pour les dessiner.
 struct Particle
 {
-	vec3 position;
-	vec3 velocity;
-	float mass;
-	float miscValue;
+	vec3 position; // Coordonnées dans la scène.
+	vec3 velocity; // Vecteur de vitesse (donc direction de la particule).
+	float mass; // Masse (affecte l'accélération et taille de la particule).
+	float miscValue; // Une valeur quelquonque. On peut mettre ce qu'on veut dans nos données.
 
-	static void setAttribs() {
+	// Configurer les attributs dans un VBO.
+	static void setupAttribs() {
 		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(0, Particle, position);
 		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(1, Particle, velocity);
 		SET_SCALAR_VERTEX_ATTRIB_FROM_STRUCT_MEM(2, Particle, mass);
@@ -46,6 +48,7 @@ struct Particle
 
 struct App : public OpenGLApplication
 {
+	const size_t numParticles = 1'000'000;
 	std::vector<Particle> particles;
 	GLuint vaoDrawing = 0;
 	GLuint vaoComputation = 0;
@@ -72,7 +75,17 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
-		// Vu que l'affichage et le traitement vont être un peu plus lourd, on désactive le blend et z-test.
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"flèches : bouger la caméra dans le plan XY." "\n"
+			"roulette de souris : zoom in/out." "\n"
+			"clic gauche : appliquer un champ attractif sur le curseur de la souris." "\n"
+			"clic droit : appliquer un champ répulsif sur le curseur de la souris." "\n"
+			"espace : freiner les particules." "\n"
+			"F : sauvegarder les données de particules dans un fichier CSV en plus d'un screenshot." "\n"
+		);
+
+		// Vu que le traitement vont être un peu plus lourd, on désactive le blend et z-test.
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -80,12 +93,10 @@ struct App : public OpenGLApplication
 
 		loadShaders();
 
-		constexpr size_t numParticles = 100'000;
-		particles.resize(numParticles);
-
 		// Générer l'état initial des particules. On applique une distribution normale (gaussienne) centrée en 0,0 pour la position et la vitesse et une distribution uniforme pour la masse.
+		particles.resize(numParticles);
 		std::mt19937_64 randEng(time(nullptr));
-		std::normal_distribution<float> normDist(0.0f, 2.0f);
+		std::normal_distribution<float> normDist(0.01f, 2.0f);
 		std::uniform_real_distribution<float> uniDist(0.5f, 1.0f);
 		auto randomNorm = [&]() { return normDist(randEng); };
 		auto randomUni = [&]() { return uniDist(randEng); };
@@ -101,10 +112,8 @@ struct App : public OpenGLApplication
 			p.miscValue = (float)i / (numParticles - 1);
 			particles[i] = p;
 		}
-		// Mélanger les particules.
-		std::shuffle(particles.begin(), particles.end(), randEng);
 
-		// Créer les VAO. Dans notre exemple assez simple, ce n'est pas nécessaire d'en avoir deux. Mais en général, on va avoir un VAO pour chaque mesh à afficher, donc ceux-ci auront très probablement des configs différentes du VAO de calcul (EBO différent, vertex attribs venant de plusieurs VBO, etc.). Bref n'importe quel état qui est sauvegardé dans le VAO et pourrait être différent pour le calcul et l'affichage.
+		// Créer les VAO. Dans notre exemple assez simple, ce n'est pas nécessaire d'en avoir deux. Mais en général, on va avoir un VAO pour chaque mesh à afficher, donc ceux-ci auront très probablement des configs différentes du VAO de calcul (EBO différent, vertex attribs venant de plusieurs VBO, etc.). Bref, n'importe quel état qui est sauvegardé dans le VAO et pourrait être différent pour le calcul et l'affichage.
 		glGenVertexArrays(1, &vaoDrawing);
 		glGenVertexArrays(1, &vaoComputation);
 		// Créer les VBO.
@@ -236,10 +245,10 @@ struct App : public OpenGLApplication
 
 	// Appelée lors d'un bouton de souris appuyé.
 	void onMouseButtonPress(const sf::Event::MouseButtonEvent& mouseBtn) override {
-		// Bouton gauche appuyé : champs attractif
-		// Bouton droit appuyé : champs répulsif
+		// Bouton gauche appuyé : champ attractif
+		// Bouton droit appuyé : champ répulsif
 		auto& mouse = getMouse();
-		// Mettre à jour l'intensité du champs de force selon les boutons de la souris.
+		// Mettre à jour l'intensité du champ de force selon les boutons de la souris.
 		computationProg.use();
 		computationProg.setUniform(forceFieldStrength);
 		if (mouseBtn.button == sf::Mouse::Left)
@@ -252,7 +261,7 @@ struct App : public OpenGLApplication
 
 	// Appelée lors d'un bouton de souris relâché.
 	void onMouseButtonRelease(const sf::Event::MouseButtonEvent& mouseBtn) override {
-		// Relâcher le bouton de souris désactive le champs de force.
+		// Relâcher le bouton de souris désactive le champ de force.
 		if (mouseBtn.button == sf::Mouse::Left)
 			forceFieldStrength = 0;
 		else if (mouseBtn.button == sf::Mouse::Right)
@@ -280,11 +289,11 @@ struct App : public OpenGLApplication
 		deltaTime = getFrameDeltaTime();
 		computationProg.setUniform(deltaTime);
 
-		// Mettre à jour l'origine du champs de force avec la souris.
+		// Mettre à jour l'origine du champ de force avec la souris.
 		// Pour obtenir la position de la souris dans la scène (on a juste une scène 2D dans notre cas donc on assume z=0) on applique l'inverse de la matrice projection * visualisation aux coordonnées d'écrans normalisées de la souris.
 		// En effet, si prend les coordonnées de la souris relatives au centre de la fenêtre et normalisées dans [-1,1], on a l'équivalent des coordonnées normalisées d'OpenGL. En appliquant l'inverse des matrices de proj et visu (pas modèle), on obtient donc les coordonnées de scène.
 		// P·V·M·A = A′          où A est un vecteur de position et A′ est sa coords normalisées
-		//     M·A = (P·V)⁻¹·A′  or M·A est la coordonnées de scène (ou universelle).
+		//     M·A = (P·V)⁻¹·A′  or M·A est la coordonnée de scène (ou universelle).
 		vec2 mousePosition = vec2(getMouse().normalized.x, getMouse().normalized.y);
 		mat4 invTransform = inverse(projection * view);
 		auto v = invTransform * vec4(mousePosition, 0, 1);
@@ -294,7 +303,7 @@ struct App : public OpenGLApplication
 		glBindVertexArray(vaoComputation);
 		// Configurer le VBO d'entrée pour les données de sommets. Il faut répéter les configurations d'attributs quand on bind un différent VBO.
 		glBindBuffer(GL_ARRAY_BUFFER, vboIn);
-		Particle::setAttribs();
+		Particle::setupAttribs();
 		// Configurer le VBO de sortie pour contenir les résultats de calculs.
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vboOut);
 
@@ -315,10 +324,10 @@ struct App : public OpenGLApplication
 	void drawParticles() {
 		drawingProg.use();
 
-		// Rien de très spécial ici, on fait le bind et les configs d'attributs puis on dessine.
+		// Rien de très spécial ici, on fait le bind et les configs d'attributs puis on dessine. Le nuanceur de géométrie s'occupe de générer les sommets en temps réel selon les propriétés physiques des particules.
 		glBindVertexArray(vaoDrawing);
 		glBindBuffer(GL_ARRAY_BUFFER, vboIn);
-		Particle::setAttribs();
+		Particle::setupAttribs();
 		glDrawArrays(GL_POINTS, 0, (GLsizei)particles.size());
 	}
 
@@ -329,7 +338,7 @@ struct App : public OpenGLApplication
 		// Si ce nombre est non-nul, on a des résultats.
 		if (numResults != 0) {
 			// Lire le contenu du tampon de rétroaction dans le tableau de particules original (donc le mettre à jour).
-			auto numBytes = particles.size() * sizeof(Particle);
+			auto numBytes = numResults * sizeof(Particle);
 			glGetBufferSubData(
 				GL_TRANSFORM_FEEDBACK_BUFFER,
 				0,
@@ -356,7 +365,7 @@ struct App : public OpenGLApplication
 			file << "m\tx\ty\tvx\tvy" << "\n";
 			for (auto& p : dataCopy) {
 				file << std::format(
-					"{:.7e}\t{:.7e}\t{:.7e}\t{:.7e}\t{:.7e}",
+					"{:.5e}\t{:.5e}\t{:.5e}\t{:.5e}\t{:.5e}",
 					p.mass,
 					p.position.x, p.position.y,
 					p.velocity.x, p.velocity.y
@@ -368,7 +377,8 @@ struct App : public OpenGLApplication
 				std::cout << readFile(filename) << "\n";
 			}
 		});
-		savingThread.detach();
+		// Détacher le fil pour qu'il se gère tout seul, donc pas besoin de join() ou de garder la variable vivante.
+		savingThread.detach();;
 	}
 
 	void applyOrtho() {

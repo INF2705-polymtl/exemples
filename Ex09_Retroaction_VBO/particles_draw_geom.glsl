@@ -4,20 +4,23 @@ layout(points) in;
 layout(triangle_strip, max_vertices = 128) out;
 
 
-in VertOut {
+uniform mat4 model = mat4(1);
+uniform mat4 view = mat4(1);
+uniform mat4 projection = mat4(1);
+
+uniform int numFaces = 8; // Nombre de faces du polygone généré.
+uniform float trailLengthMax = 10;
+uniform float speedMin = 1e-10;
+uniform float speedMax = 10;
+
+
+in VertexOut {
 	vec3 position;
 	vec3 velocity;
 	float mass;
 	float miscValue;
 } inputs[];
 
-uniform mat4 model = mat4(1);
-uniform mat4 view = mat4(1);
-uniform mat4 projection = mat4(1);
-uniform int numFaces = 8;
-uniform float trailLengthMax = 10;
-uniform float speedMin = 1e-10;
-uniform float speedMax = 10;
 
 out vec4 color;
 
@@ -41,11 +44,13 @@ void main() {
 	float trailLength = mix(1, trailLengthMax, speedValue);
 	// Couleur de la particule dépend de la vitesse (lent = rouge, vite = jaune).
 	vec4 particleColor = mix(vec4(1, 0, 0, 1), vec4(1, 1, 0, 1), speedValue);
-	
+
 	// On veut dessiner un genre de triangle fan, mais on n'a pas cette primitive donc on dessine séparément chaque triangle du triangle fan.
 
 	// Le vecteur de rayon de la première face.
 	vec3 radiusVec = direction * radius;
+	// L'angle entre chaque sommet du polygone.
+	float angle = 360.0 / numFaces;
 	// Pour chaque face du polygone.
 	for (int i = 0; i < numFaces; i++) {
 		// 1er sommet : le centre du polygone.
@@ -59,7 +64,7 @@ void main() {
 		EmitVertex();
 
 		// 3e sommet : le deuxième coin de la face courante, donc avec une rotation anti-horaire.
-		radiusVec = rotate(radiusVec, 360.0 / numFaces);
+		radiusVec = rotate(radiusVec, angle);
 		gl_Position = transformMat * vec4(center + radiusVec, 1);
 		color = particleColor;
 		EmitVertex();
@@ -92,13 +97,12 @@ void main() {
 vec3 rotate(vec3 v, float angle) {
 	float rads = radians(angle);
 	// En GLSL, on n'a pas les rotate/scale/translate comme avec GLM, donc on bâtit notre propre matrice de rotation pour tourner le vecteur v autour de l'axe des z (on est en 2D dans notre exemple pour garder ça simple).
-	// Attention, les matrices GLSL sont en colonne-major.
-	mat4 rotation = mat4(
-		cos(rads), sin(rads), 0.0, 0.0,
-		-sin(rads), cos(rads), 0.0, 0.0,
-		0.0, 0.0, 1.0, 0.0,
-		0.0, 0.0, 0.0, 1.0
+	// Attention, les matrices GLSL sont en colonne-major, comme avec GLM.
+	mat3 rotation = mat3(
+		 cos(rads), sin(rads), 0.0,
+		-sin(rads), cos(rads), 0.0,
+		       0.0,       0.0, 1.0
 	);
 	// Résultat de la rotation.
-	return vec3(rotation * vec4(v, 1));
+	return rotation * v;
 }

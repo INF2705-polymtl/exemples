@@ -1,10 +1,5 @@
-#version 410
+ #version 410
 
-
-layout(location = 0) in vec3  a_position;
-layout(location = 1) in vec3  a_velocity;
-layout(location = 2) in float a_mass;
-layout(location = 3) in float a_miscValue;
 
 uniform float deltaTime = 0;
 uniform float drag = 0.2;
@@ -14,6 +9,15 @@ uniform float speedMin = 1e-10;
 uniform float speedMax = 10;
 uniform float globalSpeedFactor = 1;
 
+
+// Les données du VBO d'entrée, donc la struct Particle.
+layout(location = 0) in vec3  a_position;
+layout(location = 1) in vec3  a_velocity;
+layout(location = 2) in float a_mass;
+layout(location = 3) in float a_miscValue;
+
+
+// Les variables de sortie des calculs. L'ordre et les types déterminent le format des données dans le VBO de sortie. Ici, on met la même chose en sortie qu'en entrée, c'est-à-dire la struct Particle du programme principal. Les noms des variables de sorties doivent être cohérentes avec ce qui est passé à glTransformFeedbackVaryings.
 out vec3  position;
 out vec3  velocity;
 out float mass;
@@ -21,7 +25,7 @@ out float miscValue;
 
 
 void main() {
-	// Calculer l'effet du champs de force.
+	// Calculer l'effet du champ de force.
 	float fieldDist = length(forceFieldPosition - a_position);
 	vec3 forceFieldDir = normalize(forceFieldPosition - a_position);
 	// La normalisation peut causer une division par zéro (normaliser un vecteur nul). Dans ce cas on force le vecteur de direction vers y. Ça ne changera rien dans les calculs, vu que la distance est nulle.
@@ -41,7 +45,7 @@ void main() {
 	velocity *= globalSpeedFactor;
 
 	vec3 velocityDir = normalize(velocity);
-	// Encore là, la normalisation peut faire de NaN si la vitesse est nulle. On force donc la direction vers l'origine du champs de force.
+	// Encore là, la normalisation peut faire des NaN si la vitesse est nulle. On force donc la direction vers l'origine du champ de force.
 	if (any(isnan(velocityDir)))
 		velocityDir = forceFieldDir;
 	// Borner la vitesse.

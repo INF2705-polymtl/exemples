@@ -313,7 +313,7 @@ struct App : public OpenGLApplication
 		texEye.bindToTextureUnit(0);
 		eye.draw();
 
-		// La TV et l'écran. Ils ont le même positionnement et dimensions, donc même matrice de modélisation.
+		// La TV et l'écran (le quad texturé à l'intérieur de la TV). Ils ont le même positionnement et mise à l'échelle, donc même matrice de modélisation.
 		model.push(); {
 			model.translate({0, 2.5, -9.45});
 			model.scale({(float)texRender.size.x / texRender.size.y, 1, 1});
