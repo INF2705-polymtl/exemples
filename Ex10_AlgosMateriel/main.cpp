@@ -49,6 +49,20 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
+		setKeybindMessage(
+			"1 : droite où m = 0" "\n"
+			"2 : droite où 0 < m < 1" "\n"
+			"3 : droite où m = 1" "\n"
+			"4 : droite où m > 1" "\n"
+			"5 : droite où -1 < m < 0" "\n"
+			"6 : droite où m = -1" "\n"
+			"7 : droite où m < -1" "\n"
+			"8 : droite où x1 > x2, 0 < m < 1" "\n"
+			"9 : droite où x1 > x2, m < -1" "\n"
+			"C : changer entre les exemples de cercles et de droites." "\n"
+			"B : utiliser l'algo de Bresenham (avec entiers et symétries) ou incrémental (avec des réels)" "\n"
+		);
+
 		// Pas de test de profondeur pour aujourd'hui, on fait tout en 2D.
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -160,14 +174,17 @@ struct App : public OpenGLApplication
 		case Num8:
 		case Num9:
 			currentLine = key.code - Num1;
-			std::cout << "Current line : " << (currentLine + 1) << "\n";
+			std::cout << "Ligne " << (currentLine + 1) << "\n";
 			break;
 		case C:
 			drawingCircles ^= 1;
 			break;
 		case B:
 			usingBresenham ^= 1;
-			std::cout << "Using Bresenham : " << std::boolalpha << usingBresenham << "\n";
+			std::cout << "Bresenham : " << std::boolalpha << usingBresenham << "\n";
+			break;
+		case F5:
+			saveScreenshot();
 			break;
 		}
 	}
@@ -252,6 +269,7 @@ struct App : public OpenGLApplication
 				fragments[x][y] = true;
 		};
 
+		// L'algorithme de base qui est implémenté ci-dessous allume seulement les fragments pour l'octant Nord-Nord-Est. Cependant, un cercle est nécessairement symétrique sur tous ces octants, donc pour chaque fragment, on allume aussi les 8 symétries.
 		auto fillFragmentAndSymmetries = [&](int x, int y) {
 			fillFragment( x,  y);
 			fillFragment( y,  x);
@@ -298,8 +316,8 @@ struct App : public OpenGLApplication
 		vec4 p1 = p0;
 		for (int i = 0; i < numSections; i++) {
 			p1 = rotation * p0;
-			referenceLines.vertices.push_back({{p0.xyz + offset}});
-			referenceLines.vertices.push_back({{p1.xyz + offset}});
+			referenceLines.vertices.push_back({{p0.xyz() + offset}});
+			referenceLines.vertices.push_back({{p1.xyz() + offset}});
 			p0 = p1;
 		}
 	}

@@ -161,6 +161,7 @@
     <ClInclude Include="..\inf2705\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="uniform_frag.glsl" />
     <None Include="basic_vert.glsl" />
     <None Include="CMakeLists.txt" />
