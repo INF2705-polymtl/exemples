@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Header Files\inf2705">
       <UniqueIdentifier>{8f553e8b-48ea-4c43-9a38-aff5ff8bc0fc}</UniqueIdentifier>
     </Filter>
@@ -64,14 +60,15 @@
     <None Include="basic_vert.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
-    <None Include="CMakeLists.txt" >
+    <None Include="CMakeLists.txt">
       <Filter>VSCode Files</Filter>
     </None>
-    <None Include=".vscode\settings.json" >
+    <None Include=".vscode\settings.json">
       <Filter>VSCode Files</Filter>
     </None>
     <None Include="CMakeLists.txt">
       <Filter>VSCode Files</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

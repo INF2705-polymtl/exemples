@@ -55,7 +55,7 @@ struct App : public OpenGLApplication
 	TransformStack view = {"view"};
 	TransformStack projection = {"projection"};
 
-	OrbitCamera camera = {10, 15, 30, 0};
+	OrbitCamera camera = {10, 15, 30, 0, {0, 2, -5}};
 	float scanValue = 0;
 	float scanAngle = 0;
 	bool scanPaused = false;
@@ -63,14 +63,21 @@ struct App : public OpenGLApplication
 
 	// Appelée avant la première trame.
 	void init() override {
+		setKeybindMessage(
+			"R : réinitialiser la position de la caméra." "\n"
+			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
+			"haut/bas : changer la latitude de la caméra orbitale." "\n"
+			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
+			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
+			"espace : mettre en pause le scan de la caméra de surveillance." "\n"
+		);
+
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glDisable(GL_CULL_FACE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POINT_SMOOTH);
-		glPointSize(3.0f);
-		glLineWidth(3.0f);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
 		// On utilise les nuanceurs de base qui échantillonnent les textures, pas besoin de quoique ce soit de fancy.
@@ -85,15 +92,15 @@ struct App : public OpenGLApplication
 		quad = Mesh::loadFromWavefrontFile("quad.obj")[0];
 		tv = Mesh::loadFromWavefrontFile("tv.obj")[0];
 
-		texSteel = Texture::loadFromFile("steel.png");
-		texRust = Texture::loadFromFile("rust.png");
-		texEye = Texture::loadFromFile("eye.png");
-		texConcrete = Texture::loadFromFile("concrete.png");
-		texBuilding = Texture::loadFromFile("building.png");
-		texBox = Texture::loadFromFile("box.png");
-		texRock = Texture::loadFromFile("rock.png");
+		texSteel = Texture::loadFromFile("steel.png", 8);
+		texRust = Texture::loadFromFile("rust.png", 8);
+		texEye = Texture::loadFromFile("eye.png", 8);
+		texConcrete = Texture::loadFromFile("concrete.png", 8);
+		texBuilding = Texture::loadFromFile("building.png", 8);
+		texBox = Texture::loadFromFile("box.png", 1);
+		texRock = Texture::loadFromFile("rock.png", 8);
 		basicProg.use();
-		basicProg.setTextureUnit("texMain", 0);
+		basicProg.setInt("texMain", 0);
 
 		// Créer une texture de rendu comme une texture normale.
 		texRender.size = {1024, 768};
@@ -120,7 +127,6 @@ struct App : public OpenGLApplication
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texRender.id, 0);
 
 		// Appliquer la caméra et perspective habituelle.
-		camera.origin = {0, 2, -5};
 		camera.updateProgram(basicProg, view);
 		applyPerspective(50, getWindowAspect());
 	}
@@ -129,7 +135,7 @@ struct App : public OpenGLApplication
 	void drawFrame() override {
 		basicProg.use();
 
-		// Calculer l'angle de la caméra de surveillance selon le temps écoulé.
+		// Calculer l'angle de la caméra de surveillance selon le temps écoulé depuis la dernière trame.
 		if (not scanPaused) {
 			scanValue += getFrameDeltaTime();
 			scanValue = fmodf(scanValue, 10.0f);
@@ -138,16 +144,9 @@ struct App : public OpenGLApplication
 		teapotValue += getFrameDeltaTime();
 		teapotValue = fmodf(teapotValue, 5.0f);
 
-		// Dessiner la scène selon le point de vue de la caméra de surveillance.
-		view.pushIdentity(); {
-			// Positionner la caméra synthétique juste devant l'oeil. On se rappelle qu'il faut faire l'inverse des opérations quand on bouge la caméra synthétique à travers la matrice de visualisation.
-			view.translate({0, 0, 1.2});
-			view.rotate(180, {0, 1, 0});
-			view.rotate(-20, {1, 0, 0});
-			view.rotate(-scanAngle, {0, 1, 0});
-			view.translate({0, -6, 10});
-			basicProg.setMat(view);
-		} view.pop();
+		// 1. Dessiner la scène selon le point de vue de la caméra de surveillance dans le framebuffer.
+		// 2. Dessiner la scène normalement avec la caméra orbitale principale dans le tampon de la fenêtre.
+
 		// Lier le framebuffer de la caméra secondaire.
 		glBindFramebuffer(GL_FRAMEBUFFER, camFrameBuffer);
 		// Il faut faire le glClear() pour chaque buffer, car il s'applique sur le buffer de trame actuel, qui est lié par glBindFramebuffer.
@@ -159,6 +158,15 @@ struct App : public OpenGLApplication
 		glGetIntegerv(GL_VIEWPORT, (GLint*)&viewport);
 		// Établir un viewport qui a les mêmes dimensions que la texture de rendu.
 		glViewport(0, 0, texRender.size.x, texRender.size.y);
+		// Positionner la caméra synthétique juste devant l'oeil. On se rappelle qu'il faut faire l'inverse des opérations quand on bouge la caméra synthétique à travers la matrice de visualisation.
+		view.pushIdentity(); {
+			view.translate({0, 0, 1.2});
+			view.rotate(180, {0, 1, 0});
+			view.rotate(-20, {1, 0, 0});
+			view.rotate(-scanAngle, {0, 1, 0});
+			view.translate({0, -6, 10});
+			basicProg.setMat(view);
+		} view.pop();
 		// Appliquer une perpective pour la caméra secondaire encore là selon les dimensions de la texture de rendu (dans notre cas 1024x768, donc aspect 4:3).
 		projection.push(); {
 			applyPerspective(40, (float)texRender.size.x / texRender.size.y);
@@ -196,6 +204,7 @@ struct App : public OpenGLApplication
 		switch (key.code) {
 		case Space:
 			scanPaused ^= 1;
+			std::cout << "Scan " << (scanPaused ? "pause" : "unpause") << "\n";
 			break;
 		}
 	}
