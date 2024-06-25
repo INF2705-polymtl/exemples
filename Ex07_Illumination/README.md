@@ -8,9 +8,9 @@ Dans cet exemple, on passe les données de matériau et de source lumineuse unif
 // Une struct qui aura son équivalent dans les nuanceurs.
 struct MaStruct { vec4 data1; float data2; float data3 };
 // Le bloc uniforme. On passe le nom du bloc en GLSL et un index de liaison qu'on choisit.
-UniformBlock<MaStruct> monBloc = {"LightSource", 42};
+UniformBlock<MaStruct> monBloc = {"MaStruct", 42};
 // Affecte les données.
-monBloc = MaStruct{{1, 2, 3, 4}, 42, 69};
+monBloc = MaStruct{{1, 2, 3, 4}, 1337, 69};
 // Remplir le UBO avec les données. Ça fait un appel à glBufferData, comme avec les VBO.
 monBloc.setup();
 // Lier au bloc uniforme dans le programme GLSL.
@@ -51,6 +51,7 @@ On peut aussi contrôler un effet de *cel-shading* (pensez à *Wind Waker* pour 
 
 ## Contrôles
 
+* F5 : capture d'écran.
 * R : réinitialiser la position de la caméra.
 * \+ et - : rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.

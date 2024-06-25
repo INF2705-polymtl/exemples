@@ -173,7 +173,7 @@ struct App : public OpenGLApplication
 		// Réactiver l'écriture dans le tampon. Oui, c'est un peu redondant vu qu'on le fait au début de la fonction, mais c'est bon pour la paix d'esprit.
 		glDepthMask(GL_TRUE);
 
-		// Malgré nos précautions, on observe quand même une aberration si on regarde le cube de vitre devant le carré de vitre. Ça donne l'impression que le carré est devant le cube. Il n'y a pas de façon magique de régler ce problème juste en manipulant le tampon de pronfondeur. Il faut soit changer l'ordre d'affichage (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poid ou un tampon de profondeur auxilliaire. De nos jours, la tendance est définitivement vers le ray-tracing (pas matière à INF2705) pour gérer les problèmes de transparence/réflexion/réfraction.
+		// Malgré nos précautions, on observe quand même une aberration si on regarde le cube de vitre devant le carré de vitre. Ça donne l'impression que le carré est devant le cube. Il n'y a pas de façon magique de régler ce problème juste en manipulant le tampon de profondeur. Il faut soit changer l'ordre d'affichage (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poids ou un tampon de profondeur auxiliaire. De nos jours, la tendance est certainement vers le ray-tracing (pas matière à INF2705) pour gérer les problèmes de transparence/réflexion/réfraction.
 	}
 
 	// Appelée lors d'une touche de clavier.

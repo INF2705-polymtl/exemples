@@ -1,7 +1,7 @@
 #version 410
 
 
-// Les variables uniformes sont partagées entre sommets (d'où le nom « uniforme »).
+// Les variables uniformes sont partagées entre tous les appels de nuanceurs (d'où le nom « uniforme »).
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;

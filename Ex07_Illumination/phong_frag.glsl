@@ -1,4 +1,4 @@
-// Dans le modèle de Phong, les calculs géométriques (positions, directions, normales) sont faits dans le nuanceur de sommet et interpolés aux fragments. C'est ensuite dans chaque fragment que sont effectués les calculs d'éclairage avec les vecteurs interpolés en entrée.
+// Dans le modèle de Phong, les calculs géométriques (positions, directions, normales) sont faits dans le nuanceur de sommets et interpolés aux fragments. C'est ensuite dans chaque fragment que sont effectués les calculs d'éclairage avec les vecteurs interpolés en entrée.
 
 #version 410
 
@@ -65,6 +65,7 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 	
 	// Calculer la réflexion ambiante. Elle ne dépend pas de la géométrie de la scène.
 	result.ambient = material.ambientColor * (lightModel.ambientColor + light.ambientColor);
+	result.ambient = clamp(result.ambient, 0, 1);
 
 	float dotProd = dot(n, l);
 	// Si la face est éclairée. En effet, N · L < 0 implique que la face n'est pas éclairée de l'avant, donc on ne fait pas les calculs de réflexion diffuse et spéculaire.
@@ -73,6 +74,7 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 		result.diffuse = material.diffuseColor * light.diffuseColor * dotProd;
 		// Appliquer le facteur d'atténuation selon la distance (c'est le même facteur pour la réflexion diffuse et spéculaire).
 		result.diffuse *= attenuation;
+		result.diffuse = clamp(result.diffuse, 0, 1);
 
 		// Calculer l'intensité de la réflexion spéculaire selon la formule de Blinn ou Phong. Elle dépend de la position de la lumière, de la normale et de la position de l'observateur.
 		float specIntensity = (usingBlinnFormula) ?
@@ -87,8 +89,9 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 			float shine = pow(specIntensity, material.shininess);
 			// Calculer la couleur spéculaire.
 			result.specular = material.specularColor * light.specularColor * shine;
-			// Appliquer le facteur d'atténuation selon la distance (c'est le même facteur pour la réflection diffuse et spéculaire).
+			// Appliquer le facteur d'atténuation selon la distance (c'est le même facteur pour la réflexion diffuse et spéculaire).
 			result.specular *= attenuation;
+			result.specular = clamp(result.specular, 0, 1);
 		}
 	}
 

@@ -64,13 +64,14 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
+			"F5 : capture d'écran." "\n"
 			"R : réinitialiser la position de la caméra." "\n"
 			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
 			"haut/bas : changer la latitude de la caméra orbitale." "\n"
 			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
 			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
 			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
-			"espace : mettre en pause le scan de la caméra de surveillance." "\n"
+			"espace : mettre en pause le mouvement de la caméra de surveillance." "\n"
 		);
 
 		glEnable(GL_DEPTH_TEST);
@@ -120,8 +121,8 @@ struct App : public OpenGLApplication
 		// Créer un tampon de rendu qui servira de tampon de profondeur. En effet, avec un framebuffer un z-buffer dédié doit être créé.
 		glGenRenderbuffers(1, &camZBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, camZBuffer);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, camZBuffer);
 		// Définir ce tampon comme tampon de profondeur.
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, camZBuffer);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, texRender.size.x, texRender.size.y);
 		// Lier le framebuffer à la texture de rendu.
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texRender.id, 0);
@@ -195,7 +196,7 @@ struct App : public OpenGLApplication
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
-		// Espace met en pause le scan de la caméra de surveillance.
+		// Espace met en pause le mouvement de la caméra de surveillance.
 
 		camera.handleKeyEvent(key, 5, 0.5, {10, 15, 30, 0, {0, 2, -5}});
 		camera.updateProgram(basicProg, view);
@@ -205,6 +206,11 @@ struct App : public OpenGLApplication
 		case Space:
 			scanPaused ^= 1;
 			std::cout << "Scan " << (scanPaused ? "pause" : "unpause") << "\n";
+			break;
+
+		case F5:
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 	}

@@ -92,6 +92,7 @@ On compare la différence entre perspective et orthogonale dans les deux capture
 
 ## Contrôles
 
+* F5 : capture d'écran.
 * \+ et - : rapprocher et éloigner la caméra orbitale.
 * \+ et - avec Shift : réduire/élargir le champs de vision (FOV).
 * haut/bas : changer l'élévation ou la latitude de la caméra orbitale.

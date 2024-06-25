@@ -64,6 +64,7 @@ struct App : public OpenGLApplication
 	void drawFrame() override {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+		// Rouler la simulation une seule fois.
 		if (not firstRun)
 			return;
 		firstRun = false;
@@ -168,7 +169,7 @@ struct App : public OpenGLApplication
 		);
 	}
 
-	void runTest(const std::string& id, const Buffers& frag, const Buffers& init, std::function<void()> fn) {
+	void runTest(const std::string& id, const Buffers& frag, const Buffers& init, std::function<void()> setup) {
 		// Afficher le nom du test
 		std::cout << id << ")" << "\n";
 
@@ -182,7 +183,7 @@ struct App : public OpenGLApplication
 		// Appliquer la config par défaut d'OpenGL manuellement.
 		resetDefaultGLConfig();
 		// Appliquer les modifications voulues pour le test.
-		fn();
+		setup();
 
 		// Passer les valeurs de fragments qu'on veut en variables uniformes. Les attributs de sommets sont ignorés dans les nuanceurs.
 		basicProg.use();

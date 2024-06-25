@@ -51,10 +51,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="frag.glsl">
+    <None Include="discard_frag.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
-    <None Include="vert.glsl">
+    <None Include="basic_vert.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
     <None Include="CMakeLists.txt">

@@ -29,7 +29,7 @@ using namespace glm;
 // Un matériau d'objet dans la scène.
 struct Material
 {
-	// Couleur émise par l'objet même en l'absence de source lumineuse.
+	// Couleur émise par l'objet indépendamment de la présence de sources lumineuses.
 	vec4 emissionColor;
 	// Couleur reflétée peut importe la distance ou direction des sources lumineuses.
 	vec4 ambientColor;
@@ -112,6 +112,7 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
+			"F5 : capture d'écran." "\n"
 			"R : réinitialiser la position de la caméra." "\n"
 			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
 			"haut/bas : changer la latitude de la caméra orbitale." "\n"
@@ -336,6 +337,11 @@ struct App : public OpenGLApplication
 		case I:
 			numCelShadingBands = std::max(1, numCelShadingBands - 1);
 			std::cout << "Cel-shading : " << numCelShadingBands << "\n";
+			break;
+
+		case F5:
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 

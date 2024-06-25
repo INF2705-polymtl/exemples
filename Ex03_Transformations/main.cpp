@@ -65,6 +65,7 @@ struct App : public OpenGLApplication
 	void init() override {
 		// Le message expliquant les touches de clavier.
 		setKeybindMessage(
+			"F5 : capture d'écran." "\n"
 			"+ et - : rapprocher et éloigner la caméra orbitale." "\n"
 			"+ et - avec Shift : réduire/élargir le champs de vision (FOV)." "\n"
 			"haut/bas : changer l'élévation ou la latitude de la caméra orbitale." "\n"
@@ -172,17 +173,20 @@ struct App : public OpenGLApplication
 			break;
 		// 1 : Projection perspective
 		case Num1:
-		case Numpad1:
 			perspectiveCamera = true;
 			updateProjection();
 			std::cout << "Proj perspective" << "\n";
 			break;
 		// 2 : Projection orthogonale
 		case Num2:
-		case Numpad2:
 			perspectiveCamera = false;
 			updateProjection();
 			std::cout << "Proj ortho" << "\n";
+			break;
+
+		case F5:
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 	}
@@ -216,7 +220,7 @@ struct App : public OpenGLApplication
 		};
 		pyramid.setup();
 
-		// La classe Mesh configure les attributs de position, de normale et de coordonnées de texture pour chaque sommet. Ce sont pas mal les informations de base nécessaires pour afficher des formes. Dans notre cas, on veut de la couleur, donc un vec4 (RGBA) de plus pour chaque sommet. On peut ajouter un autre VBO qui passera les couleurs de sommets dans l'attribut de sommet à l'index 3.
+		// La classe Mesh configure les attributs de position, de normale et de coordonnées de texture pour chaque sommet. Ce sont les informations de base nécessaires pour afficher des formes. Dans notre cas, on veut de la couleur, donc un vec4 (RGBA) de plus pour chaque sommet. On peut ajouter un autre VBO qui passera les couleurs de sommets dans l'attribut de sommet à l'index 3.
 		vec4 pyramidVertexColors[4] = {
 			brightYellow,
 			brightGreen,

@@ -26,7 +26,7 @@ using namespace gl;
 using namespace glm;
 
 
-// Un spritesheet est une vielle méthode d'animation numérique. C'est à la base une image contient plusieurs sprites (lutins). Ces sprites sont de petites images qui, ensemble, forment les trames d'une animation. Chaque sprite dans le spritesheet est placé dans une disposition régulière (horizontalement dans notre cas). On utilise ensuite un index dans le spritesheet pour afficher le sprite correct à l'écran.
+// Un spritesheet est une vielle méthode d'animation numérique. C'est à la base une image qui contient plusieurs sprites (lutins). Ces sprites sont de petites images qui, ensemble, forment les trames d'une animation. Chaque sprite dans le spritesheet est placé dans une disposition régulière (horizontalement dans notre cas). On utilise ensuite un index dans le spritesheet pour afficher le sprite correct à l'écran.
 struct SpriteSheet
 {
 	sf::Image originalImg;
@@ -97,6 +97,7 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
+			"F5 : capture d'écran." "\n"
 			"R : réinitialiser la position de la caméra." "\n"
 			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
 			"haut/bas : changer la latitude de la caméra orbitale." "\n"
@@ -235,6 +236,11 @@ struct App : public OpenGLApplication
 
 		case Space:
 			swingStartFrame = swordStartFrame = getCurrentFrameNumber();
+			break;
+
+		case F5:
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 

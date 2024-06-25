@@ -40,6 +40,7 @@ Pour limiter la distance de rendu et en cacher les effets, beaucoup de vieux jeu
 
 ## Contrôles
 
+* F5 : capture d'écran.
 * R : réinitialiser la position de la caméra.
 * \+ et - :  rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.

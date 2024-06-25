@@ -160,9 +160,9 @@
     <ClInclude Include="..\inf2705\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="frag.glsl" />
+    <None Include="discard_frag.glsl" />
     <None Include="README.md" />
-    <None Include="vert.glsl" />
+    <None Include="basic_vert.glsl" />
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
   </ItemGroup>

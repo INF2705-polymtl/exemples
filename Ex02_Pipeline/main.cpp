@@ -89,7 +89,7 @@ struct App : public OpenGLApplication
 		// Face arrière
 		red, green, yellow,
 	};
-	// Struct pour combiner les positions et couleurs de façon contigües.
+	// Struct pour combiner les positions et couleurs de façon contigüe.
 	struct VertexData
 	{
 		vec3 position;
@@ -126,7 +126,7 @@ struct App : public OpenGLApplication
 	GLuint vertexShader = 0;
 	GLuint fragmentShader = 0;
 
-	// Les matrices de tranformation
+	// Les matrices de transformation
 	mat4 model = mat4(1.0f);
 	mat4 view = mat4(1.0f);
 	mat4 projection = mat4(1.0f);
@@ -195,7 +195,7 @@ struct App : public OpenGLApplication
 
 		glUseProgram(shaderProgram);
 
-		// Faire tourner la pyramide sur elle-même en appliquant une rotation à chaque trame. On ne réinitialise pas la matrice à chaque trame, donc les rotations s'accumlent (d'où la rotation continue).
+		// Faire tourner la pyramide sur elle-même en appliquant une rotation à chaque trame. On ne réinitialise pas la matrice à chaque trame, donc les rotations s'accumulent (d'où la rotation continue).
 		model = glm::rotate(model, radians(1.0f), {0.0f, 1.0f, 0.0f});
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, value_ptr(model));
 
@@ -291,7 +291,7 @@ struct App : public OpenGLApplication
 		view = glm::lookAt(vec3{0.0f, 0.0f, 6.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
 		// La matrice de projection contrôle comment la caméra observe la scène.
 		projection = glm::frustum(-2.0f / 3, 2.0f / 3, -2.0f / 3, 2.0f / 3, 4.0f, 8.0f);
-		// Ça peut paraître redondant, mais il faut faire glUseProgram avant se faire des glUniform* même si ceux-ci utilisent déjà le ID du programme dans l'obtention de l'adresse de la variable uniforme.
+		// Ça peut paraître redondant, mais il faut faire glUseProgram avant de faire des glUniform* même si ceux-ci utilisent déjà le ID du programme dans l'obtention de l'adresse de la variable uniforme.
 		// Les adresses de variables données par glGetUniformLocation ne sont pas globalement uniques et il faut se mettre dans le contexte du programme spécifique.
 		glUseProgram(shaderProgram);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, value_ptr(view));

@@ -18,6 +18,7 @@ Dans le code, `fillLineFragmentsIncremental` crée les fragments en faisant un a
 
 ## Contrôles
 
+* F5 : capture d'écran.
 * 1 : droite où m = 0
 * 2 : droite où 0 < m < 1
 * 3 : droite où m = 1

@@ -49,19 +49,20 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
+			"F5 : capture d'écran." "\n"
 			"R : réinitialiser la position de la caméra." "\n"
 			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
 			"haut/bas : changer la latitude de la caméra orbitale." "\n"
 			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
 			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
 			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
-			"Z : afficher en faces pleines ou wireframe." "\n"
-			"X : montrer ou cacher les arêtes de la forme originale (avant tessellation)." "\n"
-			"C : activer/désactiver le cull des faces arrières." "\n"
+			"1 : afficher en faces pleines ou wireframe." "\n"
+			"2 : montrer ou cacher les arêtes de la forme originale (avant tessellation)." "\n"
+			"3 : activer/désactiver le cull des faces arrières." "\n"
 			"W et S : étirer/compresser le d20 en Y." "\n"
 			"A et D : étirer/compresser le d20 en XZ." "\n"
-			"I et shift+I : augmenter/diminuer le niveau de tess intérieur." "\n"
-			"O et shift+O : augmenter/diminuer le niveau de tess extérieur." "\n"
+			"I et shift+I : augmenter/diminuer le niveau de tessellation intérieur." "\n"
+			"O et shift+O : augmenter/diminuer le niveau de tessellation extérieur." "\n"
 		);
 
 		// Config de base, pas de cull, lignes assez visibles.
@@ -127,11 +128,13 @@ struct App : public OpenGLApplication
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
 		// Les touches gauche/droite change la longitude ou le roulement (avec shift) de la caméra orbitale.
 		//
-		// Z : Afficher en faces pleines ou wireframe.
-		// X : Montrer ou cacher les arêtes de la forme originale (avant tessellation).
-		// C : Activer/désactiver le cull des faces arrières.
+		// 1 : Afficher en faces pleines ou wireframe.
+		// 2 : Montrer ou cacher les arêtes de la forme originale (avant tessellation).
+		// 3 : Activer/désactiver le cull des faces arrières.
 		// W et S : Étirer/compresser le D20 en Y.
 		// A et D : Étirer/compresser le D20 en XZ.
+		// I et shift+I : augmenter/diminuer le niveau de tessellation intérieur.
+		// O et shift+O : augmenter/diminuer le niveau de tessellation extérieur.
 
 		camera.handleKeyEvent(key, 5, 0.5, {5, 30, 30, 0});
 		camera.updateProgram(sphereProg, view);
@@ -156,15 +159,15 @@ struct App : public OpenGLApplication
 			//std::cout << "Scale Y : " << model.top()[1][1] << "\n";
 			break;
 
-		case Z:
+		case Num1:
 			wireframeMode ^= 1;
 			std::cout << "Wireframe " << (wireframeMode ? "ON" : "OFF") << "\n";
 			break;
-		case X:
+		case Num2:
 			showingOriginalShape ^= 1;
 			std::cout << "Mesh original visible " << (showingOriginalShape ? "ON" : "OFF") << "\n";
 			break;
-		case C:
+		case Num3:
 			cullMode ^= 1;
 			std::cout << "Cull " << (cullMode ? "ON" : "OFF") << "\n";
 			break;
@@ -194,6 +197,11 @@ struct App : public OpenGLApplication
 				"Niveau tess intérieur={} extérieur={}",
 				tessLevelInner.get(), tessLevelOuter.get()
 			) << "\n";
+			break;
+
+		case F5:
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 	}

@@ -8,6 +8,7 @@ layout(triangle_strip, max_vertices = 9) out;
 uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
+
 uniform float extrudeLength = 0;
 uniform bool usingWorldPositions = false;
 

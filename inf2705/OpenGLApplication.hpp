@@ -174,41 +174,45 @@ public:
 		return std::move(img);
 	}
 
-	void saveScreenshot(const std::string& folder = "screenshots", const std::string& filename = "") {
+	std::string saveScreenshot(const std::string& folder = "screenshots", const std::string& filename = "") {
 		using namespace std::filesystem;
+
+		path trimmedFilename = trim(filename);
+		path trimmedFolder = trim(folder);
 
 		// Capturer la trame actuelle.
 		sf::Image frameImage = captureCurrentFrame();
 
 		// Si le dossier cible n'existe pas, le créer.
-		path folderPath(folder);
-		if (not folder.empty())
-			create_directory(folderPath);
+		if (not trimmedFolder.empty())
+			create_directory(trimmedFolder);
 
-		// Les éléments du nom de fichier.
-		int frameNumber = frame_;
-		std::string dateTimeStr = formatStartTime("%Y%m%d_%H%M%S");
-		std::string execFilename = argv_[0];
+		// Construire le chemin et nom du fichier.
+		std::string filePathStr;
+		if (not trimmedFilename.empty()) {
+			filePathStr = (trimmedFolder / trimmedFilename).make_preferred().string();
+		} else {
+			// Si aucun nom de fichier est fourni, construire un nom avec le nom de l'exécutable, l'heure de démarrage de l'application et le numéro de la trame actuelle.
+			int frameNumber = getCurrentFrameNumber();
+			std::string dateTimeStr = formatStartTime("%Y%m%d_%H%M%S");
+			std::string execFilename = argv_[0];
+			path execName = path(execFilename).stem();
+			filePathStr = std::format(
+				"{}_{}_{}.png",
+				(trimmedFolder / execName).make_preferred().string(),
+				dateTimeStr,
+				frameNumber
+			);
+		}
 
 		// Faire l'écriture dans le fichier dans un fil parallèle pour moins ralentir le fil principal avec une écriture sur le disque. La capture (avec glReadPixels) doit être faite dans le fil principal, mais l'écriture sur le disque peut être faite en parallèle sans causer de problème de synchronisation. On remarque la capture par copie.
 		std::thread savingThread([=]() {
-			std::string filePathStr;
-			if (not filename.empty()) {
-				filePathStr = (folderPath/path(filename)).make_preferred().string();
-			} else {
-				// Si aucun nom de fichier est fourni, construire un nom avec le nom de l'exécutable, l'heure de démarrage de l'application et le numéro de la trame actuelle.
-				path execName = path(execFilename).stem();
-				filePathStr = std::format(
-					"{}_{}_{}.png",
-					(folderPath/execName).make_preferred().string(),
-					dateTimeStr,
-					frameNumber
-				);
-			}
 			frameImage.saveToFile(filePathStr);
 		});
 		// Détacher le fil pour qu'il se gère tout seul, donc pas besoin de join() ou de garder la variable vivante.
 		savingThread.detach();
+
+		return filePathStr;
 	}
 
 	// Les méthodes virtuelles suivantes sont à surcharger.
@@ -222,7 +226,7 @@ public:
 	// Appelée lors d'une touche de clavier.
 	virtual void onKeyPress(const sf::Event::KeyEvent& key) { }
 
-	// Appelée lors d'une touche de clavier relachée.
+	// Appelée lors d'une touche de clavier relâchée.
 	virtual void onKeyRelease(const sf::Event::KeyEvent& key) { }
 
 	// Appelée lors d'un bouton de souris appuyé.
@@ -262,12 +266,11 @@ protected:
 				window_.close();
 				break;
 			// Redimensionnement de la fenêtre.
-			case Resized: {
+			case Resized:
 				glViewport(0, 0, event.size.width, event.size.height);
 				onResize(event.size); // À surcharger
 				lastResize_ = event.size;
 				break;
-			}
 			// Touche appuyée.
 			case KeyPressed:
 				onKeyPress(event.key); // À surcharger

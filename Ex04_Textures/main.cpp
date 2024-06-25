@@ -50,6 +50,7 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
+			"F5 : Capture d'écran" "\n"
 			"R : réinitialiser la position de la caméra." "\n"
 			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
 			"haut/bas : changer la latitude de la caméra orbitale." "\n"
@@ -79,7 +80,7 @@ struct App : public OpenGLApplication
 		updateCamera();
 		applyPerspective();
 
-		// Pour le reste de la session, ça va devenir de moins en moins faisable de hard-coder toutes les données à la main. On va plutôt importer nos mesh de fichiers Wavefront (.obj). Ceux-ci contiennent les positions, normales et coordonnées de texture.
+		// Pour le reste de la session, ça va devenir de moins en moins faisable de hard-coder toutes les données à la main. On va plutôt importer nos mesh à partir de fichiers Wavefront (.obj). Ceux-ci contiennent les positions, normales et coordonnées de texture.
 		// Beaucoup de logiciels de modélisation 3D (Blender, 3ds Max, même Wings 3D) supporte l'exportation en Wavefront.
 		cubeBox = Mesh::loadFromWavefrontFile("cube_box.obj")[0];
 		cubeRoad = Mesh::loadFromWavefrontFile("cube_road.obj")[0];
@@ -159,6 +160,11 @@ struct App : public OpenGLApplication
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texLevels);
 			mode = 3;
+			break;
+
+		case F5:
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 	}

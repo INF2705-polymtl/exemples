@@ -29,13 +29,13 @@ using namespace gl;
 using namespace glm;
 
 
-// Les données cinétiques d'une particle. C'est ce qui est chargé et modifié dans les VBO. On remarque que ce ne sont pas des données utiles au dessin (comme la classe Mesh par exemple). En effet, le dessin est fait par le nuanceur de géométrie qui utilise les propriétés physiques des particules pour les dessiner.
+// Les données cinétiques d'une particule. C'est ce qui est chargé et modifié dans les VBO. On remarque que ce ne sont pas des données utiles au dessin (comme la classe Mesh par exemple). En effet, le dessin est fait par le nuanceur de géométrie qui utilise les propriétés physiques des particules pour les dessiner.
 struct Particle
 {
 	vec3 position; // Coordonnées dans la scène.
 	vec3 velocity; // Vecteur de vitesse (donc direction de la particule).
 	float mass; // Masse (affecte l'accélération et taille de la particule).
-	float miscValue; // Une valeur quelquonque. On peut mettre ce qu'on veut dans nos données.
+	float miscValue; // Une valeur quelconque. On peut mettre ce qu'on veut dans nos données.
 
 	// Configurer les attributs dans un VBO.
 	static void setupAttribs() {
@@ -76,6 +76,7 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
+			"F5 : capture d'écran." "\n"
 			"R : réinitialiser la position de la caméra." "\n"
 			"flèches : bouger la caméra dans le plan XY." "\n"
 			"roulette de souris : zoom in/out." "\n"
@@ -113,7 +114,7 @@ struct App : public OpenGLApplication
 			particles[i] = p;
 		}
 
-		// Créer les VAO. Dans notre exemple assez simple, ce n'est pas nécessaire d'en avoir deux. Mais en général, on va avoir un VAO pour chaque mesh à afficher, donc ceux-ci auront très probablement des configs différentes du VAO de calcul (EBO différent, vertex attribs venant de plusieurs VBO, etc.). Bref, n'importe quel état qui est sauvegardé dans le VAO et pourrait être différent pour le calcul et l'affichage.
+		// Créer les VAO. Dans notre exemple assez simple, ce n'est pas nécessaire d'en avoir deux. En général, on va avoir un VAO pour chaque mesh à afficher, donc ceux-ci auront très probablement des configs différentes du VAO de calcul (EBO différent, vertex attribs venant de plusieurs VBO, etc.). Bref, n'importe quel état qui est sauvegardé dans le VAO et pourrait être différent pour le calcul et l'affichage.
 		glGenVertexArrays(1, &vaoDrawing);
 		glGenVertexArrays(1, &vaoComputation);
 		// Créer les VBO.
@@ -179,9 +180,11 @@ struct App : public OpenGLApplication
 			glFinish();
 			queryParticleData();
 			// Enregistrer les données dans un fichier CSV avec un nom généré.
-			saveParticleDataAsCsv();
+			std::string csvName = saveParticleDataAsCsv();
 			// Prendre une capture d'écran tant qu'à y être et la mettre dans le même dossier que le CSV.
-			saveScreenshot("output");
+			std::string screenshotName = saveScreenshot("output");
+			std::cout << "Sauvegarde des données dans " << csvName << "\n"
+			          << "Capture d'écran dans " << screenshotName << std::endl;
 
 			savingData = false;
 		}
@@ -231,7 +234,7 @@ struct App : public OpenGLApplication
 		applyOrtho();
 	}
 
-	// Appelée lors d'une touche de clavier relachée.
+	// Appelée lors d'une touche de clavier relâchée.
 	void onKeyRelease(const sf::Event::KeyEvent& key) override {
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
@@ -296,8 +299,7 @@ struct App : public OpenGLApplication
 		//     M·A = (P·V)⁻¹·A′  or M·A est la coordonnée de scène (ou universelle).
 		vec2 mousePosition = vec2(getMouse().normalized.x, getMouse().normalized.y);
 		mat4 invTransform = inverse(projection * view);
-		auto v = invTransform * vec4(mousePosition, 0, 1);
-		forceFieldPosition = vec3(v);
+		forceFieldPosition = vec3(invTransform * vec4(mousePosition, 0, 1));
 		computationProg.setUniform(forceFieldPosition);
 
 		glBindVertexArray(vaoComputation);
@@ -348,7 +350,7 @@ struct App : public OpenGLApplication
 		}
 	}
 
-	void saveParticleDataAsCsv() {
+	std::string saveParticleDataAsCsv() {
 		// Construire un nom de fichier avec l'heure de départ de l'application et le numéro de trame.
 		std::string dateTimeStr = formatStartTime("%Y%m%d_%H%M%S");
 		std::string filename = std::format(
@@ -378,7 +380,8 @@ struct App : public OpenGLApplication
 			}
 		});
 		// Détacher le fil pour qu'il se gère tout seul, donc pas besoin de join() ou de garder la variable vivante.
-		savingThread.detach();;
+		savingThread.detach();
+		return filename;
 	}
 
 	void applyOrtho() {

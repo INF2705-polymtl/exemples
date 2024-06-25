@@ -21,6 +21,7 @@ Résumé des opérations pour afficher un réticule dans une lunette qui appliqu
 
 ## Contrôles
 
+* F5 : capture d'écran.
 * R : réinitialiser la position de la caméra.
 * \+ et - :  rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.

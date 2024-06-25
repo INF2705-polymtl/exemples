@@ -20,7 +20,7 @@ using namespace gl;
 using namespace glm;
 
 
-// Utilisation légitime de macros : génération de code
+// Configurer l'attribut de sommets pour un membre scalaire `member` (int, float) d'une struct `elemType`.
 #define SET_SCALAR_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
 {																			\
 	glVertexAttribPointer(													\
@@ -34,6 +34,7 @@ using namespace glm;
 	glEnableVertexAttribArray(index);										\
 }																			\
 
+// Configurer l'attribut de sommets pour un membre vectoriel `member` (vec3, vec4) d'une struct `elemType`.
 #define SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(index, elemType, member)	\
 {																		\
 	glVertexAttribPointer(												\

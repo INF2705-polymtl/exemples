@@ -24,6 +24,7 @@ On a aussi une série d'images [lvl0.png](lvl0.png) à [lvl5.png](lvl5.png) qui 
 
 ## Contrôles
 
+* F5 : capture d'écran.
 * R : réinitialiser la position de la caméra.
 * \+ et - :  rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.

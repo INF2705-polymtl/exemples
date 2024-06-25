@@ -16,7 +16,7 @@ Voici de quoi a l'air la pyramide avec ses positions dans l'espace :
 
 Chaque sommet a une position et une couleur. On peut aussi choisir de mettre les données de la pyramide au complet VBO face par face dans le VBO (donc en répétant les sommets partagés), ou de façon unique en utilisant un tableau de connectivité (un *Element Buffer Object* ou EBO). La variable `usingElements` dans le code contrôle quel façon de faire est utilisée.
 
-Si on charge les données de la pyramide au complet pour faire un appel à `glDrawArrays`, on aura 4 faces de 3 sommets chacunes, donc 12 positions et 12 couleurs. Dans la figure ci-dessous, *BR*, *BL*, *BF* et *Top* font référence aux positions dans la figure précédente.
+Si on charge les données de la pyramide au complet pour faire un appel à `glDrawArrays`, on aura 4 faces de 3 sommets chacune, donc 12 positions et 12 couleurs. Dans la figure ci-dessous, *BR*, *BL*, *BF* et *Top* font référence aux positions dans la figure précédente.
 
 <img src="doc/vbo_all.png"/>
 

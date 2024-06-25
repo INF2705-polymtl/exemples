@@ -50,6 +50,7 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
+			"F5 : capture d'écran." "\n"
 			"1 : droite où m = 0" "\n"
 			"2 : droite où 0 < m < 1" "\n"
 			"3 : droite où m = 1" "\n"
@@ -183,8 +184,10 @@ struct App : public OpenGLApplication
 			usingBresenham ^= 1;
 			std::cout << "Bresenham : " << std::boolalpha << usingBresenham << "\n";
 			break;
+
 		case F5:
-			saveScreenshot();
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 	}

@@ -96,7 +96,7 @@ void main() {
 
 vec3 rotate(vec3 v, float angle) {
 	float rads = radians(angle);
-	// En GLSL, on n'a pas les rotate/scale/translate comme avec GLM, donc on bâtit notre propre matrice de rotation pour tourner le vecteur v autour de l'axe des z (on est en 2D dans notre exemple pour garder ça simple).
+	// En GLSL, on n'a pas les rotate/scale/translate comme avec GLM, donc on bâtit notre propre matrice de rotation pour tourner le vecteur v autour de l'axe des z (on est dans le plan XY dans notre exemple pour garder ça simple).
 	// Attention, les matrices GLSL sont en colonne-major, comme avec GLM.
 	mat3 rotation = mat3(
 		 cos(rads), sin(rads), 0.0,
