@@ -351,8 +351,8 @@ struct App : public OpenGLApplication
 
 	void loadShaders() {
 		basicProg.create();
-		basicProg.attachSourceFile(GL_VERTEX_SHADER, "vert.glsl");
-		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "frag.glsl");
+		basicProg.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
+		basicProg.attachSourceFile(GL_FRAGMENT_SHADER, "discard_frag.glsl");
 		basicProg.link();
 	}
 };
