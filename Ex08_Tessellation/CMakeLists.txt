@@ -23,7 +23,7 @@ add_executable(${PROJECT_NAME} ${ALL_FILES})
 include_directories("../")
 
 # Les flags de compilation.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -fsigned-char -Wno-unknown-pragmas -D WIN32_LEAN_AND_MEAN -D NOMINMAX -D _CRT_SECURE_NO_WARNINGS -D GLM_FORCE_SWIZZLE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -fsigned-char -Wno-unknown-pragmas -Wno-enum-compare -D WIN32_LEAN_AND_MEAN -D NOMINMAX -D _CRT_SECURE_NO_WARNINGS -D GLM_FORCE_SWIZZLE -D GLM_FORCE_INTRINSICS")
 
 # Tous ce qui suit sont des package Vcpkg. Pour savoir quoi mettre, on fait "vcpkg install <le package>", puis on met ce qu'ils disent de mettre dans le CMakeLists.
 # Vous pouvez commenter/décommenter les packages que vous utilisez ou pas.
