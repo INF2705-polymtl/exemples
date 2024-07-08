@@ -49,9 +49,6 @@
     <ClInclude Include="..\inf2705\utils.hpp">
       <Filter>Header Files\inf2705</Filter>
     </ClInclude>
-    <ClInclude Include="..\inf2705\SceneObject.hpp">
-      <Filter>Header Files\inf2705</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic_frag.glsl">

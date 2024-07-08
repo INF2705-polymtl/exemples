@@ -24,7 +24,7 @@ Avant la première trame : Générer un framebuffer avec une texture comme tampo
 * \+ et - :  rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.
 * gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale.
-* clic central (cliquer la roulette) : bouger la caméra en glissant la souris.
+* clic droit ou central : bouger la caméra en glissant la souris.
 * roulette : rapprocher et éloigner la caméra orbitale.
 * espace : mettre en pause le mouvement de la caméra de surveillance.
 

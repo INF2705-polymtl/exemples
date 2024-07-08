@@ -29,7 +29,7 @@ On a aussi une série d'images [lvl0.png](lvl0.png) à [lvl5.png](lvl5.png) qui 
 * \+ et - :  rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.
 * gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale.
-* clic central (cliquer la roulette) : bouger la caméra en glissant la souris.
+* clic droit ou central : bouger la caméra en glissant la souris.
 * roulette : rapprocher et éloigner la caméra orbitale.
 * 1 : Boîte en carton avec du texte compositionné.
 * 2 : Exemple de route avec texture qui se répète.

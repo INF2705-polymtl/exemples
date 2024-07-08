@@ -56,7 +56,7 @@ On peut aussi contrôler un effet de *cel-shading* (pensez à *Wind Waker* pour 
 * \+ et - : rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.
 * gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale.
-* clic central (cliquer la roulette) : bouger la caméra en glissant la souris.
+* clic droit ou central : bouger la caméra en glissant la souris.
 * roulette : rapprocher et éloigner la caméra orbitale.
 * 1 : Démo des modèles de calcul de normales.
 * 2 : Modèle plat ou flat shading (calculs par primitive).

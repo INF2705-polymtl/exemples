@@ -70,8 +70,9 @@ struct OrbitCamera
 	}
 
 	void handleMouseMoveEvent(sf::Event::MouseMoveEvent move, const MouseState& mouse, float degsPerPixel = 1.0f) {
-		// Le bouton central (cliquer la roulette) bouge la caméra en glissant la souris.
-		if (mouse.buttons[sf::Mouse::Middle] and mouse.isInsideWindow) {
+		// Le bouton droit ou central (cliquer la roulette) bouge la caméra en glissant la souris.
+		bool buttonDown = mouse.buttons[sf::Mouse::Middle] or mouse.buttons[sf::Mouse::Right];
+		if (buttonDown and mouse.isInsideWindow) {
 			float deltaLong = std::clamp(move.x * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
 			float deltaLat =  std::clamp(move.y * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
 			moveNorth(deltaLat);

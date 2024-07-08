@@ -153,7 +153,6 @@
     <ClInclude Include="..\inf2705\Mesh.hpp" />
     <ClInclude Include="..\inf2705\OpenGLApplication.hpp" />
     <ClInclude Include="..\inf2705\OrbitCamera.hpp" />
-    <ClInclude Include="..\inf2705\SceneObject.hpp" />
     <ClInclude Include="..\inf2705\sfml_utils.hpp" />
     <ClInclude Include="..\inf2705\ShaderProgram.hpp" />
     <ClInclude Include="..\inf2705\Texture.hpp" />

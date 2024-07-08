@@ -34,9 +34,6 @@
     <ClInclude Include="..\inf2705\OrbitCamera.hpp">
       <Filter>Header Files\inf2705</Filter>
     </ClInclude>
-    <ClInclude Include="..\inf2705\SceneObject.hpp">
-      <Filter>Header Files\inf2705</Filter>
-    </ClInclude>
     <ClInclude Include="..\inf2705\sfml_utils.hpp">
       <Filter>Header Files\inf2705</Filter>
     </ClInclude>

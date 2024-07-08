@@ -18,7 +18,6 @@
 #include <inf2705/ShaderProgram.hpp>
 #include <inf2705/Texture.hpp>
 #include <inf2705/TransformStack.hpp>
-#include <inf2705/SceneObject.hpp>
 #include <inf2705/OrbitCamera.hpp>
 
 

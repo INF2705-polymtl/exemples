@@ -31,7 +31,7 @@ Dans [sphere_tesseval.glsl](sphere_tesseval.glsl), on fait la moyenne pondérée
 * \+ et - :  rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.
 * gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale.
-* clic central (cliquer la roulette) : bouger la caméra en glissant la souris.
+* clic droit ou central : bouger la caméra en glissant la souris.
 * roulette : rapprocher et éloigner la caméra orbitale.
 * 1 : afficher en faces pleines ou wireframe.
 * 2 : montrer ou cacher les arêtes de la forme originale (avant tessellation).

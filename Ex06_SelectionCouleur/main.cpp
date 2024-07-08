@@ -19,11 +19,29 @@
 #include <inf2705/ShaderProgram.hpp>
 #include <inf2705/Texture.hpp>
 #include <inf2705/TransformStack.hpp>
-#include <inf2705/SceneObject.hpp>
 
 
 using namespace gl;
 using namespace glm;
+
+
+// Un objet dessinable dans la scène.
+struct SceneObject
+{
+	unsigned id = 0; // ID unique de l'objet
+	std::string name; // Nom usuel de l'objet
+	Mesh* mesh = nullptr; // Le mesh utilisé
+	std::vector<BoundTexture> textures; // Les textures utilisées
+	TransformStack modelMat; // La matrice de modélisation propre à l'objet
+
+	void draw(ShaderProgram& prog) {
+		prog.use();
+		for (auto&& tex : textures)
+			tex.bindToProgram(prog);
+		prog.setMat(modelMat);
+		mesh->draw();
+	}
+};
 
 
 inline vec4 uintToVec4(uint32_t i) {
@@ -75,11 +93,11 @@ struct App : public OpenGLApplication
 			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
 			"haut/bas : changer la latitude de la caméra orbitale." "\n"
 			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
-			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"clic droit ou central : bouger la caméra en glissant la souris." "\n"
 			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
 			"WASD : contrôler la théière sélectionnée." "\n"
 			"clic gauche : sélectionner l'objet sous le curseur (théières seulement)." "\n"
-			"clic droit et espace : annuler la sélection." "\n"
+			"espace : annuler la sélection." "\n"
 		);
 
 		glEnable(GL_DEPTH_TEST);
@@ -180,6 +198,7 @@ struct App : public OpenGLApplication
 		switch (key.code) {
 		case Space:
 			selectedObjectID = 0;
+			selecting = false;
 			break;
 		case A:
 			pieceTranslate = glm::translate(mat4(1), {1, 0, 0});
@@ -220,18 +239,12 @@ struct App : public OpenGLApplication
 			lastMouseBtnEvent = mouseBtn;
 			selecting = true;
 			break;
-		// Clic droit déselectionne.
-		case sf::Mouse::Right:
-			// ID 0 -> pas d'objets sélectionné.
-			selectedObjectID = 0;
-			selecting = false;
-			break;
 		}
 	}
 
 	// Appelée lors d'un mouvement de souris.
 	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
-		// Mettre à jour la caméra si on a un clic de la roulette.
+		// Mettre à jour la caméra si on a un clic droit ou central.
 		auto mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f/30));
 		for (auto&& prog : programs)

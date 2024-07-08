@@ -45,7 +45,7 @@ Pour limiter la distance de rendu et en cacher les effets, beaucoup de vieux jeu
 * \+ et - :  rapprocher et éloigner la caméra orbitale.
 * haut/bas : changer la latitude de la caméra orbitale.
 * gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale.
-* clic central (cliquer la roulette) : bouger la caméra en glissant la souris.
+* clic droit ou central : bouger la caméra en glissant la souris.
 * roulette : rapprocher et éloigner la caméra orbitale.
 * 1 : activer/désactiver le carré de vitre.
 * 2 : activer/désactiver le cube de vitre.

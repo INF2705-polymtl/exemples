@@ -21,7 +21,6 @@
 #include <inf2705/ShaderProgram.hpp>
 #include <inf2705/Texture.hpp>
 #include <inf2705/TransformStack.hpp>
-#include <inf2705/SceneObject.hpp>
 #include <inf2705/OrbitCamera.hpp>
 
 
@@ -80,8 +79,8 @@ struct App : public OpenGLApplication
 			"R : réinitialiser la position de la caméra." "\n"
 			"flèches : bouger la caméra dans le plan XY." "\n"
 			"roulette de souris : zoom in/out." "\n"
-			"clic gauche : appliquer un champ attractif sur le curseur de la souris." "\n"
-			"clic droit : appliquer un champ répulsif sur le curseur de la souris." "\n"
+			"clic gauche : appliquer un champ attractif sous le curseur de la souris." "\n"
+			"clic droit : appliquer un champ répulsif sous le curseur de la souris." "\n"
 			"espace : freiner les particules." "\n"
 			"F : sauvegarder les données de particules dans un fichier CSV en plus d'un screenshot." "\n"
 		);

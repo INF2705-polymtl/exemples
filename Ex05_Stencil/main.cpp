@@ -59,7 +59,7 @@ struct App : public OpenGLApplication
 			"+ et - :  rapprocher et éloigner la caméra orbitale." "\n"
 			"haut/bas : changer la latitude de la caméra orbitale." "\n"
 			"gauche/droite : changer la longitude ou le roulement (avec shift) de la caméra orbitale." "\n"
-			"clic central (cliquer la roulette) : bouger la caméra en glissant la souris." "\n"
+			"clic droit ou central : bouger la caméra en glissant la souris." "\n"
 			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
 			"1 : lunette" "\n"
 			"2 : wireframe à travers la lunette" "\n"
@@ -233,7 +233,7 @@ struct App : public OpenGLApplication
 
 	// Appelée lors d'un mouvement de souris.
 	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
-		// Mettre à jour la caméra si on a un clic de la roulette.
+		// Mettre à jour la caméra si on a un clic droit ou central.
 		auto& mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
 		applyCamera();

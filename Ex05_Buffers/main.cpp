@@ -46,8 +46,6 @@ struct App : public OpenGLApplication
 
 	ShaderProgram basicProg;
 
-	bool firstRun = true;
-
 	// Appelée avant la première trame.
 	void init() override {
 		glPointSize(500.0f);
@@ -65,9 +63,8 @@ struct App : public OpenGLApplication
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		// Rouler la simulation une seule fois.
-		if (not firstRun)
+		if (getCurrentFrameNumber() != 0)
 			return;
-		firstRun = false;
 
 		// Exemples pris d'un ancien examen (intra hiver 2018).
 
@@ -197,9 +194,10 @@ struct App : public OpenGLApplication
 
 		// Lire les valeurs de buffers pour le fragment au milieu de l'écran.
 		Buffers result = {};
-		glReadPixels(100, 100, 1, 1, GL_RGBA, GL_FLOAT, &result.color);
-		glReadPixels(100, 100, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &result.z);
-		glReadPixels(100, 100, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &result.stencil);
+		ivec2 middle = ivec2{getWindow().getSize().x, getWindow().getSize().y} / 2;
+		glReadPixels(middle.x, middle.y, 1, 1, GL_RGBA, GL_FLOAT, &result.color);
+		glReadPixels(middle.x, middle.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &result.z);
+		glReadPixels(middle.x, middle.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &result.stencil);
 
 		// Afficher les buffers.
 		std::cout << "             Z  |    Color Buffer     | Stencil" << "\n"
