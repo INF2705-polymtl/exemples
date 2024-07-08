@@ -143,6 +143,17 @@ struct Texture
 
 		return result;
 	}
+
+	// Créer une texture de 1 pixel d'une couleur donnée.
+	static Texture createFromColor(vec4 color) {
+		Texture tex = {};
+		tex.size = {1, 1};
+		tex.numLevels = 1;
+		glGenTextures(1, &tex.id);
+		glBindTexture(GL_TEXTURE_2D, tex.id);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_FLOAT, &color);
+		return tex;
+	}
 };
 
 // Une texture liée à une variable uniforme et une unité active.

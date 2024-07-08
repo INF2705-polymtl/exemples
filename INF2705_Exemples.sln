@@ -31,6 +31,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex09_Retroaction_VBO", "Ex0
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex10_AlgosMateriel", "Ex10_AlgosMateriel\Ex10_AlgosMateriel.vcxproj", "{621DFDF2-8E73-41EA-8323-CE16F491E1DC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_Stencil_Mirroir", "Ex05_Stencil_Mirroir\Ex05_Stencil_Mirroir.vcxproj", "{013CC645-F0A5-480C-8C8F-271683B6341B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -151,6 +153,14 @@ Global
 		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x64.Build.0 = Release|x64
 		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.ActiveCfg = Release|Win32
 		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.Build.0 = Release|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x64.ActiveCfg = Debug|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x64.Build.0 = Debug|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x86.ActiveCfg = Debug|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x86.Build.0 = Debug|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x64.ActiveCfg = Release|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x64.Build.0 = Release|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x86.ActiveCfg = Release|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
