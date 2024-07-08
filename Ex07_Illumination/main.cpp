@@ -453,62 +453,7 @@ struct App : public OpenGLApplication
 };
 
 
-void runDiffuseModelTest(const std::string& filename, vec3 posL, vec3 n1, vec3 n2, vec3 p1, vec3 p2) {
-	n1 = normalize(n1);
-	n2 = normalize(n2);
-
-	std::vector<float> xs;
-	for (float x = p1.x; x <= p2.x; x += 0.1f)
-		xs.push_back(x);
-
-	// Avec Gouraud, on calcule les couleurs aux sommets et on interpole dans les fragments.
-	std::vector<float> gouraud;
-	float c1 = dot(n1, normalize(posL - p1));
-	float c2 = dot(n2, normalize(posL - p2));
-	for (float x : xs) {
-		float xValue = (x - p1.x) / (p2.x - p1.x);
-		float diffuse = mix(c1, c2, xValue);
-		gouraud.push_back(std::clamp(diffuse, 0.0f, 1.0f));
-	}
-
-	// Avec Phong, on calcule les vecteurs (L pour le diffus) aux sommets et on calcule les couleurs dans les fragments avec les vecteurs interpolés.
-	std::vector<float> phong;
-	vec3 l1 = posL - p1;
-	vec3 l2 = posL - p2;
-	for (float x : xs) {
-		float xValue = (x - p1.x) / (p2.x - p1.x);
-		vec3 l = normalize(mix(l1, l2, xValue));
-		vec3 n = normalize(mix(n1, n2, xValue));
-		float diffuse = dot(n, l);
-		phong.push_back(std::clamp(diffuse, 0.0f, 1.0f));
-	}
-
-	std::ofstream file(filename);
-	file << "x\tGouraud\tPhong" << "\n";
-	for (size_t i = 0; i < xs.size(); i++)
-		file << std::format("{}\t{}\t{}\n", xs[i], gouraud[i], phong[i]);
-}
-
-
 int main(int argc, char* argv[]) {
-	// Vous pouvez utiliser cette fonction pour générer des courbes d'interpolations selon les modèles de Gouraud et Phong. Les données sont ensuite importables dans Excel pour la visualisation.
-	runDiffuseModelTest(
-		"test1.csv",
-		{0, 4, 0},
-		{0, 1, 0},
-		{1, 1, 0},
-		{-4, 0, 0},
-		{ 4, 0, 0}
-	);
-	runDiffuseModelTest(
-		"test2.csv",
-		{0, 4, 0},
-		{0, 1, 0},
-		{1, 2, 0},
-		{-4, 0, 0},
-		{4, 0, 0}
-	);
-
 	WindowSettings settings = {};
 	settings.fps = 30;
 	settings.context.antialiasingLevel = 4;

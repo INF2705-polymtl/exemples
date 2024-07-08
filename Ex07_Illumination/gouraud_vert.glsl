@@ -90,10 +90,10 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 
 		// Si le résultat est positif (il y a de la réflexion spéculaire).
 		if (specIntensity > 0) {
-			// Calculer le facteur de brillance en utilisant l'exposant de "shininess".
-			float shine = pow(specIntensity, material.shininess);
+			// Appliquer l'exposant de brillance ("shininess").
+			specIntensity = pow(specIntensity, material.shininess);
 			// Calculer la couleur spéculaire.
-			result.specular = material.specularColor * light.specularColor * shine;
+			result.specular = material.specularColor * light.specularColor * specIntensity;
 			// Appliquer le facteur d'atténuation selon la distance (c'est le même facteur pour la réflexion diffuse et spéculaire).
 			result.specular *= attenuation;
 			result.specular = clamp(result.specular, 0, 1);

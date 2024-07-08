@@ -15,9 +15,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_OpsFragments", "Ex05_O
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_Stencil", "Ex05_Stencil\Ex05_Stencil.vcxproj", "{3A454C98-7100-415D-943C-E13A17A7627C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_Stencil_Miroir", "Ex05_Stencil_Miroir\Ex05_Stencil_Miroir.vcxproj", "{013CC645-F0A5-480C-8C8F-271683B6341B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_CalculsTampons", "Ex05_CalculsTampons\Ex05_CalculsTampons.vcxproj", "{D04C951E-194A-488D-B5FB-8D6F06485D86}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex06_SelectionCouleur", "Ex06_SelectionCouleur\Ex06_SelectionCouleur.vcxproj", "{88CA3032-7F92-4420-BAFC-D33B3847D7F8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex07_Illumination", "Ex07_Illumination\Ex07_Illumination.vcxproj", "{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex07_Illumination_Calculs", "Ex07_Illumination_Calculs\Ex07_Illumination_Calculs.vcxproj", "{7FD07506-25EC-4E69-8301-D4A6954C304A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex08_Geometrie", "Ex08_Geometrie\Ex08_Geometrie.vcxproj", "{B4546A3B-153A-4B9B-B4C0-2148A474F44C}"
 EndProject
@@ -28,10 +34,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex09_Retroaction_VBO", "Ex09_Retroaction_VBO\Ex09_Retroaction_VBO.vcxproj", "{5FB16B60-179F-4B38-9078-7E3D4A2C573E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex10_AlgosMateriel", "Ex10_AlgosMateriel\Ex10_AlgosMateriel.vcxproj", "{621DFDF2-8E73-41EA-8323-CE16F491E1DC}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_Stencil_Miroir", "Ex05_Stencil_Miroir\Ex05_Stencil_Miroir.vcxproj", "{013CC645-F0A5-480C-8C8F-271683B6341B}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_CalculsTampons", "Ex05_CalculsTampons\Ex05_CalculsTampons.vcxproj", "{D04C951E-194A-488D-B5FB-8D6F06485D86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -161,6 +163,14 @@ Global
 		{D04C951E-194A-488D-B5FB-8D6F06485D86}.Release|x64.Build.0 = Release|x64
 		{D04C951E-194A-488D-B5FB-8D6F06485D86}.Release|x86.ActiveCfg = Release|Win32
 		{D04C951E-194A-488D-B5FB-8D6F06485D86}.Release|x86.Build.0 = Release|Win32
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Debug|x64.ActiveCfg = Debug|x64
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Debug|x64.Build.0 = Debug|x64
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Debug|x86.ActiveCfg = Debug|Win32
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Debug|x86.Build.0 = Debug|Win32
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Release|x64.ActiveCfg = Release|x64
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Release|x64.Build.0 = Release|x64
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Release|x86.ActiveCfg = Release|Win32
+		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
