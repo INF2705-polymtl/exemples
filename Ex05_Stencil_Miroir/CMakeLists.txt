@@ -13,7 +13,6 @@ set(ALL_FILES
     "../inf2705/OpenGLApplication.hpp"
     "../inf2705/OrbitCamera.hpp"
     "../inf2705/ShaderProgram.hpp"
-    "../inf2705/SceneObject.hpp"
     "../inf2705/sfml_utils.hpp"
     "../inf2705/Texture.hpp"
     "../inf2705/TransformStack.hpp"
