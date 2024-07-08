@@ -11,4 +11,4 @@
 * roulette : rapprocher et éloigner la caméra orbitale.
 * WASD : contrôler la théière sélectionnée.
 * clic gauche : sélectionner l'objet sous le curseur (théières seulement).
-* clic droit et espace : annuler la sélection.
+* espace : annuler la sélection.

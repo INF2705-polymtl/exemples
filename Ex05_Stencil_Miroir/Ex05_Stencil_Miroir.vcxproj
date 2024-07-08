@@ -22,9 +22,9 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{013cc645-f0a5-480c-8c8f-271683b6341b}</ProjectGuid>
-    <RootNamespace>Ex05_Stencil_Mirroir</RootNamespace>
+    <RootNamespace>Ex05_Stencil_Miroir</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Ex05_Stencil_Mirroir</ProjectName>
+    <ProjectName>Ex05_Stencil_Miroir</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

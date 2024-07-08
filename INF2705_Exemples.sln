@@ -31,7 +31,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex09_Retroaction_VBO", "Ex0
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex10_AlgosMateriel", "Ex10_AlgosMateriel\Ex10_AlgosMateriel.vcxproj", "{621DFDF2-8E73-41EA-8323-CE16F491E1DC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_Stencil_Mirroir", "Ex05_Stencil_Mirroir\Ex05_Stencil_Mirroir.vcxproj", "{013CC645-F0A5-480C-8C8F-271683B6341B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ex05_Stencil_Miroir", "Ex05_Stencil_Miroir\Ex05_Stencil_Miroir.vcxproj", "{013CC645-F0A5-480C-8C8F-271683B6341B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

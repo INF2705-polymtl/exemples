@@ -70,10 +70,10 @@ struct App : public OpenGLApplication
 			"clic droit ou central : bouger la caméra en glissant la souris." "\n"
 			"roulette : rapprocher et éloigner la caméra orbitale." "\n"
 			"1 : activer/désactiver l'illustration de la zone affectée par le stencil." "\n"
-			"2 : activer/désactiver la scène normale (pas réfléchie dans le mirroir)." "\n"
-			"3 : activer/désactiver la texture de vitre du mirroir." "\n"
-			"W et S : bouger le mirroir en Z." "\n"
-			"A et D : bouger le mirroir en X." "\n"
+			"2 : activer/désactiver la scène normale (pas réfléchie dans le miroir)." "\n"
+			"3 : activer/désactiver la texture de vitre du miroir." "\n"
+			"W et S : bouger le miroir en Z." "\n"
+			"A et D : bouger le miroir en X." "\n"
 		);
 
 		glEnable(GL_DEPTH_TEST);
@@ -121,16 +121,16 @@ struct App : public OpenGLApplication
 		glEnable(GL_STENCIL_TEST);
 		// Le test ne passe jamais, donc les tampons de couleurs et de profondeur ne sont pas modifiés.
 		glStencilFunc(GL_NEVER, 1, 1);
-		// Pour chaque pixel du mirroir, remplacer par la valeur de référence (1 dans notre cas).
+		// Pour chaque pixel du miroir, remplacer par la valeur de référence (1 dans notre cas).
 		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
 		// On a déjà activé le culling pour le programme. Ça fait en sorte que la face arrière du miroir remplisse le stencil. Ça fait en sorte que la face arrière ne fait pas de réflexion. Ça simplifie le reste du code, car on n'a pas besoin de penser au plan de coupe pour les deux faces.
 		drawMirrorSurface();
 
-		// Dessiner la scène réfléchie, mais seulement dans la région du mirroir.
+		// Dessiner la scène réfléchie, mais seulement dans la région du miroir.
 		// Activer le test de stencil pour garder seulement ce qui est dans la zone du stencil égale à 1.
 		glStencilFunc(GL_EQUAL, 1, 1);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-		// Définir les faces avant en ordre horaire (donc l'inverse du mode usuel). En effet, la scène réfléchie est bel et bien un mirroir, donc l'ordre relatif des sommets dessinés (horaire/anti-horaire) est aussi inversé.
+		// Définir les faces avant en ordre horaire (donc l'inverse du mode usuel). En effet, la scène réfléchie est bel et bien un miroir, donc l'ordre relatif des sommets dessinés (horaire/anti-horaire) est aussi inversé.
 		glFrontFace(GL_CW);
 		drawReflectedScene();
 		if (showingStencil)
@@ -140,7 +140,7 @@ struct App : public OpenGLApplication
 		glFrontFace(GL_CCW);
 		glDisable(GL_STENCIL_TEST);
 
-		// Dessiner la surface du mirroir comme une vitre. D'une part, ça identifie visuellement la surface en lui donnant une texture. D'autre part (plus important), ça met les bonnes valeurs en Z pour la surface. En effet, le tampon de profondeur est jusque là remplit avec les valeurs laissées par la scène réfléchie, alors que le mirroir est supposé être un objet solide dans la scène. On dessine donc une surface plane (même si on lui donne une couleur entièrement transparente) pour remplir le z-buffer correctement avant de dessiner le reste de la scène normalement.
+		// Dessiner la surface du miroir comme une vitre. D'une part, ça identifie visuellement la surface en lui donnant une texture. D'autre part (plus important), ça met les bonnes valeurs en Z pour la surface. En effet, le tampon de profondeur est jusque là remplit avec les valeurs laissées par la scène réfléchie, alors que le miroir est supposé être un objet solide dans la scène. On dessine donc une surface plane (même si on lui donne une couleur entièrement transparente) pour remplir le z-buffer correctement avant de dessiner le reste de la scène normalement.
 		drawMirrorSurface();
 
 		// Dessiner la scène normalement.
@@ -170,7 +170,7 @@ struct App : public OpenGLApplication
 			break;
 		case Num3:
 			usingGlassTextured ^= 1;
-			std::cout << "Texture mirroir " << (usingGlassTextured ? "ON" : "OFF") << "\n";
+			std::cout << "Texture miroir " << (usingGlassTextured ? "ON" : "OFF") << "\n";
 			break;
 		case W:
 			mirrorPosition.z -= 0.5;
@@ -214,7 +214,7 @@ struct App : public OpenGLApplication
 	void drawMirrorSurface() {
 		clipPlaneProg.use();
 
-		// La surface du mirroir.
+		// La surface du miroir.
 		model.push(); {
 			model.translate(mirrorPosition);
 			model.scale({4, 2, 1});
@@ -239,9 +239,9 @@ struct App : public OpenGLApplication
 		clipPlaneProg.setUniform(clipPlane);
 
 		model.push(); {
-			// Déplacer la scène au complet à la position du mirroir.
+			// Déplacer la scène au complet à la position du miroir.
 			model.translate(mirrorPosition);
-			// Appliquer une réflexion (mise à l'échelle de -1) en Z, car le mirroir est dans le plan XY.
+			// Appliquer une réflexion (mise à l'échelle de -1) en Z, car le miroir est dans le plan XY.
 			model.scale({1, 1, -1});
 			// Appliquer la translation inverse.
 			model.translate(-mirrorPosition);
@@ -306,7 +306,7 @@ struct App : public OpenGLApplication
 		texRock.bindToTextureUnit(0);
 		teapot.draw();
 
-		// Le poteau auquel est attaché le mirroir.
+		// Le poteau auquel est attaché le miroir.
 		model.push(); {
 			model.translate({mirrorPosition.x, 0, mirrorPosition.z - 0.5});
 			model.scale({0.75, 1, 0.75});
@@ -315,7 +315,7 @@ struct App : public OpenGLApplication
 		texRust.bindToTextureUnit(0);
 		pole.draw();
 
-		// Le cadre du mirroir.
+		// Le cadre du miroir.
 		model.push(); {
 			model.translate(mirrorPosition);
 			model.scale({4, 2, 1});
@@ -361,5 +361,5 @@ int main(int argc, char* argv[]) {
 	settings.context.antialiasingLevel = 4;
 
 	App app;
-	app.run(argc, argv, "Exemple Semaine 5: Mirroir", settings);
+	app.run(argc, argv, "Exemple Semaine 5: Miroir", settings);
 }
