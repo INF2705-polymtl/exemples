@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5.0)
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 # Le nom du projet.
-project(INF2705_Ex05_CalculsTampons)
+project(Ex05_CalculsTampons)
 
 # On met les fichiers sources (incluant les entêtes)
 set(ALL_FILES
@@ -13,7 +13,6 @@ set(ALL_FILES
     "../inf2705/OpenGLApplication.hpp"
     "../inf2705/OrbitCamera.hpp"
     "../inf2705/ShaderProgram.hpp"
-    "../inf2705/SceneObject.hpp"
     "../inf2705/sfml_utils.hpp"
     "../inf2705/Texture.hpp"
     "../inf2705/TransformStack.hpp"

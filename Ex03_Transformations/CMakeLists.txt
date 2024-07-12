@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5.0)
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 # Le nom du projet.
-project(INF2705_Ex03_Transformations)
+project(Ex03_Transformations)
 
 # On met les fichiers sources (incluant les entêtes)
 set(ALL_FILES
