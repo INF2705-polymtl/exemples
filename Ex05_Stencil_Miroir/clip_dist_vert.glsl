@@ -6,6 +6,7 @@ uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
 
 uniform vec4 clipPlane = vec4(0);
+uniform bool clipEnabled = false;
 
 
 layout(location = 0) in vec3 a_position;
@@ -24,7 +25,8 @@ void main() {
 
 	// Calculer la distance du sommet au plan de coupe en utilisant les coordonnées de scène.
 	// Les fragments avec des distances négatives seront éliminés.
-	gl_ClipDistance[0] = dot(clipPlane, worldPosition);
+	if (clipEnabled)
+		gl_ClipDistance[0] = dot(clipPlane, worldPosition);
 
 	gl_Position = clipPosition;
 	texCoords = a_texCoords;

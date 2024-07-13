@@ -58,6 +58,7 @@ struct App : public OpenGLApplication
 	bool usingGlassTextured = true;
 	bool showingRegularScene = true;
 	Uniform<vec4> clipPlane = {"clipPlane"};
+	Uniform<bool> clipEnabled = {"clipEnabled"};
 
 	// Appelée avant la première trame.
 	void init() override {
@@ -234,8 +235,10 @@ struct App : public OpenGLApplication
 
 		// Activer le plan de coupe et définir sa formule à partir de l'équation implicite du plan.
 		glEnable(GL_CLIP_PLANE0);
+		clipEnabled = true;
 		clipPlane = {0, 0, -1, mirrorPosition.z};
 		// La distance au plan de coupe est calculée dans le nuanceur de sommets.
+		clipPlaneProg.setUniform(clipEnabled);
 		clipPlaneProg.setUniform(clipPlane);
 
 		model.push(); {
@@ -251,6 +254,8 @@ struct App : public OpenGLApplication
 
 		// Désactiver le plan de coupe, on n'en veut pas pour le dessin autre que la scène réfléchie.
 		glDisable(GL_CLIP_PLANE0);
+		clipEnabled = false;
+		clipPlaneProg.setUniform(clipEnabled);
 	}
 
 	void drawScene() {
