@@ -107,23 +107,26 @@ public:
 		return deltaTime_;
 	}
 
+	// Ratio des dimensions de la fenêtre (x/y).
 	float getWindowAspect() const {
-		// Calculer l'aspect de notre caméra à partir des dimensions de la fenêtre.
 		auto windowSize = window_.getSize();
 		float aspect = (float)windowSize.x / windowSize.y;
 		return aspect;
 	}
 
+	// Moment de début du chronomètre des trames (commence juste avant la première trame).
 	auto getStartTime() const {
 		return startTime_;
 	}
 
+	// Obtenir une string formatée du temps de départ.
 	std::string formatStartTime(const std::string& format = "%Y-%m-%d %H:%M:%S") const {
 		std::time_t timestamp = std::chrono::system_clock::to_time_t(startTime_);
 		auto locTime = localtime(&timestamp);
 		return (std::stringstream() << std::put_time(locTime, format.c_str())).str();
 	}
 
+	// Afficher les raccourcis clavier.
 	void printKeybinds() const {
 		if (not keybindMessage_.empty())
 			std::cout << "\n" << "Raccourcis clavier" << "\n"
@@ -136,8 +139,8 @@ public:
 			keybindMessage_ = "    " + replaceAll(trim(msg), "\n", "\n    ");
 	}
 
+	// Afficher les informations de base de la carte graphique et de la version OpenGL des drivers.
 	void printGLInfo() {
-		// Afficher les informations de base de la carte graphique et de la version OpenGL des drivers.
 		auto openglVersion = glGetString(GL_VERSION);
 		auto openglVendor = glGetString(GL_VENDOR);
 		auto openglRenderer = glGetString(GL_RENDERER);

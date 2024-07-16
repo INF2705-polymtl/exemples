@@ -10,7 +10,7 @@ uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
 
 
-in VertOut {
+in VertexOut {
 	vec3 origPosition;
 	vec3 worldPosition;
 	vec2 texCoords;
