@@ -22,6 +22,16 @@ On a aussi une série d'images [lvl0.png](lvl0.png) à [lvl5.png](lvl5.png) qui 
 
 <img src="doc/mipmaps.png"/>
 
+## Modes de débordement des textures
+
+Les paramètres de débordement (`GL_TEXTURE_WRAP_\*`) contrôlent comment les textures sont échantillonnées quand les coordonnées de texture sortent de l'intervalle [0, 1]. Dans le mode d'affichage 4, on a une démonstration de ces débordements (9 au total) à l'aide d'un quadrilatère dont les coordonnées de textures vont de -1 à 2 avec la texture [test.png](test.png).
+
+<img src="doc/coords_test.png"/>
+
+Avec les appels spécifiques à `glTexParameteri(GL_TEXTURE_2D, ...)`, on a les résultats suivants :
+
+<img src="doc/wrapping.png"/>
+
 ## Contrôles
 
 * F5 : capture d'écran.
@@ -34,3 +44,4 @@ On a aussi une série d'images [lvl0.png](lvl0.png) à [lvl5.png](lvl5.png) qui 
 * 1 : Boîte en carton avec du texte compositionné.
 * 2 : Exemple de route avec texture qui se répète.
 * 3 : Exemple de Mipmap manuel.
+* 4 : Démo des modes de débordement.

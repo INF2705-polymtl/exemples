@@ -29,6 +29,7 @@ struct App : public OpenGLApplication
 {
 	Mesh cubeBox;
 	Mesh cubeRoad;
+	Mesh quad;
 	ShaderProgram allPrograms[2] = {};
 	ShaderProgram& progBasic = allPrograms[0];
 	ShaderProgram& progCompositing = allPrograms[1];
@@ -38,6 +39,7 @@ struct App : public OpenGLApplication
 	GLuint texBoxText = 0;
 	GLuint texAsphalt = 0;
 	GLuint texLevels = 0;
+	GLuint texTest = 0;
 
 	TransformStack model;
 	TransformStack view;
@@ -60,6 +62,7 @@ struct App : public OpenGLApplication
 			"1 : Boîte en carton avec du texte compositionné." "\n"
 			"2 : Exemple de route avec texture qui se répète." "\n"
 			"3 : Exemple de Mipmap manuel." "\n"
+			"4 : Démo des modes de débordement." "\n"
 		);
 
 		glEnable(GL_DEPTH_TEST);
@@ -84,11 +87,24 @@ struct App : public OpenGLApplication
 		// Beaucoup de logiciels de modélisation 3D (Blender, 3ds Max, même Wings 3D) supporte l'exportation en Wavefront.
 		cubeBox = Mesh::loadFromWavefrontFile("cube_box.obj")[0];
 		cubeRoad = Mesh::loadFromWavefrontFile("cube_road.obj")[0];
+		// On va faire quand même coder à la main les cas simples.
+		quad.vertices = {
+			{{-1, -1, 0}, {}, {-1, -1}},
+			{{ 1, -1, 0}, {}, { 2, -1}},
+			{{ 1,  1, 0}, {}, { 2,  2}},
+			{{-1,  1, 0}, {}, {-1,  2}}
+		};
+		quad.indices = {
+			0, 1, 2,
+			0, 2, 3
+		};
+		quad.setup();
 
 		// Charger les textures. On peut expérimenter avec la génération automatique de mipmaps (deuxième paramètre de la fonction).
 		texBlank = loadTextureFromFile("blank.png", false);
 		texBoxBG = loadTextureFromFile("box_bg.png", true);
 		texBoxText = loadTextureFromFile("box_text.png", false);
+		texTest = loadTextureFromFile("test.png", false);
 
 		texAsphalt = loadTextureFromFile("asphalt.png", false);
 		// Ici, vous pouvez expérimenter avec le mode de dépassement des coordonnées de textures.
@@ -102,12 +118,10 @@ struct App : public OpenGLApplication
 		// Affecter l'unité 0 à la variable uniforme tex0 et ainsi de suite. Le sampler avec la valeur 0 lit de l'unité de texture GL_TEXTURE0.
 		for (auto& prog : allPrograms) {
 			prog.use();
-			progCompositing.setInt("tex0", 0);
-			progCompositing.setInt("tex1", 1);
-			progCompositing.setInt("tex2", 2);
+			prog.setInt("tex0", 0);
+			prog.setInt("tex1", 1);
+			prog.setInt("tex2", 2);
 		}
-
-		bindBoxTextures();
 	}
 
 	// Appelée à chaque trame. Le buffer swap est fait juste après.
@@ -118,15 +132,119 @@ struct App : public OpenGLApplication
 		case 1:
 			// Pour la boîte en carton, on superpose des textures.
 			progCompositing.use();
-			progCompositing.setMat("model", model);
+
+			// Lier la texture de carton à l'unité de texture 0.
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texBoxBG);
+			// Lier la texture de texte à l'unité de texture 1.
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texBoxText);
+			// Lier la texture transparente à l'unité de texture 2.
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, texBlank);
+
+			model.push(); {
+				progCompositing.setMat("model", model);
+			} model.pop();
 			cubeBox.draw();
 			break;
 		case 2:
 		case 3:
 			// Pour les autres modes, on applique simplement une texture.
 			progBasic.use();
-			progBasic.setMat("model", model);
+			// Lier la texture d'asphalte à l'unité de texture 0.
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, mode == 2 ? texAsphalt : texLevels);
+			model.push(); {
+				progCompositing.setMat("model", model);
+			} model.pop();
 			cubeRoad.draw();
+			break;
+		case 4:
+			progBasic.use();
+
+			// Lier la texture de test à l'unité de texture 0.
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texTest);
+
+			// Appliquer une projection orthogonale et une caméra fixe.
+			projection.pushIdentity();
+			float aspect = getWindowAspect();
+			projection.ortho(-4 * aspect, 4 * aspect, -4, 4, -1, 1);
+			progBasic.setMat("projection", projection);
+			progBasic.setMat("view", mat4(1));
+
+			model.pushIdentity();
+
+			// Haut-gauche
+			model.translate({-2.5, 2.5, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			quad.draw();
+
+			// Haut-centre
+			model.translate({2.5, 0, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+			quad.draw();
+
+			// Haut-droite
+			model.translate({2.5, 0, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			quad.draw();
+
+			// Centre-gauche
+			model.translate({-5, -2.5, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			quad.draw();
+
+			// Centre
+			model.translate({2.5, 0, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			quad.draw();
+
+			// Centre-droite
+			model.translate({2.5, 0, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+			quad.draw();
+
+			// Bas-gauche
+			model.translate({-5, -2.5, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			quad.draw();
+
+			// Bas-centre
+			model.translate({2.5, 0, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+			quad.draw();
+
+			// Bas-droite
+			model.translate({2.5, 0, 0});
+			progBasic.setMat("model", model);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			quad.draw();
+
+			model.pop();
+			projection.pop();
+			progBasic.setMat("model", model);
+			progBasic.setMat("view", view);
+			progBasic.setMat("projection", projection);
+
 			break;
 		}
 	}
@@ -144,22 +262,10 @@ struct App : public OpenGLApplication
 		switch (key.code) {
 		// Touches numériques: changer l'exemple courant.
 		case Num1: // 1: Boîte en carton avec du texte compositionné.
-			bindBoxTextures();
-			mode = 1;
-			break;
 		case Num2: // 2: Exemple de route avec texture qui se répète.
-			progBasic.use();
-			// Lier la texture d'asphalte à l'unité de texture 0.
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texAsphalt);
-			mode = 2;
-			break;
 		case Num3: // 3: Exemple de Mipmap manuel.
-			progBasic.use();
-			// Lier la texture de niveaux à l'unité de texture 0.
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texLevels);
-			mode = 3;
+		case Num4: // 4: Démonstration des modes de débordement.
+			mode = key.code - Num0;;
 			break;
 
 		case F5:
@@ -271,25 +377,10 @@ struct App : public OpenGLApplication
 		return texID;
 	}
 
-	void bindBoxTextures() {
-		progCompositing.use();
-		// Lier la texture de carton à l'unité de texture 0.
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texBoxBG);
-		// Lier la texture de texte à l'unité de texture 1.
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texBoxText);
-		// Lier la texture transparente à l'unité de texture 2.
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, texBlank);
-	}
-
 	void updateCamera() {
-		view.pushIdentity();
 		camera.applyToView(view);
 		// En positionnant la caméra, on met seulement à jour la matrice de visualisation.
 		setMatrixOnAll("view", view);
-		view.pop();
 	}
 
 	void applyPerspective() {
@@ -297,11 +388,9 @@ struct App : public OpenGLApplication
 		auto windowSize = window_.getSize();
 		float aspect = (float)windowSize.x / windowSize.y;
 
-		projection.pushIdentity();
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
 		projection.perspective(50, aspect, 0.01f, 100.0f);
 		setMatrixOnAll("projection", projection);
-		projection.pop();
 	}
 
 	void setMatrixOnAll(std::string_view name, const TransformStack& matrix) {
