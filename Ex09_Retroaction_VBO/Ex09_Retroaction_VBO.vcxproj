@@ -173,12 +173,12 @@
     <ClInclude Include="..\inf2705\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="color_frag.glsl" />
+    <None Include="draw_frag.glsl" />
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
-    <None Include="particles_compute_vert.glsl" />
-    <None Include="particles_draw_geom.glsl" />
-    <None Include="particles_draw_vert.glsl" />
+    <None Include="compute_vert.glsl" />
+    <None Include="draw_geom.glsl" />
+    <None Include="draw_vert.glsl" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

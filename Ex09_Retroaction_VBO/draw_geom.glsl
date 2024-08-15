@@ -1,14 +1,13 @@
 #version 410
 
 layout(points) in;
-layout(triangle_strip, max_vertices = 128) out;
+layout(triangle_strip, max_vertices = 8) out;
 
 
 uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
 
-uniform int numFaces = 8; // Nombre de faces du polygone généré.
 uniform float trailLengthMax = 10;
 uniform float speedMin = 1e-10;
 uniform float speedMax = 10;
@@ -22,6 +21,7 @@ in VertexOut {
 } inputs[];
 
 
+out vec2 texCoords;
 out vec4 color;
 
 
@@ -41,54 +41,47 @@ void main() {
 	// La valeur normalisée de la vitesse (entre 0 et 1 selon les vitesses min et max).
 	float speedValue = smoothstep(speedMin, speedMax, length(inputs[0].velocity));
 	// Longueur de la trainée dépend de la vitesse.
-	float trailLength = mix(1, trailLengthMax, speedValue);
+	float trailLength = mix(0.1, trailLengthMax, speedValue);
 	// Couleur de la particule dépend de la vitesse (lent = rouge, vite = jaune).
 	vec4 particleColor = mix(vec4(1, 0, 0, 1), vec4(1, 1, 0, 1), speedValue);
 
-	// On veut dessiner un genre de triangle fan, mais on n'a pas cette primitive donc on dessine séparément chaque triangle du triangle fan.
-
-	// Le vecteur de rayon de la première face.
+	// Le vecteur de rayon du sprite.
 	vec3 radiusVec = direction * radius;
-	// L'angle entre chaque sommet du polygone.
-	float angle = 360.0 / numFaces;
-	// Pour chaque face du polygone.
-	for (int i = 0; i < numFaces; i++) {
-		// 1er sommet : le centre du polygone.
-		gl_Position = transformMat * vec4(center, 1);
-		color = particleColor;
-		EmitVertex();
 
-		// 2e sommet : le premier coin de la face courante.
-		gl_Position = transformMat * vec4(center + radiusVec, 1);
-		color = particleColor;
-		EmitVertex();
+	// Les sommets du carré affichant le sprite de la particule.
+	gl_Position = transformMat * vec4(center + rotate(radiusVec, 45), 1);
+	texCoords = vec2(1, 0);
+	color = particleColor;
+	EmitVertex();
+	gl_Position = transformMat * vec4(center + rotate(radiusVec, -45), 1);
+	texCoords = vec2(0, 0);
+	color = particleColor;
+	EmitVertex();
+	gl_Position = transformMat * vec4(center + rotate(radiusVec, 135), 1);
+	texCoords = vec2(1, 0.5);
+	color = particleColor;
+	EmitVertex();
+	gl_Position = transformMat * vec4(center + rotate(radiusVec, -135), 1);
+	texCoords = vec2(0, 0.5);
+	color = particleColor;
+	EmitVertex();
 
-		// 3e sommet : le deuxième coin de la face courante, donc avec une rotation anti-horaire.
-		radiusVec = rotate(radiusVec, angle);
-		gl_Position = transformMat * vec4(center + radiusVec, 1);
-		color = particleColor;
-		EmitVertex();
+	EndPrimitive();
 
-		// Dessiner le triangle séparément (sinon ça sera un triangle strip).
-		EndPrimitive();
-	}
-
-	// Enfin, on ajoute un triangle pour la trainée derrière le polygone (donc qui pointe à l'opposée de sa direction).
-
-	// 1er sommet : le coin "tribord" (à droite de sa direction) du polygone.
-	radiusVec = direction;
-	radiusVec = rotate(radiusVec, -90);
-	gl_Position = transformMat * vec4(center + radiusVec * radius, 1);
+	// Le triangle du sprite de la trainée derrière la particule (donc qui pointe à l'opposée de sa direction).
+	// 1er sommet : le coin "tribord" (à droite de sa direction).
+	gl_Position = transformMat * vec4(center + rotate(radiusVec, -135), 1);
+	texCoords = vec2(0, 0.5);
 	color = particleColor;
 	EmitVertex();
 	// 2e sommet : le coin "babord"
-	radiusVec = rotate(radiusVec, 180);
-	gl_Position = transformMat * vec4(center + radiusVec * radius, 1);
+	gl_Position = transformMat * vec4(center + rotate(radiusVec, 135), 1);
+	texCoords = vec2(1, 0.5);
 	color = particleColor;
 	EmitVertex();
 	// 3e sommet : le bout de la queue. trailLength est en fait un facteur appliqué au rayon du polygone.
-	radiusVec = rotate(radiusVec, 90) * trailLength;
-	gl_Position = transformMat * vec4(center + radiusVec * radius, 1);
+	gl_Position = transformMat * vec4(center + rotate(radiusVec * (0.7 + trailLength), 180), 1);
+	texCoords = vec2(0.5, 1);
 	color = particleColor;
 	EmitVertex();
 }

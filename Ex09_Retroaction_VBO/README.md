@@ -4,7 +4,7 @@ On a dans cette scène 2D un nuage de particules sur lesquelles est appliquée d
 
 <img src="doc/cloud.png"/>
 
-Chaque particule (classe `Particle`) a une position dans l'espace, une vitesse actuelle et une masse. Elle est affichée comme un octogone (ou un polygone quelconque). Une plus grande masse rend une particule plus grosse à l'écran et une plus grande vitesse lui donne une couleur plus jaune ainsi qu'une trainée.
+Chaque particule (classe `Particle`) a une position dans l'espace, une vitesse actuelle et une masse. Elle est affichée avec un lutin (un *sprite*) et une trainée. Une plus grande masse rend une particule plus grosse à l'écran et une plus grande vitesse lui donne une couleur plus jaune ainsi qu'une trainée plus longue.
 
 <img src="doc/particles.png"/>
 
@@ -14,7 +14,7 @@ Le nuage peut contenir des millions de particules (quantité contrôlée par la 
 
 ## Affichage des particules
 
-Le nuanceur de géométrie ([particles_draw_geom.glsl](particles_draw_geom.glsl)) génère les sommets d'un polygone avec une trainée à partir des données cinétiques des particules. En effet, c'est plus simple que d'avoir à mettre à jour un maillage préchargé avec les polygones complets à chaque trame. De cette façon, les seules données qui transigent entre les nuanceurs sont les propriétés physiques, pas géométriques.
+Le nuanceur de géométrie ([particles_draw_geom.glsl](particles_draw_geom.glsl)) génère les sommets d'un carré qui affichera un lutin avec une trainée à partir des données cinétiques des particules. En effet, c'est plus simple que de mettre à jour un maillage préchargé avec les polygones complets à chaque trame. De cette façon, les seules données qui transigent entre les nuanceurs sont les propriétés physiques, pas géométriques.
 
 ## Étapes
 

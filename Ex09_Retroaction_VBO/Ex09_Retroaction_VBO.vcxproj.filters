@@ -51,7 +51,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color_frag.glsl">
+    <None Include="draw_frag.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
     <None Include="CMakeLists.txt">
@@ -63,13 +63,13 @@
     <None Include="CMakeLists.txt">
       <Filter>VSCode Files</Filter>
     </None>
-    <None Include="particles_compute_vert.glsl">
+    <None Include="compute_vert.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
-    <None Include="particles_draw_vert.glsl">
+    <None Include="draw_vert.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
-    <None Include="particles_draw_geom.glsl">
+    <None Include="draw_geom.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
     <None Include="README.md" />

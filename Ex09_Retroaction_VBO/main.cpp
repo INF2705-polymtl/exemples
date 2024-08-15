@@ -56,6 +56,8 @@ struct App : public OpenGLApplication
 	GLuint tfoComputation = 0;
 	GLuint reqParticles = 0;
 
+	Texture particleSprite;
+
 	ShaderProgram computationProg;
 	ShaderProgram drawingProg;
 
@@ -75,7 +77,6 @@ struct App : public OpenGLApplication
 	// Appelée avant la première trame.
 	void init() override {
 		setKeybindMessage(
-			"F5 : capture d'écran." "\n"
 			"R : réinitialiser la position de la caméra." "\n"
 			"flèches : bouger la caméra dans le plan XY." "\n"
 			"roulette de souris : zoom in/out." "\n"
@@ -85,9 +86,8 @@ struct App : public OpenGLApplication
 			"F : sauvegarder les données de particules dans un fichier CSV en plus d'un screenshot." "\n"
 		);
 
-		// Vu que le traitement vont être un peu plus lourd, on désactive le blend et z-test.
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
 
@@ -157,6 +157,15 @@ struct App : public OpenGLApplication
 		computationProg.setUniform(speedMax);
 		drawingProg.use();
 		drawingProg.setUniform(speedMax);
+
+		// La texture utilisée pour le sprite des particules.
+		particleSprite = Texture::loadFromFile("particle_sprite.png");
+		// Pas de filtres, c'est une texture qui doit être pixelisée.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		drawingProg.setInt("texMain", 0);
 
 		applyOrtho();
 	}
@@ -326,6 +335,7 @@ struct App : public OpenGLApplication
 		drawingProg.use();
 
 		// Rien de très spécial ici, on fait le bind et les configs d'attributs puis on dessine. Le nuanceur de géométrie s'occupe de générer les sommets en temps réel selon les propriétés physiques des particules.
+		particleSprite.bindToTextureUnit(0);
 		glBindVertexArray(vaoDrawing);
 		glBindBuffer(GL_ARRAY_BUFFER, vboIn);
 		Particle::setupAttribs();
@@ -399,13 +409,13 @@ struct App : public OpenGLApplication
 	}
 
 	void loadShaders() {
-		drawingProg.attachSourceFile(GL_VERTEX_SHADER, "particles_draw_vert.glsl");
-		drawingProg.attachSourceFile(GL_GEOMETRY_SHADER, "particles_draw_geom.glsl");
-		drawingProg.attachSourceFile(GL_FRAGMENT_SHADER, "color_frag.glsl");
+		drawingProg.attachSourceFile(GL_VERTEX_SHADER, "draw_vert.glsl");
+		drawingProg.attachSourceFile(GL_GEOMETRY_SHADER, "draw_geom.glsl");
+		drawingProg.attachSourceFile(GL_FRAGMENT_SHADER, "draw_frag.glsl");
 		drawingProg.link();
 
-		computationProg.attachSourceFile(GL_VERTEX_SHADER, "particles_compute_vert.glsl");
-		// L'édition de lien (le linking) pour le prog de calcul est faite plus tard après avoir fait glTransformFeedbackVaryings.
+		computationProg.attachSourceFile(GL_VERTEX_SHADER, "compute_vert.glsl");
+		// L'édition de liens (le linking) pour le prog de calcul est faite plus tard après avoir appliqué les glTransformFeedbackVaryings.
 	}
 };
 
