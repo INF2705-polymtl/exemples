@@ -364,6 +364,10 @@ public:
 		return prog.getUniformBlockIndex(this->getName());
 	}
 
+	void deleteObject() {
+		glDeleteBuffers(1, &ubo_);
+	}
+
 private:
 	GLuint ubo_ = 0;
 	GLuint bindingIndex_ = -1;

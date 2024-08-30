@@ -249,6 +249,24 @@ struct App : public OpenGLApplication
 		}
 	}
 
+	// Appelée lorsque la fenêtre se ferme.
+	void onClose() override {
+		cubeBox.deleteObjects();
+		cubeRoad.deleteObjects();
+		quad.deleteObjects();
+		glDeleteTextures(1, &texBlank);
+		glDeleteTextures(1, &texBoxBG);
+		glDeleteTextures(1, &texBoxText);
+		glDeleteTextures(1, &texAsphalt);
+		glDeleteTextures(1, &texLevels);
+		glDeleteTextures(1, &texTest);
+		texBlank = texBoxBG = texBoxText = texAsphalt = texLevels = texTest = 0;
+		progBasic.deleteShaders();
+		progBasic.deleteProgram();
+		progCompositing.deleteShaders();
+		progCompositing.deleteProgram();
+	}
+
 	// Appelée lors d'une touche de clavier.
 	void onKeyPress(const sf::Event::KeyEvent& key) override {
 		// La touche R réinitialise la position de la caméra.

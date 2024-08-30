@@ -226,6 +226,9 @@ public:
 	// Appelée à chaque trame. Le buffer swap est fait juste après.
 	virtual void drawFrame() { }
 
+	// Appelée lorsque la fenêtre se ferme.
+	virtual void onClose() { }
+
 	// Appelée lors d'une touche de clavier.
 	virtual void onKeyPress(const sf::Event::KeyEvent& key) { }
 
@@ -243,9 +246,6 @@ public:
 
 	// Appelée lors d'un défilement de souris.
 	virtual void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) { }
-
-	// Appelée lorsque la fenêtre se ferme.
-	virtual void onClose() { }
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
 	virtual void onResize(const sf::Event::SizeEvent& event) { }

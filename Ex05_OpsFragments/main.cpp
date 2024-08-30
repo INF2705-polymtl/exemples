@@ -176,6 +176,19 @@ struct App : public OpenGLApplication
 		// Malgré nos précautions, on observe quand même une aberration si on regarde le cube de vitre devant le carré de vitre. Ça donne l'impression que le carré est devant le cube. Il n'y a pas de façon magique de régler ce problème juste en manipulant le tampon de profondeur. Il faut soit changer l'ordre d'affichage (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poids ou un tampon de profondeur auxiliaire. De nos jours, la tendance est certainement vers le ray-tracing (pas matière à INF2705) pour gérer les problèmes de transparence/réflexion/réfraction.
 	}
 
+	// Appelée lorsque la fenêtre se ferme.
+	void onClose() override {
+		cube.deleteObjects();
+		quad.deleteObjects();
+		texBox.deleteObject();
+		texDrywall.deleteObject();
+		texWindow.deleteObject();
+		basicProg.deleteShaders();
+		basicProg.deleteProgram();
+		fogProg.deleteShaders();
+		fogProg.deleteProgram();
+	}
+
 	// Appelée lors d'une touche de clavier.
 	void onKeyPress(const sf::Event::KeyEvent& key) override {
 		// La touche R réinitialise la position de la caméra.

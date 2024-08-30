@@ -160,6 +160,16 @@ struct App : public OpenGLApplication
 		drawReferenceLines();
 	}
 
+	// Appelée lorsque la fenêtre se ferme.
+	void onClose() override {
+		gridLines.deleteObjects();
+		gridPoints.deleteObjects();
+		referenceLines.deleteObjects();
+		quad.deleteObjects();
+		globalColorProg.deleteShaders();
+		globalColorProg.deleteProgram();
+	}
+
 	// Appelée lors d'une touche de clavier.
 	void onKeyPress(const sf::Event::KeyEvent& key) override {
 		using enum sf::Keyboard::Key;

@@ -55,6 +55,10 @@ struct Texture
 		);
 	}
 
+	void deleteObject() {
+		glDeleteTextures(1, &id);
+	}
+
 	// Si detailLevels est > 1, demande à OpenGL de générer les mipmaps.
 	static Texture loadFromImage(const sf::Image& img, int detailLevels = 1) {
 		// Beaucoup de bibliothèques importent les images avec x=0,y=0 (donc premier pixel du tableau) au coin haut-gauche de l'image. C'est la convention en graphisme, mais les textures en OpenGL ont leur origine au coin bas-gauche.

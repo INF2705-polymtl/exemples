@@ -213,6 +213,18 @@ struct App : public OpenGLApplication
 			glDrawArrays(GL_TRIANGLES, 0, (GLint)std::size(pyramidIndices));
 	}
 
+	// Appelée lorsque la fenêtre se ferme.
+	void onClose() override {
+		glDeleteVertexArrays(1, &pyramidVao);
+		glDeleteBuffers(1, &pyramidPositionVbo);
+		glDeleteBuffers(1, &pyramidColorVbo);
+		glDeleteBuffers(1, &pyramidCombinedDataVbo);
+		glDeleteBuffers(1, &pyramidEbo);
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+		glDeleteProgram(shaderProgram);
+	}
+
 	void initPositionBuffer() {
 		// Créer le VBO des positions.
 		glGenBuffers(1, &pyramidPositionVbo);

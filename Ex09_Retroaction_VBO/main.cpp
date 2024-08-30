@@ -49,8 +49,8 @@ struct App : public OpenGLApplication
 {
 	const size_t numParticles = 1'000'000;
 	std::vector<Particle> particles;
-	GLuint vaoDrawing = 0;
 	GLuint vaoComputation = 0;
+	GLuint vaoDrawing = 0;
 	GLuint vboIn = 0;
 	GLuint vboOut = 0;
 	GLuint tfoComputation = 0;
@@ -196,6 +196,21 @@ struct App : public OpenGLApplication
 
 			savingData = false;
 		}
+	}
+
+	// Appelée lorsque la fenêtre se ferme.
+	void onClose() override {
+		glDeleteVertexArrays(1, &vaoComputation);
+		glDeleteVertexArrays(1, &vaoDrawing);
+		glDeleteBuffers(1, &vboIn);
+		glDeleteBuffers(1, &vboOut);
+		glDeleteQueries(1, &reqParticles);
+		glDeleteTransformFeedbacks(1, &tfoComputation);
+		particleSprite.deleteObject();
+		computationProg.deleteShaders();
+		computationProg.deleteProgram();
+		drawingProg.deleteShaders();
+		drawingProg.deleteProgram();
 	}
 
 	// Appelée lors d'une touche de clavier.

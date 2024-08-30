@@ -112,6 +112,18 @@ struct App : public OpenGLApplication
 		rotatingAngle += 2;
 	}
 
+	// Appelée lorsque la fenêtre se ferme.
+	void onClose() override {
+		pyramid.deleteObjects();
+		cubeBox.deleteObjects();
+		cubeWire.deleteObjects();
+		glDeleteBuffers(1, &pyramidColorVbo);
+		coloredVertexShaders.deleteShaders();
+		coloredVertexShaders.deleteProgram();
+		solidColorShaders.deleteShaders();
+		solidColorShaders.deleteProgram();
+	}
+
 	// Appelée lors d'une touche de clavier.
 	void onKeyPress(const sf::Event::KeyEvent& key) override {
 		using enum sf::Keyboard::Key;

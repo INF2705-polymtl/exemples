@@ -136,6 +136,13 @@ struct Mesh
 		unbindVao();
 	}
 
+	void deleteObjects() {
+		glDeleteVertexArrays(1, &vao);
+		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(1, &ebo);
+		vao = vbo = ebo = 0;
+	}
+
 	void bindVao() { glBindVertexArray(vao); }
 	void unbindVao() { glBindVertexArray(0); }
 	void bindVbo() { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
