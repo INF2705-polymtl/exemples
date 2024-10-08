@@ -44,12 +44,12 @@ struct SceneObject
 };
 
 
-inline vec4 uintToVec4(uint32_t i) {
+vec4 uintToVec4(uint32_t i) {
 	auto bytes = (uint8_t*)&i;
 	return vec4(bytes[0] / 255.0f, bytes[1] / 255.0f, bytes[2] / 255.0f, 1);
 }
 
-inline uint32_t vec4ToUInt(vec4 v) {
+uint32_t vec4ToUInt(vec4 v) {
 	uint8_t b1 = (uint8_t)std::lrint(v.r * 255);
 	uint8_t b2 = (uint8_t)std::lrint(v.g * 255);
 	uint8_t b3 = (uint8_t)std::lrint(v.b * 255);
@@ -157,7 +157,7 @@ struct App : public OpenGLApplication
 			// Obtenir la couleur du pixel cliqué avec la souris. Cet couleur est un nombre 24 bit (RGB8, on ne peut pas utiliser le alpha) qui correspond à notre identifiant d'objet de scène.
 			unsigned clickedObj = getObjectIDUnderMouse(lastMouseBtnEvent);
 			if (clickedObj != 0)
-				std::cout << "Clicked object " << clickedObj << "\n";
+				std::cout << std::format("Sélection de l'objet 0x{:04X}", clickedObj) << "\n";
 			// Chercher dans le dictionnaire de théières (pieces) si le ID est reconnu. On choisit de ne pas pouvoir sélectionner la planche.
 			if (clickedObj != selectedObjectID and pieces.contains(clickedObj)) {
 				// Sélectionner l'objet et réinitialiser l'animation de clignotement.
@@ -174,13 +174,28 @@ struct App : public OpenGLApplication
 		}
 
 		// Mettre à jour la valeur de clignotement, qui est tout simplement le temps en secondes modulo 1.
-		flashingValue += deltaTime_;
+		flashingValue += getFrameDeltaTime();
 		flashingValue = fmodf(flashingValue, 1.0f);
 		flashingProg.use();
 		flashingProg.setFloat("flashingValue", flashingValue);
 
 		// Dessiner la scène normalement.
 		drawScene();
+	}
+
+	// Appelée lorsque la fenêtre se ferme.
+	void onClose() override {
+		meshBoard.deleteObjects();
+		meshTeapot.deleteObjects();
+		texRock.deleteObject();
+		texRockDark.deleteObject();
+		texCheckers.deleteObject();
+		for (auto prog : programs) {
+			prog->deleteShaders();
+			prog->deleteProgram();
+		}
+		objects.clear();
+		pieces.clear();
 	}
 
 	// Appelée lors d'une touche de clavier.
@@ -193,7 +208,7 @@ struct App : public OpenGLApplication
 
 		camera.handleKeyEvent(key, 5, 0.5f, {10, 90, 180, 0});
 
-		mat4 pieceTranslate(1);
+		vec3 pieceTranslate = {};
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case Space:
@@ -201,16 +216,16 @@ struct App : public OpenGLApplication
 			selecting = false;
 			break;
 		case A:
-			pieceTranslate = glm::translate(mat4(1), {1, 0, 0});
+			pieceTranslate = {1, 0, 0};
 			break;
 		case D:
-			pieceTranslate = glm::translate(mat4(1), {-1, 0, 0});
+			pieceTranslate = {-1, 0, 0};
 			break;
 		case W:
-			pieceTranslate = glm::translate(mat4(1), {0, 0, 1});
+			pieceTranslate = {0, 0, 1};
 			break;
 		case S:
-			pieceTranslate = glm::translate(mat4(1), {0, 0, -1});
+			pieceTranslate = {0, 0, -1};
 			break;
 
 		case F5:
@@ -222,8 +237,10 @@ struct App : public OpenGLApplication
 		// Appliquer la translation à l'objet sélectionné si aplicable.
 		auto it = objects.find(selectedObjectID);
 		auto* selectedObject = it != objects.end() ? &it->second : nullptr;
-		if (selectedObject != nullptr)
-			selectedObject->modelMat = pieceTranslate * selectedObject->modelMat.top();
+		if (selectedObject != nullptr) {
+			mat4 translateMat = glm::translate(mat4(1), pieceTranslate);
+			selectedObject->modelMat = translateMat * selectedObject->modelMat.top();
+		}
 
 		// Mettre à jour la caméra.
 		for (auto&& prog : programs)
@@ -293,8 +310,8 @@ struct App : public OpenGLApplication
 		for (int i = 0; i < 12; i++) {
 			// j=0 -> pièce blanche, j=1 -> pièce noire.
 			for (int j = 0; j < 2; j++) {
-				// Calculer le ID de l'objet (partant de 1000 pour les pièces blanches, 2000 pour les noires).
-				int id = 1000 * (j + 1) + i;
+				// Calculer le ID de l'objet (partant de 0xF0 pour les pièces blanches, 0xF000 pour les noires).
+				int id = i + (j == 0 ? 0xF0 : 0xF000);
 				SceneObject obj = {
 					(unsigned)id,
 					"Piece",
