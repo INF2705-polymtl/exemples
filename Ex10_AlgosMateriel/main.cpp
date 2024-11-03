@@ -32,10 +32,11 @@ struct App : public OpenGLApplication
 	Mesh gridLines;
 	Mesh gridPoints;
 	Mesh referenceLines;
-	Mesh quad;
-	bool fragments[gridSize][gridSize] = {};
+	bool activeFrags[gridSize][gridSize] = {};
+	GLuint activeFragsVbo = 0;
 
 	ShaderProgram globalColorProg;
+	ShaderProgram quadGenProg;
 
 	TransformStack model = {"model"};
 	TransformStack view = {"view"};
@@ -74,16 +75,6 @@ struct App : public OpenGLApplication
 
 		referenceLines.setup();
 
-		quad.vertices = {
-			{{-0.5, -0.5, 0}, {}, {}},
-			{{ 0.5, -0.5, 0}, {}, {}},
-			{{ 0.5,  0.5, 0}, {}, {}},
-			{{-0.5, -0.5, 0}, {}, {}},
-			{{ 0.5,  0.5, 0}, {}, {}},
-			{{-0.5,  0.5, 0}, {}, {}},
-		};
-		quad.setup();
-
 		for (int i = 0; i <= gridSize; i++) {
 			gridLines.vertices.push_back({{i, 0, 0}});
 			gridLines.vertices.push_back({{i, gridSize, 0}});
@@ -92,10 +83,17 @@ struct App : public OpenGLApplication
 		}
 		gridLines.setup();
 
-		for (int i = 0; i < gridSize; i++)
-			for (int j = 0; j < gridSize; j++)
-				gridPoints.vertices.push_back({{i + 0.5f, j + 0.5f, 0}});
+		for (int x = 0; x < gridSize; x++)
+			for (int y = 0; y < gridSize; y++)
+				gridPoints.vertices.push_back({{x + 0.5f, y + 0.5f, 0}});
 		gridPoints.setup();
+
+		gridPoints.bindVao();
+		glGenBuffers(1, &activeFragsVbo);
+		glBindBuffer(GL_ARRAY_BUFFER, activeFragsVbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(activeFrags), activeFrags, GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(3, 1, GL_UNSIGNED_BYTE, GL_FALSE, 1, 0);
+		glEnableVertexAttribArray(3);
 
 		applyOrtho();
 	}
@@ -105,7 +103,7 @@ struct App : public OpenGLApplication
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		// Réinitialiser la grille de fragments et les lignes de référence.
-		std::fill_n((uint8_t*)fragments, sizeof(fragments), 0);
+		std::fill_n((uint8_t*)activeFrags, sizeof(activeFrags), 0);
 		referenceLines.vertices.clear();
 
 		// Points de droites.
@@ -164,8 +162,9 @@ struct App : public OpenGLApplication
 	void onClose() override {
 		gridLines.deleteObjects();
 		gridPoints.deleteObjects();
+		glDeleteBuffers(1, &activeFragsVbo);
+		activeFragsVbo = 0;
 		referenceLines.deleteObjects();
-		quad.deleteObjects();
 		globalColorProg.deleteShaders();
 		globalColorProg.deleteProgram();
 	}
@@ -210,7 +209,7 @@ struct App : public OpenGLApplication
 		auto fillFragment = [&](float x, float y) {
 			// S'assurer que le fragment à allumer est bien dans la grille.
 			if (0 <= x and x < gridSize and 0 <= y and y < gridSize)
-				fragments[lround(x)][lround(y)] = true;
+				activeFrags[lround(x)][lround(y)] = true;
 		};
 
 		float m = ((float)y2 - y1) / (x2 - x1);
@@ -234,7 +233,7 @@ struct App : public OpenGLApplication
 				std::swap(x, y);
 			// S'assurer que le fragment à allumer est bien dans la grille.
 			if (0 <= x and x < gridSize and 0 <= y and y < gridSize)
-				fragments[x][y] = true;
+				activeFrags[x][y] = true;
 		};
 
 		// Si la pente est > 1, balayer par rapport à y plutôt que x, donc faire à semblant que les x sont des y et vice-versa.
@@ -278,7 +277,7 @@ struct App : public OpenGLApplication
 			y += center.y;
 			// S'assurer que le fragment à allumer est bien dans la grille.
 			if (0 <= x and x < gridSize and 0 <= y and y < gridSize)
-				fragments[x][y] = true;
+				activeFrags[x][y] = true;
 		};
 
 		// L'algorithme de base qui est implémenté ci-dessous allume seulement les fragments pour l'octant Nord-Nord-Est. Cependant, un cercle est nécessairement symétrique sur tous ces octants, donc pour chaque fragment, on allume aussi les 8 symétries.
@@ -335,20 +334,11 @@ struct App : public OpenGLApplication
 	}
 
 	void drawFragments() {
-		// Dessiner les faux fragments comme un quad rouge (fragment allumé) ou blanc (fragment éteint).
-		static const vec4 fragmentColor = {1, 0.5, 0.5, 1};
-
-		globalColorProg.use();
-		for (int x = 0; x < gridSize; x++) {
-			for (int y = 0; y < gridSize; y++) {
-				globalColor = fragments[x][y] ? fragmentColor : vec4(1, 1, 1, 1);
-				globalColorProg.setUniform(globalColor);
-				model.loadIdentity();
-				model.translate({x + 0.5f, y + 0.5f, 0});
-				globalColorProg.setUniform(model);
-				quad.draw();
-			}
-		}
+		quadGenProg.use();
+		gridPoints.bindVao();
+		glBindBuffer(GL_ARRAY_BUFFER, activeFragsVbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(activeFrags), activeFrags, GL_DYNAMIC_DRAW);
+		gridPoints.draw(GL_POINTS);
 	}
 
 	void drawReferenceLines() {
@@ -397,13 +387,22 @@ struct App : public OpenGLApplication
 
 		globalColorProg.use();
 		globalColorProg.setMat(projection);
+		quadGenProg.use();
+		quadGenProg.setMat(projection);
 	}
 
 	void loadShaders() {
 		globalColorProg.create();
-		globalColorProg.attachSourceFile(GL_VERTEX_SHADER, "basic_vert.glsl");
+		globalColorProg.attachSourceFile(GL_VERTEX_SHADER, "common_vert.glsl");
 		globalColorProg.attachSourceFile(GL_FRAGMENT_SHADER, "uniform_frag.glsl");
 		globalColorProg.link();
+
+		quadGenProg.create();
+		quadGenProg.attachSourceFile(GL_VERTEX_SHADER, "common_vert.glsl");
+		quadGenProg.attachSourceFile(GL_GEOMETRY_SHADER, "quad_geom.glsl");
+		quadGenProg.attachSourceFile(GL_FRAGMENT_SHADER, "color_frag.glsl");
+		quadGenProg.link();
+
 	}
 };
 

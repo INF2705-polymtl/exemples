@@ -173,9 +173,11 @@
     <ClInclude Include="..\inf2705\utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="color_frag.glsl" />
+    <None Include="quad_geom.glsl" />
     <None Include="README.md" />
     <None Include="uniform_frag.glsl" />
-    <None Include="basic_vert.glsl" />
+    <None Include="common_vert.glsl" />
     <None Include="CMakeLists.txt" />
     <None Include=".vscode\settings.json" />
   </ItemGroup>

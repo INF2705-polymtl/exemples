@@ -54,7 +54,7 @@
     <None Include="uniform_frag.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
-    <None Include="basic_vert.glsl">
+    <None Include="common_vert.glsl">
       <Filter>Shader Source Files</Filter>
     </None>
     <None Include="CMakeLists.txt">
@@ -67,5 +67,11 @@
       <Filter>VSCode Files</Filter>
     </None>
     <None Include="README.md" />
+    <None Include="color_frag.glsl">
+      <Filter>Shader Source Files</Filter>
+    </None>
+    <None Include="quad_geom.glsl">
+      <Filter>Shader Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

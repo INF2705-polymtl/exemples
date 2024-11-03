@@ -1,15 +1,21 @@
 #version 410
 
 
-layout(location = 0) in vec3 a_position;
-layout(location = 1) in vec3 a_normal;
-layout(location = 2) in vec2 a_texCoords;
-
 uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
 
-out vec2 texCoords;
+
+layout(location = 0) in vec3 a_position;
+layout(location = 1) in vec3 a_normal;
+layout(location = 2) in vec2 a_texCoords;
+layout(location = 3) in int a_activeFrag;
+
+
+out VertOut {
+	vec3 origPosition;
+	bool activeFrag;
+} outputs;
 
 
 void main() {
@@ -19,5 +25,6 @@ void main() {
 	vec4 clipPosition = projection * viewPosition;
 
 	gl_Position = clipPosition;
-	texCoords = a_texCoords;
+	outputs.origPosition = a_position;
+	outputs.activeFrag = bool(a_activeFrag);
 }
