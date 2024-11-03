@@ -32,7 +32,7 @@ void main() {
 	// La matrice de tranformation habituelle.
 	mat4 transformMat = projection * view * model;
 
-	// Le rayon du polygone dépend de sa masse de la particule.
+	// Le rayon du polygone dessiné dépend de la masse de la particule.
 	float radius = inputs[0].mass * 0.05;
 	// La position de la particule est le centre du polygone.
 	vec3 center = inputs[0].position;
@@ -40,9 +40,9 @@ void main() {
 	vec3 direction = normalize(inputs[0].velocity);
 	// La valeur normalisée de la vitesse (entre 0 et 1 selon les vitesses min et max).
 	float speedValue = smoothstep(speedMin, speedMax, length(inputs[0].velocity));
-	// Longueur de la trainée dépend de la vitesse.
+	// La longueur de la trainée dépend de la vitesse.
 	float trailLength = mix(0.1, trailLengthMax, speedValue);
-	// Couleur de la particule dépend de la vitesse (lent = rouge, vite = jaune).
+	// La couleur de la particule dépend de la vitesse (lent = rouge, vite = jaune).
 	vec4 particleColor = mix(vec4(1, 0, 0, 1), vec4(1, 1, 0, 1), speedValue);
 
 	// Le vecteur de rayon du sprite.
@@ -80,7 +80,7 @@ void main() {
 	color = particleColor;
 	EmitVertex();
 	// 3e sommet : le bout de la queue. trailLength est en fait un facteur appliqué au rayon du polygone.
-	gl_Position = transformMat * vec4(center + rotate(radiusVec * (0.7 + trailLength), 180), 1);
+	gl_Position = transformMat * vec4(center + -radiusVec * (0.7 + trailLength), 1);
 	texCoords = vec2(0.5, 1);
 	color = particleColor;
 	EmitVertex();

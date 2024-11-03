@@ -178,7 +178,7 @@ struct App : public OpenGLApplication
 		};
 		light.setup();
 
-		// Initialiser le modèle d'éclairage. dans ce cas on n'utilise pas de couleur ambiante (c'est la source lumineuse qui l'a).
+		// Initialiser le modèle d'éclairage. Dans ce cas on n'utilise pas de couleur ambiante (c'est la source lumineuse qui l'a).
 		lightModel = LightModel{{0, 0, 0, 1}, true};
 		lightModel.setup();
 
@@ -286,11 +286,11 @@ struct App : public OpenGLApplication
 			model.rotate(-5, {0, 1, 0});
 			break;
 		case W:
-			light->position.z += 0.5;
+			light->position.z -= 0.5;
 			light.updateBuffer();
 			break;
 		case S:
-			light->position.z -= 0.5;
+			light->position.z += 0.5;
 			light.updateBuffer();
 			break;
 		case R:

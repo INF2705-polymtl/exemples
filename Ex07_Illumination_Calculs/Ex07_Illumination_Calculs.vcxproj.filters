@@ -12,9 +12,6 @@
     <Filter Include="Header Files\inf2705">
       <UniqueIdentifier>{8f553e8b-48ea-4c43-9a38-aff5ff8bc0fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader Source Files">
-      <UniqueIdentifier>{6e79003b-e1d3-45e1-a872-875f5748de59}</UniqueIdentifier>
-    </Filter>
     <Filter Include="VSCode Files">
       <UniqueIdentifier>{2454d832-51d2-4081-bad2-591ba3680c60}</UniqueIdentifier>
     </Filter>

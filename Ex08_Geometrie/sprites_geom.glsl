@@ -1,6 +1,6 @@
 #version 410
 
-// On reçoit en entrée les triangles de la primitive et on sort les trois faces du pic extrudé, donc 9 sommets au total.
+// On reçoit en entrée les centres de chaque lutin et sort le quad en triangle_strip.
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 

@@ -57,6 +57,7 @@ struct Texture
 
 	void deleteObject() {
 		glDeleteTextures(1, &id);
+		id = 0;
 	}
 
 	// Si detailLevels est > 1, demande à OpenGL de générer les mipmaps.

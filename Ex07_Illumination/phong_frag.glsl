@@ -62,7 +62,7 @@ Reflections computeReflection(vec3 l, vec3 n, vec3 o, float attenuation) {
 		vec4(0, 0, 0, 1),
 		vec4(0, 0, 0, 1)
 	);
-	
+
 	// Calculer la réflexion ambiante. Elle ne dépend pas de la géométrie de la scène.
 	result.ambient = material.ambientColor * (lightModel.ambientColor + light.ambientColor);
 	result.ambient = clamp(result.ambient, 0, 1);

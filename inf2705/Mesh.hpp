@@ -57,7 +57,7 @@ struct VertexData
 	vec2 texCoords; // layout(location = 2)
 };
 
-// Un mesh (ou maillage) représente la géométrie d'une forme d'une façon traçable par OpenGL.
+// Un mesh (ou maillage) représente la géométrie d'un objet d'une façon traçable par OpenGL.
 struct Mesh
 {
 	std::vector<VertexData> vertices;

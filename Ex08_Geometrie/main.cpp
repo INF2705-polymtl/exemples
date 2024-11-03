@@ -234,6 +234,10 @@ struct App : public OpenGLApplication
 			break;
 		case O:
 			usingWorldPositions ^= 1;
+			std::cout << std::format(
+				"Transformations sur les coords {}",
+				usingWorldPositions ? "de scène" : "d'objet"
+			) << "\n";
 			break;
 
 		case A:
@@ -331,7 +335,7 @@ struct App : public OpenGLApplication
 
 		modelSprite.loadIdentity();
 		// Positionner le point en fonction de la trame actuelle (donc mouvement vers la droite).
-		modelSprite.translate({-0.5 + swordAnimFrame * 0.05, -0.015, 0});
+		modelSprite.translate({-0.49 + swordAnimFrame * 0.05, -0.011, 0});
 		// Mettre à l'échelle en appliquant les proportions de la texture.
 		modelSprite.scale({spriteSword.elemSize.x * 0.1f, spriteSword.elemSize.y * 0.1f, 1});
 		modelSprite.scale({0.1, 0.1, 1});
