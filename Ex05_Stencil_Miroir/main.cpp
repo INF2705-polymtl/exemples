@@ -197,7 +197,8 @@ struct App : public OpenGLApplication
 			break;
 
 		case F5:
-			saveScreenshot();
+			std::string path = saveScreenshot();
+			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
 		}
 	}

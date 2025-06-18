@@ -172,6 +172,16 @@ struct App : public OpenGLApplication
 		// Compiler et attacher le nuanceur de sommets.
 		glCompileShader(vertexShader);
 		glAttachShader(shaderProgram, vertexShader);
+		// Afficher le message d'erreur si applicable.
+		GLint infologLength = 0;
+		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infologLength);
+		if (infologLength > 1) {
+			std::string infoLog(infologLength, '\0');
+			glGetShaderInfoLog(vertexShader, infologLength, nullptr, infoLog.data());
+			std::cerr << std::format("Compilation Error in '{}':\n{}", "pyramid_vert.glsl", infoLog) << std::endl;
+			glDeleteShader(vertexShader);
+			return;
+		}
 
 		// Lire et envoyer la source du nuanceur de fragments.
 		// Vous pouvez changer pour "pyramid_brightness_frag.glsl" pour observer l'effet de la variable uniforme brightness sur le nuanceur de fragment.
@@ -181,6 +191,16 @@ struct App : public OpenGLApplication
 		// Compiler et attacher le nuanceur de fragments.
 		glCompileShader(fragmentShader);
 		glAttachShader(shaderProgram, fragmentShader);
+		// Afficher le message d'erreur si applicable.
+		infologLength = 0;
+		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infologLength);
+		if (infologLength > 1) {
+			std::string infoLog(infologLength, '\0');
+			glGetShaderInfoLog(fragmentShader, infologLength, nullptr, infoLog.data());
+			std::cerr << std::format("Compilation Error in '{}':\n{}", "pyramid_frag.glsl", infoLog) << std::endl;
+			glDeleteShader(fragmentShader);
+			return;
+		}
 
 		// Lier les deux nuanceurs au pipeline du programme.
 		glLinkProgram(shaderProgram);

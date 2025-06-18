@@ -148,7 +148,7 @@ struct Mesh
 	void bindVbo() { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
 	void bindEbo() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
 
-	// Charge des mesh d'objets à partir d'un fichier Wavefront (il peut y avoir plusieurs objet dans le même fichier). Les données sont chargées par sommet sans tableau d'indices.
+	// Charge des mesh d'objets à partir d'un fichier Wavefront (il peut y avoir plusieurs objets dans le même fichier). Les données sont chargées par sommet sans tableau d'indices.
 	static std::vector<Mesh> loadFromWavefrontFile(std::string_view filename, bool setupOnLoad = true) {
 		// Code inspiré de l'exemple https://github.com/tinyobjloader/tinyobjloader/tree/release#example-code-new-object-oriented-api
 

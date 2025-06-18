@@ -196,11 +196,11 @@ struct App : public OpenGLApplication
 			std::cout << "Proj ortho" << "\n";
 			break;
 
-		case F5:
+		case F5: {
 			std::string path = saveScreenshot();
 			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
-		}
+		}}
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
@@ -360,6 +360,7 @@ struct App : public OpenGLApplication
 	}
 
 	void drawCube(vec4 cubeColor) {
+		auto& prog = solidColorShaders;
 		// Choisir le nuanceur à couleur globale.
 		solidColorShaders.use();
 		// Mettre à jour les variables uniformes de matrice de modélisation et de couleur.

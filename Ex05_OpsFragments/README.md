@@ -30,7 +30,7 @@ La solution classique est de dessiner les objets opaques en premier avec *z-test
 
 <img src="doc/depth.png"/>
 
-Le *z-test* en lecture seule règle partiellement le problème, mais il y a encore des aberrations où certaines faces semblent être devant alors qu'elles sont derrière. Il n'y a pas de façon magique de régler ce problème juste en manipulant le tampon de profondeur. Il faut soit changer l'ordre d'affichage dynamiquement (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poids ou un tampon de profondeur auxiliaire. De nos jours, la tendance est définitivement vers le *ray-tracing* (pas matière à INF2705) pour gérer les problèmes de transparence/réflexion/réfraction.
+Le *z-test* en lecture seule règle partiellement le problème, mais il y a encore des aberrations où certaines faces semblent être devant alors qu'elles sont derrière. Il n'y a pas de façon magique de régler ce problème juste en manipulant le tampon de profondeur. Il faut soit changer l'ordre d'affichage dynamiquement (coûteux pour les scènes avec beaucoup d'objets) ou appliquer un algorithme plus avancé comme la transparence avec poids ou un tampon de profondeur auxiliaire. De nos jours, la tendance est définitivement vers le *ray-tracing* pour gérer les problèmes de transparence/réflexion/réfraction.
 
 ## Effet de brouillard un peu *vieux jeu*
 

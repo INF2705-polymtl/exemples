@@ -54,7 +54,6 @@ public:
 
 		settings_ = settings;
 
-
 		// Créer la fenêtre et afficher les infos du contexte OpenGL.
 		createWindowAndContext(title);
 		printGLInfo();
@@ -265,7 +264,9 @@ protected:
 			switch (event.type) {
 			// L'utilisateur a voulu fermer la fenêtre (le X de la fenêtre, Alt+F4 sur Windows, etc.).
 			case Closed:
+				glFinish();
 				onClose(); // À surcharger
+				glFinish();
 				window_.close();
 				break;
 			// Redimensionnement de la fenêtre.

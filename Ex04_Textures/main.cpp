@@ -286,11 +286,11 @@ struct App : public OpenGLApplication
 			mode = key.code - Num0;;
 			break;
 
-		case F5:
+		case F5: {
 			std::string path = saveScreenshot();
 			std::cout << "Capture d'écran dans " << path << std::endl;
 			break;
-		}
+		}}
 	}
 
 	// Appelée lors d'un mouvement de souris.

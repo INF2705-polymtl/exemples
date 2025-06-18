@@ -1,5 +1,53 @@
 # Pipeline de transformations et matrices
 
+## Encapsulation des opérations matricielles (classe *TransformStack*)
+
+On va encapsuler les opérations matricielles dans la classe `TransformStack` ([TransformStack.hpp](../inf2705/TransformStack.hpp)). C'est une pile de matrices de transformations (hérite de `std::stack`) et les transformations (rotation, translation, etc.) s'opèrent sur le dessus de la pile.
+
+Méthodes principales de cette classe :
+
+* `top()` : Obtenir la matrice sur le dessus de la pile.
+* `push()` : Duppliquer le dessus de la pile.
+* `push(m)` : Empiler la matrice *m*.
+* `pushIdentity()` et `loadIdentity()` : Empiler ou charger une matrice identité.
+* `pop()` : Dépiler le dessus de la pile.
+* `scale(v)`, `translate(v)`, `rotate(a, v)` : Les transformations usuelles. Notez que les angles sont en degrés.
+* `lookAt(oeil, cible, up)` : Même appel qu'avec *glm*.
+* `frustum(L, R, B, T, N, F)` : Même appel qu'avec *glm*.
+* `perspective(fovy, aspect, proche, loin)` : Même appel qu'avec *glm*, mais l'angle est en degrés.
+* Toutes les méthodes de la classe `std::stack`.
+
+Par exemple :
+
+```c++
+TransformStack matr; // Initialisée à une mat identité
+matr.translate(vec3(1, 0, 0)); // Translation de (1,0,0)
+matr.rotate(30, {1, 0, 0}); // 30° autour des x
+matr.scale(2, 2, 2); // Mise à l'échelle de 2.
+```
+
+Note : lorsqu’on modifie les matrices courantes, il faut aussi  communiquer ces modifications à la carte graphique.
+
+```c++
+prog.use()
+// Obtenir l'index de la variable uniforme
+GLuint loc = prog.getUniformLocation("model");
+// Faire les transformations matricielles
+TransformStack matr;
+matr.translate({1, 0, 0});
+// Mettre à jour la variable dans la mémoire graphique
+prog.setMat(loc, matr);
+```
+
+La classe `TransformStack` peut se rappeler du nom de sa variable uniforme et de son index pour un programme donné. Ça allège les mises à jours.
+
+```c++
+TransformStack matr = {"model"}; // Lui donner un nom uniforme à la construction
+matr.rotate(30, {0, 1, 0});
+prog.use();
+prog.setMat(matr); // S'occupe de charger l'index de la matrice
+```
+
 ## Encapsulation des VAO, VBO et EBO
 
 Pour le reste de la session, on va encapsuler la gestion des objets comme les VAO, VBO et EBO dans la classe `Mesh` ([Mesh.hpp](../inf2705/Mesh.hpp)). Ça va nous éviter la répétition de code pour le dessin de formes. Un maillage (*mesh*) représente les sommets d'une forme à afficher. Chaque sommet (structure `VertexData`) a une position (référentiel de l'objet), un vecteur normal et des coordonnées de texture. Dans le présent exemple, on va seulement utiliser la position, mais les deux autres sont des informations assez fondamentales.
@@ -27,23 +75,6 @@ square.setup();
 square.draw(GL_TRIANGLES);
 ```
 
-## Encapsulation des opérations matricielles
-
-On va aussi encapsuler les opérations matricielles dans la classe TransformStack ([TransformStack.hpp](../inf2705/TransformStack.hpp)). C'est une pile de matrices de transformations (hérite de `std::stack`) et les transformations (rotation, translation, etc.) s'opèrent sur le dessus de la pile. C'est un peu comme la classe `MatricePipeline` des notes de cours.
-
-Méthodes principales de cette classe :
-
-* `top()` : Obtenir la matrice sur le dessus de la pile.
-* `push()` : Duppliquer le dessus de la pile.
-* `push(m)` : Empiler *m*.
-* `pushIdentity()` et `loadIdentity()` : Empiler ou charger une matrice identité.
-* `pop()` : Dépiler le dessus de la pile.
-* `scale(v)`, `translate(v)`, `rotate(a, v)` : Les transformations usuelles. Notez que les angles sont en degrés.
-* `lookAt(oeil, cible, up)` : Même appel qu'avec *glm*.
-* `frustum(L, R, B, T, N, F)` : Même appel qu'avec *glm*.
-* `perspective(fovy, aspect, proche, loin)` : Même appel qu'avec *glm*, mais l'angle est en degrés.
-* Toutes les méthodes de la classe `std::stack`.
-
 ## Encapsulation des programmes GLSL
 
 La classe `ShaderProgram` ([ShaderProgram.hpp](../inf2705/ShaderProgram.hpp)) emballe les opérations liées à la compilation de nuanceurs et à la mise à jour de variables uniformes. Ça va encore là nous éviter beaucoup de répétition de code pour la gestion de nuanceurs.
@@ -59,11 +90,8 @@ La mise à jour des variables uniformes est aussi plus simple :
 
 ```c++
 vec4 uniVariable = {1, 0, 0, 1};
-TransformStack viewMatrix;
-viewMatrix.lookAt({0, 10, 5}, {0, -1, 0}, {0, 1, 0});
 prog.use();
 prog.setVec("nomDeLaVariable", uniVariable);
-prog.setMat("view", viewMatrix);
 ```
 
 ## Objets dans la scène
