@@ -33,6 +33,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_SelectionCouleur", "E
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_Illumination_Calculs", "Extra_Illumination_Calculs\C07_Illumination_Calculs.vcxproj", "{7FD07506-25EC-4E69-8301-D4A6954C304A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C05_Stencil", "C05_Stencil\C05_Stencil.vcxproj", "{3A454C98-7100-415D-943C-E13A17A7627C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C05_Stencil_Miroir", "C05_Stencil_Miroir\C05_Stencil_Miroir.vcxproj", "{013CC645-F0A5-480C-8C8F-271683B6341B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -161,6 +165,22 @@ Global
 		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Release|x64.Build.0 = Release|x64
 		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Release|x86.ActiveCfg = Release|Win32
 		{7FD07506-25EC-4E69-8301-D4A6954C304A}.Release|x86.Build.0 = Release|Win32
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Debug|x64.ActiveCfg = Debug|x64
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Debug|x64.Build.0 = Debug|x64
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Debug|x86.ActiveCfg = Debug|Win32
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Debug|x86.Build.0 = Debug|Win32
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Release|x64.ActiveCfg = Release|x64
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Release|x64.Build.0 = Release|x64
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Release|x86.ActiveCfg = Release|Win32
+		{3A454C98-7100-415D-943C-E13A17A7627C}.Release|x86.Build.0 = Release|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x64.ActiveCfg = Debug|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x64.Build.0 = Debug|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x86.ActiveCfg = Debug|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Debug|x86.Build.0 = Debug|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x64.ActiveCfg = Release|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x64.Build.0 = Release|x64
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x86.ActiveCfg = Release|Win32
+		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
