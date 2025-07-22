@@ -249,7 +249,7 @@ public:
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
 	virtual void onResize(const sf::Event::Resized& event) { }
 
-	// Appelée sur un évènement autre que Closed, Resized ou KeyPressed.
+	// Appelée sur n'importe quel évènement (incluant ceux ci-dessus).
 	virtual void onEvent(const sf::Event& event) { }
 
 protected:
@@ -259,6 +259,9 @@ protected:
 
 		// Traiter les événements survenus depuis la dernière trame.
 		while (auto event = window_.pollEvent()) {
+			// N'importe quel événement.
+			onEvent(*event); // À surcharger
+
 			// L'utilisateur a voulu fermer la fenêtre (le X de la fenêtre, Alt+F4 sur Windows, etc.).
 			if (event->is<sf::Event::Closed>()) {
 				glFinish();
@@ -291,9 +294,6 @@ protected:
 			// Souris défilée
 			} else if (auto* e = event->getIf<sf::Event::MouseWheelScrolled>()) {
 				onMouseScroll(*e);
-			// Autre événement.
-			} else {
-				onEvent(*event); // À surcharger
 			}
 		}
 	}
@@ -331,7 +331,7 @@ protected:
 		lastFrameTime_ = t;
 	}
 
-	sf::Window window_;
+	sf::RenderWindow window_;
 	sf::Event::Resized lastResize_ = {};
 	int frame_ = 0;
 	float deltaTime_ = 0.0f;

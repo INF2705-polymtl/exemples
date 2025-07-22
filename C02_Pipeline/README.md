@@ -4,7 +4,7 @@
 
 D'abord, on a encapsulé l'exécution de notre programme OpenGL dans la classe `OpenGLApplication` ([OpenGLApplication.hpp](../inf2705/OpenGLApplication.hpp)). Ça inclue beaucoup de fonctionnalités comme la gestion de fenêtre et d'événements, mais aussi la capture de trame (des *screenshot*).
 
-Pour créer une application, il faut en hériter, puis redéfinir les méthodes `init` (appelée avant la première trame.) et `drawFrame` (appelée à chaque trame), puis appeler `run` dans le `main` qui part et gère la boucle d'exécution. Ça simplifie le code pour le reste de la session.
+Pour créer une application, il faut en hériter, puis redéfinir les méthodes `init` (appelée avant la première trame) et `drawFrame` (appelée à chaque trame), puis appeler `run` dans le `main` qui part et gère la boucle d'exécution. Ça simplifie le code pour le reste de la session.
 
 ## Tampons de données de sommets (VBO et EBO)
 
