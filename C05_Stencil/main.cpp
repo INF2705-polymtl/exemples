@@ -208,7 +208,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -248,7 +248,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un mouvement de souris.
-	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
+	void onMouseMove(const sf::Event::MouseMoved& mouseDelta) override {
 		// Mettre à jour la caméra si on a un clic droit ou central.
 		auto& mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
@@ -256,14 +256,14 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un défilement de souris.
-	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+	void onMouseScroll(const sf::Event::MouseWheelScrolled& mouseScroll) override {
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
 		applyCamera();
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		applyPerspective();
 	}
 
@@ -377,7 +377,7 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 8;
+	settings.context.antiAliasingLevel = 8;
 	// Spécifier la largeur des valeurs du tampon de stencil. Sur beaucoup de matériel, on a généralement 8 bit de stencil. Dans l'exemple d'aujourd'hui, on a seulement besoin d'un bit (0 ou 1).
 	settings.context.stencilBits = 1;
 

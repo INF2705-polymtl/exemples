@@ -34,7 +34,7 @@ using namespace gl;
 
 struct WindowSettings
 {
-	sf::VideoMode videoMode = {600, 600};
+	sf::VideoMode videoMode = sf::VideoMode({600, 600});
 	int fps = 30;
 	sf::ContextSettings context = sf::ContextSettings(24, 8);
 };
@@ -163,13 +163,13 @@ public:
 		glGetIntegerv(GL_READ_BUFFER, &readBufferSrc);
 		// Lire du front buffer (le tampon d'affichage, donc ce qui est à l'écran). On remarque qu'on n'a pas besoin de faire glFinish(), vu que le tampon d'affichage est complet après le buffer swap.
 		glReadBuffer(GL_FRONT);
-		std::vector<sf::Uint8> pixels(numPixels * sizeof(sf::Color), 0);
+		std::vector<uint8_t> pixels(numPixels * sizeof(sf::Color), 0);
 		glReadPixels(0, 0, windowSize.x, windowSize.y, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
 		// Restaurer la source de glReadBuffer.
 		glReadBuffer((GLenum)readBufferSrc);
 		// Créer l'image avec les pixels lus.
 		sf::Image img;
-		img.create(windowSize.x, windowSize.y, pixels.data());
+		img.resize({windowSize.x, windowSize.y}, pixels.data());
 		// Renverser l'image verticalement à cause de l'origine (x,y=0,0) OpenGL qui est bas-gauche et celle des images SFML qui est haut-gauche.
 		img.flipVertically();
 
@@ -209,7 +209,7 @@ public:
 
 		// Faire l'écriture dans le fichier dans un fil parallèle pour moins ralentir le fil principal avec une écriture sur le disque. La capture (avec glReadPixels) doit être faite dans le fil principal, mais l'écriture sur le disque peut être faite en parallèle sans causer de problème de synchronisation. On remarque la capture par copie.
 		std::thread savingThread([=]() {
-			frameImage.saveToFile(filePathStr);
+			bool ok = frameImage.saveToFile(filePathStr);
 		});
 		// Détacher le fil pour qu'il se gère tout seul, donc pas besoin de join() ou de garder la variable vivante.
 		savingThread.detach();
@@ -229,25 +229,25 @@ public:
 	virtual void onClose() { }
 
 	// Appelée lors d'une touche de clavier.
-	virtual void onKeyPress(const sf::Event::KeyEvent& key) { }
+	virtual void onKeyPress(const sf::Event::KeyPressed& key) { }
 
 	// Appelée lors d'une touche de clavier relâchée.
-	virtual void onKeyRelease(const sf::Event::KeyEvent& key) { }
+	virtual void onKeyRelease(const sf::Event::KeyReleased& key) { }
 
 	// Appelée lors d'un bouton de souris appuyé.
-	virtual void onMouseButtonPress(const sf::Event::MouseButtonEvent& mouseBtn) { }
+	virtual void onMouseButtonPress(const sf::Event::MouseButtonPressed& mouseBtn) { }
 
 	// Appelée lors d'un bouton de souris relâché.
-	virtual void onMouseButtonRelease(const sf::Event::MouseButtonEvent& mouseBtn) { }
+	virtual void onMouseButtonRelease(const sf::Event::MouseButtonReleased& mouseBtn) { }
 
 	// Appelée lors d'un mouvement de souris.
-	virtual void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) { }
+	virtual void onMouseMove(const sf::Event::MouseMoved& mouseDelta) { }
 
 	// Appelée lors d'un défilement de souris.
-	virtual void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) { }
+	virtual void onMouseScroll(const sf::Event::MouseWheelScrolled& mouseScroll) { }
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	virtual void onResize(const sf::Event::SizeEvent& event) { }
+	virtual void onResize(const sf::Event::Resized& event) { }
 
 	// Appelée sur un évènement autre que Closed, Resized ou KeyPressed.
 	virtual void onEvent(const sf::Event& event) { }
@@ -258,56 +258,42 @@ protected:
 		currentMouseState_ = getMouseState(window_);
 
 		// Traiter les événements survenus depuis la dernière trame.
-		sf::Event event;
-		while (window_.pollEvent(event)) {
-			using enum sf::Event::EventType;
-			switch (event.type) {
+		while (auto event = window_.pollEvent()) {
 			// L'utilisateur a voulu fermer la fenêtre (le X de la fenêtre, Alt+F4 sur Windows, etc.).
-			case Closed:
+			if (event->is<sf::Event::Closed>()) {
 				glFinish();
 				onClose(); // À surcharger
 				glFinish();
 				window_.close();
-				break;
 			// Redimensionnement de la fenêtre.
-			case Resized:
-				glViewport(0, 0, event.size.width, event.size.height);
-				onResize(event.size); // À surcharger
-				lastResize_ = event.size;
-				break;
+			} else if (auto* e = event->getIf<sf::Event::Resized>()) {
+				glViewport(0, 0, e->size.x, e->size.y);
+				onResize(*e); // À surcharger
+				lastResize_ = *e;
 			// Touche appuyée.
-			case KeyPressed:
-				onKeyPress(event.key); // À surcharger
-				break;
+			} else if (auto* e = event->getIf<sf::Event::KeyPressed>()) {
+				onKeyPress(*e); // À surcharger
 			// Touche relâchée.
-			case KeyReleased:
-				onKeyRelease(event.key); // À surcharger
-				break;
+			} else if (auto* e = event->getIf<sf::Event::KeyReleased>()) {
+				onKeyRelease(*e); // À surcharger
 			// Bouton appuyé.
-			case MouseButtonPressed:
-				onMouseButtonPress(event.mouseButton); // À surcharger
-				break;
+			} else if (auto* e = event->getIf<sf::Event::MouseButtonPressed>()) {
+				onMouseButtonPress(*e); // À surcharger
 			// Bouton relâché.
-			case MouseButtonReleased:
-				onMouseButtonRelease(event.mouseButton); // À surcharger
-				break;
+			} else if (auto* e = event->getIf<sf::Event::MouseButtonReleased>()) {
+				onMouseButtonRelease(*e); // À surcharger
 			// Souris bougée.
-			case MouseEntered:
-				break;
-			case MouseMoved:
-				onMouseMove({
-					event.mouseMove.x - lastMouseState_.relative.x,
-					event.mouseMove.y - lastMouseState_.relative.y
-				});
-				break;
+			} else if (auto* e = event->getIf<sf::Event::MouseMoved>()) {
+				onMouseMove({{
+					e->position.x - lastMouseState_.relative.x,
+					e->position.y - lastMouseState_.relative.y
+				}});
 			// Souris défilée
-			case MouseWheelScrolled:
-				onMouseScroll(event.mouseWheelScroll);
-				break;
+			} else if (auto* e = event->getIf<sf::Event::MouseWheelScrolled>()) {
+				onMouseScroll(*e);
 			// Autre événement.
-			default:
-				onEvent(event); // À surcharger
-				break;
+			} else {
+				onEvent(*event); // À surcharger
 			}
 		}
 	}
@@ -323,11 +309,14 @@ protected:
 			settings_.videoMode, // Dimensions de fenêtre.
 			sfStr(title), // Titre.
 			sf::Style::Default, // Style de fenêtre (bordure, boutons X, etc.).
+			sf::State::Windowed,
 			settings_.context
 		);
 		window_.setFramerateLimit(settings_.fps);
-		window_.setActive(true);
-		lastResize_ = {window_.getSize().x, window_.getSize().y};
+		bool ok = window_.setActive(true);
+		if (not ok)
+			std::cerr << "Could not activate created window" << "\n";
+		lastResize_ = {{window_.getSize().x, window_.getSize().y}};
 
 		// On peut donner une « GetProcAddress » venant d'une autre librairie à glbinding.
 		// Si on met nullptr, glbinding se débrouille avec sa propre implémentation.
@@ -343,7 +332,7 @@ protected:
 	}
 
 	sf::Window window_;
-	sf::Event::SizeEvent lastResize_ = {};
+	sf::Event::Resized lastResize_ = {};
 	int frame_ = 0;
 	float deltaTime_ = 0.0f;
 	std::chrono::system_clock::time_point startTime_;

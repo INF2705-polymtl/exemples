@@ -214,7 +214,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		// La touche R réinitialise la position de la caméra.
 		// Les flèches bougent la caméra dans le plan XY.
 		// Espace fait freiner les particules.
@@ -258,7 +258,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier relâchée.
-	void onKeyRelease(const sf::Event::KeyEvent& key) override {
+	void onKeyRelease(const sf::Event::KeyReleased& key) override {
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case Space:
@@ -270,41 +270,41 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un bouton de souris appuyé.
-	void onMouseButtonPress(const sf::Event::MouseButtonEvent& mouseBtn) override {
+	void onMouseButtonPress(const sf::Event::MouseButtonPressed& mouseBtn) override {
 		// Bouton gauche appuyé : champ attractif
 		// Bouton droit appuyé : champ répulsif
 		auto& mouse = getMouse();
 		// Mettre à jour l'intensité du champ de force selon les boutons de la souris.
 		computationProg.use();
 		computationProg.setUniform(forceFieldStrength);
-		if (mouseBtn.button == sf::Mouse::Left)
+		if (mouseBtn.button == sf::Mouse::Button::Left)
 			forceFieldStrength = 10;
-		if (mouseBtn.button == sf::Mouse::Right)
+		if (mouseBtn.button == sf::Mouse::Button::Right)
 			forceFieldStrength = -10;
 		computationProg.use();
 		computationProg.setUniform(forceFieldStrength);
 	}
 
 	// Appelée lors d'un bouton de souris relâché.
-	void onMouseButtonRelease(const sf::Event::MouseButtonEvent& mouseBtn) override {
+	void onMouseButtonRelease(const sf::Event::MouseButtonReleased& mouseBtn) override {
 		// Relâcher le bouton de souris désactive le champ de force.
-		if (mouseBtn.button == sf::Mouse::Left)
+		if (mouseBtn.button == sf::Mouse::Button::Left)
 			forceFieldStrength = 0;
-		else if (mouseBtn.button == sf::Mouse::Right)
+		else if (mouseBtn.button == sf::Mouse::Button::Right)
 			forceFieldStrength = 0;
 		computationProg.use();
 		computationProg.setUniform(forceFieldStrength);
 	}
 
 	// Appelée lors d'un défilement de souris.
-	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+	void onMouseScroll(const sf::Event::MouseWheelScrolled& mouseScroll) override {
 		// Zoom in/out
 		orthoHeight = std::max(orthoHeight * (1 - 0.1f * mouseScroll.delta), 0.1f);
 		applyOrtho();
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		applyOrtho();
 	}
 
@@ -438,7 +438,7 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 4;
+	settings.context.antiAliasingLevel = 4;
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 9: Rétroaction avec VBO", settings);

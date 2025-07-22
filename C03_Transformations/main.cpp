@@ -125,7 +125,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		// Les touches + et - servent à rapprocher et éloigner la caméra orbitale.
@@ -204,7 +204,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		// Mettre à jour la matrice de projection avec le nouvel aspect de fenêtre après le redimensionnement.
 		updateProjection();
 	}
@@ -453,7 +453,7 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 4;
+	settings.context.antiAliasingLevel = 4;
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 3: Transformations", settings);

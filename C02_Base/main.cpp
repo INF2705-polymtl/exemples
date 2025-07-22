@@ -53,9 +53,10 @@ int main(int argc, char* argv[]) {
 		// Créer la fenêtre et initialiser le contexte OpenGL.
 	sf::Window window;
 	window.create(
-		{800, 800},                // Dimensions de la fenêtre
+		sf::VideoMode({800, 800}), // Dimensions de la fenêtre
 		"Exemple Semaine 2: Base", // Titre
 		sf::Style::Default,        // Style de fenêtre (avec barre de titre et boutons).
+		sf::State::Windowed,       // État de la fenêtre au démarrage.
 		sf::ContextSettings(24)    // Taille du tampon de profondeur. 24 bit est pas mal le standard.
 	);
 	window.setFramerateLimit(30); // Le FPS d'affichage.
@@ -117,10 +118,9 @@ int main(int argc, char* argv[]) {
 		window.display();
 
 		// On pourrait gérer les évènements de fenêtre (clavier, redimensionnement, fermeture, etc), mais pour aujourd'hui on va juste traiter l'événement de fermeture de fenêtre.
-		sf::Event e;
-		while (window.pollEvent(e)) {
+		while (auto e = window.pollEvent()) {
 			// On arrête si l'utilisateur appuie sur le X de la fenêtre (ou le raccourci clavier associé tel que Alt+F4 sur Windows).
-			if (e.type == sf::Event::EventType::Closed)
+			if (e->is<sf::Event::Closed>())
 				window.close();
 		}
 	}

@@ -46,14 +46,14 @@ struct SpriteSheet
 
 		result.elemSize = spriteElemSize;
 		sf::Image spriteImg;
-		spriteImg.create(spriteElemSize.x, spriteElemSize.y);
+		spriteImg.resize(sf::Vector2u(spriteElemSize.x, spriteElemSize.y));
 		// Pour chaque sprite :
 		for (int i = 0; i < numSprites; i++) {
 			// Copier la partie de l'image originale.
 			spriteImg.copy(
 				result.originalImg,
-				0, 0,
-				{i * spriteElemSize.x, 0, spriteElemSize.x, spriteElemSize.y}
+				{0, 0},
+				{{i * spriteElemSize.x, 0}, {spriteElemSize.x, spriteElemSize.y}}
 			);
 			// Charger cette sous-image dans une texture séparée.
 			result.sprites.push_back(Texture::loadFromImage(spriteImg));
@@ -208,7 +208,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -269,7 +269,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un mouvement de souris.
-	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
+	void onMouseMove(const sf::Event::MouseMoved& mouseDelta) override {
 		// Mettre à jour la caméra si on a un clic droit ou central.
 		auto& mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
@@ -277,14 +277,14 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un défilement de souris.
-	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+	void onMouseScroll(const sf::Event::MouseWheelScrolled& mouseScroll) override {
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
 		camera.updateProgram(extrudeSpikesProg, view);
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		applyPerspective();
 	}
 
@@ -379,9 +379,9 @@ struct App : public OpenGLApplication
 
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
-	settings.videoMode = {600, 600};
+	settings.videoMode = sf::VideoMode({600, 600});
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 4;
+	settings.context.antiAliasingLevel = 4;
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 8: Nuanceurs de géométrie", settings);

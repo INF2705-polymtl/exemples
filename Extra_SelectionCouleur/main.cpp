@@ -80,7 +80,7 @@ struct App : public OpenGLApplication
 
 	OrbitCamera camera = {10, 90, 180, 0};
 
-	sf::Event::MouseButtonEvent lastMouseBtnEvent = {};
+	sf::Event::MouseButtonPressed lastMouseBtnEvent = {};
 	bool selecting = false;
 	unsigned selectedObjectID = 0;
 	float flashingValue = 0;
@@ -199,7 +199,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -248,10 +248,10 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un bouton de souris appuyé.
-	void onMouseButtonPress(const sf::Event::MouseButtonEvent& mouseBtn) override {
+	void onMouseButtonPress(const sf::Event::MouseButtonPressed& mouseBtn) override {
 		switch (mouseBtn.button) {
 		// Clic gauche sélectionne l'objet sous la souris.
-		case sf::Mouse::Left:
+		case sf::Mouse::Button::Left:
 			// Enregistrer l'évènement de souris et se mettre en mode de sélection.
 			lastMouseBtnEvent = mouseBtn;
 			selecting = true;
@@ -260,7 +260,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un mouvement de souris.
-	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
+	void onMouseMove(const sf::Event::MouseMoved& mouseDelta) override {
 		// Mettre à jour la caméra si on a un clic droit ou central.
 		auto mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f/30));
@@ -269,7 +269,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un défilement de souris.
-	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+	void onMouseScroll(const sf::Event::MouseWheelScrolled& mouseScroll) override {
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
 		for (auto&& prog : programs)
@@ -277,7 +277,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		applyPerspective();
 	}
 
@@ -348,13 +348,13 @@ struct App : public OpenGLApplication
 		board->modelMat.scale({4, 0.12f, 4});
 	}
 
-	unsigned getObjectIDUnderMouse(const sf::Event::MouseButtonEvent& mouseBtn) {
+	unsigned getObjectIDUnderMouse(const sf::Event::MouseButtonPressed& mouseBtn) {
 		// Du bon vieux C où on crée une structure anonyme plutôt qu'un tableau bête.
 		struct { GLint x, y, width, height; } viewport = {};
 		// Obtenir le viewport pour convertir les coordonnées de souris (référentiel haut-gauche) au référentiel bas-gauche.
 		glGetIntegerv(GL_VIEWPORT, (GLint*)&viewport);
-		GLint x = mouseBtn.x;
-		GLint y = viewport.height - mouseBtn.y;
+		GLint x = mouseBtn.position.x;
+		GLint y = viewport.height - mouseBtn.position.y;
 
 		// Lire la couleur sous la souris. On initialise un entier 32bit à 0 qu'on passe comme pointeur de données à glReadPixels. On demande les composantes RGB (pas le alpha), ce qui va remplir seulement les 24 premiers bits de objectID, nous donnant notre identifiant (couleur = ID dans notre cas).
 		unsigned objectID = 0;
@@ -394,7 +394,7 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 8;
+	settings.context.antiAliasingLevel = 8;
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 6: Sélection 3D par couleur", settings);

@@ -232,8 +232,8 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 0;
-	settings.videoMode = {200, 200};
+	settings.context.antiAliasingLevel = 0;
+	settings.videoMode = sf::VideoMode({200, 200});
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 5: Calculs de tampons", settings);

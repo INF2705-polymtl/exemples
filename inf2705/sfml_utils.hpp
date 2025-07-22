@@ -34,7 +34,7 @@ inline sf::String sfStr(std::string_view s) {
 }
 
 // Obtenir la description d'une touche. Ce nom va dépendre de la langue de l'OS.
-inline std::string getKeyDescription(sf::Event::KeyEvent key) {
+inline std::string getKeyDescription(const sf::Event::KeyPressed& key) {
 	return std::string(sf::Keyboard::getDescription(key.scancode));
 }
 
@@ -278,7 +278,7 @@ inline MouseState getMouseState(const sf::WindowBase& window) {
 	// Obtenir l'état des boutons.
 	for (int i = 0; i < sf::Mouse::ButtonCount; i++) {
 		auto btn = (sf::Mouse::Button)i;
-		result.buttons[btn] = sf::Mouse::isButtonPressed(btn);
+		result.buttons[(int)btn] = sf::Mouse::isButtonPressed(btn);
 	}
 
 	sf::Vector2i windowSize(window.getSize().x, window.getSize().y);

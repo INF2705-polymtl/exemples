@@ -170,7 +170,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case Num1:
@@ -182,7 +182,7 @@ struct App : public OpenGLApplication
 		case Num7:
 		case Num8:
 		case Num9:
-			currentLine = key.code - Num1;
+			currentLine = (int)key.code - (int)Num1;
 			std::cout << "Ligne " << (currentLine + 1) << "\n";
 			break;
 		case C:
@@ -201,7 +201,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		applyOrtho();
 	}
 
@@ -410,7 +410,7 @@ struct App : public OpenGLApplication
 int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
-	settings.context.antialiasingLevel = 0;
+	settings.context.antiAliasingLevel = 0;
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 10: Algorithmes matériel", settings);

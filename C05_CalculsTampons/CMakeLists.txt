@@ -33,8 +33,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 
 # SFML: Pour la gestion de fenêtre et d'événements.
 #       Tout en C++, assez clean et léger.
-find_package(SFML COMPONENTS system window graphics CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE sfml-system sfml-network sfml-graphics sfml-window)
+find_package(SFML COMPONENTS System Window Graphics CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE SFML::System SFML::Graphics SFML::Window)
 
 # glbinding: Pour l'importation des fonctions OpenGL et la résolution d'adresses.
 #            Tout en C++ assez moderne, très clean avec des enum, des namespace et peu de macros.

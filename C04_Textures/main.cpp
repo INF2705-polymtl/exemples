@@ -268,7 +268,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -283,7 +283,7 @@ struct App : public OpenGLApplication
 		case Num2: // 2: Exemple de route avec texture qui se répète.
 		case Num3: // 3: Exemple de Mipmap manuel.
 		case Num4: // 4: Démonstration des modes de débordement.
-			mode = key.code - Num0;;
+			mode = (int)key.code - (int)Num0;
 			break;
 
 		case F5: {
@@ -294,7 +294,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un mouvement de souris.
-	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
+	void onMouseMove(const sf::Event::MouseMoved& mouseDelta) override {
 		// Mettre à jour la caméra si on a un clic droit ou central.
 		auto& mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
@@ -302,14 +302,14 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un défilement de souris.
-	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+	void onMouseScroll(const sf::Event::MouseWheelScrolled& mouseScroll) override {
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
 		updateCamera();
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		// Mettre à jour la matrice de projection avec le nouvel aspect de fenêtre après le redimensionnement.
 		applyPerspective();
 	}
@@ -317,7 +317,7 @@ struct App : public OpenGLApplication
 	GLuint loadTextureFromFile(const std::string& filename, bool generateMipmap = true) {
 		// Lire les pixels de l'image. SFML (la bibliothèque qu'on utilise pour gérer la fenêtre) a déjà une fonctionnalité de chargement d'images. Une alternative plus légère est stb_image.
 		sf::Image texImg;
-		texImg.loadFromFile(filename);
+		bool ok = texImg.loadFromFile(filename);
 		// Beaucoup de bibliothèques importent les images avec x=0,y=0 (donc premier pixel du tableau) au coin haut-gauche de l'image. C'est la convention en graphisme, mais les textures en OpenGL ont leur origine au coin bas-gauche.
 		// SFML applique la convention origine = haut-gauche, il faut donc renverser l'image verticalement avant de la passer à OpenGL.
 		texImg.flipVertically();
@@ -437,7 +437,7 @@ int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
 	// Pour des fins pédagogiques on désactive l'antialias automatique de OpenGL pour mieux illustrer le filtrage des textures.
-	settings.context.antialiasingLevel = 0;
+	settings.context.antiAliasingLevel = 0;
 
 	App app;
 	app.run(argc, argv, "Exemple Semaine 4: Textures", settings);

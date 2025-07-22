@@ -190,7 +190,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'une touche de clavier.
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -245,7 +245,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un mouvement de souris.
-	void onMouseMove(const sf::Event::MouseMoveEvent& mouseDelta) override {
+	void onMouseMove(const sf::Event::MouseMoved& mouseDelta) override {
 		// Mettre à jour la caméra si on a un clic droit ou central.
 		auto& mouse = getMouse();
 		camera.handleMouseMoveEvent(mouseDelta, mouse, deltaTime_ / (0.7f / 30));
@@ -254,7 +254,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lors d'un défilement de souris.
-	void onMouseScroll(const sf::Event::MouseWheelScrollEvent& mouseScroll) override {
+	void onMouseScroll(const sf::Event::MouseWheelScrolled& mouseScroll) override {
 		// Zoom in/out
 		camera.altitude -= mouseScroll.delta;
 		camera.updateProgram(basicProg, view);
@@ -262,7 +262,7 @@ struct App : public OpenGLApplication
 	}
 
 	// Appelée lorsque la fenêtre se redimensionne (juste après le redimensionnement).
-	void onResize(const sf::Event::SizeEvent& event) override {
+	void onResize(const sf::Event::Resized& event) override {
 		applyPerspective();
 	}
 
@@ -295,7 +295,7 @@ int main(int argc, char* argv[]) {
 	WindowSettings settings = {};
 	settings.fps = 30;
 	// On peut choisir le niveau d'anticrenélage (CSAA) dans la création du contexte OpenGL. SDL a un équivalent pour configurer l'antialias.
-	settings.context.antialiasingLevel = 16;
+	settings.context.antiAliasingLevel = 16;
 	// Il faut aussi à la création du contexte demander une certaine largeur (taille des valeurs pour chaque fragments) de tampon de profondeur.
 	settings.context.depthBits = 24;
 	// Allez dans OpenGLApplication::createWindowAndContext pour voir comment ceci est passé à SFML.

@@ -387,7 +387,7 @@ GLuint u22 = glGetUniformLocation(p2, "uni2");
 
 // Illustrer le buffer mapping
 /*
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		float positionMod = 0.0f;
 		float colorMod = 0.0f;
 
@@ -418,7 +418,7 @@ GLuint u22 = glGetUniformLocation(p2, "uni2");
 
 // Illustrer le subdata
 /*
-	void onKeyPress(const sf::Event::KeyEvent& key) override {
+	void onKeyPress(const sf::Event::KeyPressed& key) override {
 		float positionMod = 0.0f;
 		float colorMod = 0.0f;
 

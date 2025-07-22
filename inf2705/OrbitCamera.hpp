@@ -32,7 +32,7 @@ struct OrbitCamera
 	void rollCW(float angleDegrees) { roll += angleDegrees; }
 	void rollCCW(float angleDegrees) { roll -= angleDegrees; }
 
-	void handleKeyEvent(const sf::Event::KeyEvent& key, float angleStep, float distanceStep, OrbitCamera reset) {
+	void handleKeyEvent(const sf::Event::KeyPressed& key, float angleStep, float distanceStep, OrbitCamera reset) {
 		// La touche R réinitialise la position de la caméra.
 		// Les touches + et - rapprochent et éloignent la caméra orbitale.
 		// Les touches haut/bas change l'élévation ou la latitude de la caméra orbitale.
@@ -69,12 +69,13 @@ struct OrbitCamera
 		}
 	}
 
-	void handleMouseMoveEvent(sf::Event::MouseMoveEvent move, const MouseState& mouse, float degsPerPixel = 1.0f) {
+	void handleMouseMoveEvent(sf::Event::MouseMoved move, const MouseState& mouse, float degsPerPixel = 1.0f) {
 		// Le bouton droit ou central (cliquer la roulette) bouge la caméra en glissant la souris.
-		bool buttonDown = mouse.buttons[sf::Mouse::Middle] or mouse.buttons[sf::Mouse::Right];
+		using enum sf::Mouse::Button;
+		bool buttonDown = mouse.buttons[(int)Middle] or mouse.buttons[(int)Right];
 		if (buttonDown and mouse.isInsideWindow) {
-			float deltaLong = std::clamp(move.x * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
-			float deltaLat =  std::clamp(move.y * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
+			float deltaLong = std::clamp(move.position.x * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
+			float deltaLat =  std::clamp(move.position.y * degsPerPixel, -degsPerPixel * 20, degsPerPixel * 20);
 			moveNorth(deltaLat);
 			moveWest(deltaLong);
 		}
