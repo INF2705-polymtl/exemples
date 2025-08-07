@@ -176,7 +176,7 @@ public:
 	// Variable uniforme générique
 	template <typename T>
 	void setUniform(GLuint loc, const T& val) {
-		// Du beau C++ pour choisir à la compilation quelle méthode choisir pour mettre à jour une variable uniforme selon le type de valeur.
+		// Du beau C++ pour choisir à la compilation quelle méthode utiliser pour mettre à jour une variable uniforme selon le type de valeur.
 		if constexpr (isTypeOneOf_v<T, vec2, vec3, vec4, ivec2, ivec3, ivec4, uvec2, uvec3, uvec4>) {
 			setVec(loc, val);
 		} else if constexpr (isTypeOneOf_v<T, mat2, mat3, mat4, TransformStack>) {

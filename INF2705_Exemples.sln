@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C05_CalculsTampons", "C05_C
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C05_OpsFragments", "C05_OpsFragments\C05_OpsFragments.vcxproj", "{BC566EC7-C9B5-407A-9F47-E498ED523349}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C07_Illumination", "C07_Illumination\C07_Illumination.vcxproj", "{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C08_Geometrie", "C08_Geometrie\C08_Geometrie.vcxproj", "{B4546A3B-153A-4B9B-B4C0-2148A474F44C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C08_Tessellation", "C08_Tessellation\C08_Tessellation.vcxproj", "{D307BA6B-4AD9-4F49-B6EE-D93A751BB5EC}"
@@ -27,8 +25,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C09_Retroaction_TexRendu", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C09_Retroaction_VBO", "C09_Retroaction_VBO\C09_Retroaction_VBO.vcxproj", "{5FB16B60-179F-4B38-9078-7E3D4A2C573E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C10_AlgosMateriel", "C10_AlgosMateriel\C10_AlgosMateriel.vcxproj", "{621DFDF2-8E73-41EA-8323-CE16F491E1DC}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_SelectionCouleur", "Extra_SelectionCouleur\Extra_SelectionCouleur.vcxproj", "{88CA3032-7F92-4420-BAFC-D33B3847D7F8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_Illumination_Calculs", "Extra_Illumination_Calculs\C07_Illumination_Calculs.vcxproj", "{7FD07506-25EC-4E69-8301-D4A6954C304A}"
@@ -36,6 +32,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C05_Stencil", "C05_Stencil\C05_Stencil.vcxproj", "{3A454C98-7100-415D-943C-E13A17A7627C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C05_Stencil_Miroir", "C05_Stencil_Miroir\C05_Stencil_Miroir.vcxproj", "{013CC645-F0A5-480C-8C8F-271683B6341B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C06_Illumination", "C06_Illumination\C06_Illumination.vcxproj", "{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_AlgosTramage", "Extra_AlgosTramage\Extra_AlgosTramage.vcxproj", "{621DFDF2-8E73-41EA-8323-CE16F491E1DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,14 +101,6 @@ Global
 		{BC566EC7-C9B5-407A-9F47-E498ED523349}.Release|x64.Build.0 = Release|x64
 		{BC566EC7-C9B5-407A-9F47-E498ED523349}.Release|x86.ActiveCfg = Release|Win32
 		{BC566EC7-C9B5-407A-9F47-E498ED523349}.Release|x86.Build.0 = Release|Win32
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x64.ActiveCfg = Debug|x64
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x64.Build.0 = Debug|x64
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x86.ActiveCfg = Debug|Win32
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x86.Build.0 = Debug|Win32
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x64.ActiveCfg = Release|x64
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x64.Build.0 = Release|x64
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x86.ActiveCfg = Release|Win32
-		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x86.Build.0 = Release|Win32
 		{B4546A3B-153A-4B9B-B4C0-2148A474F44C}.Debug|x64.ActiveCfg = Debug|x64
 		{B4546A3B-153A-4B9B-B4C0-2148A474F44C}.Debug|x64.Build.0 = Debug|x64
 		{B4546A3B-153A-4B9B-B4C0-2148A474F44C}.Debug|x86.ActiveCfg = Debug|Win32
@@ -141,14 +133,6 @@ Global
 		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x64.Build.0 = Release|x64
 		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x86.ActiveCfg = Release|Win32
 		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x86.Build.0 = Release|Win32
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x64.ActiveCfg = Debug|x64
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x64.Build.0 = Debug|x64
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x86.ActiveCfg = Debug|Win32
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x86.Build.0 = Debug|Win32
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x64.ActiveCfg = Release|x64
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x64.Build.0 = Release|x64
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.ActiveCfg = Release|Win32
-		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.Build.0 = Release|Win32
 		{88CA3032-7F92-4420-BAFC-D33B3847D7F8}.Debug|x64.ActiveCfg = Debug|x64
 		{88CA3032-7F92-4420-BAFC-D33B3847D7F8}.Debug|x64.Build.0 = Debug|x64
 		{88CA3032-7F92-4420-BAFC-D33B3847D7F8}.Debug|x86.ActiveCfg = Debug|Win32
@@ -181,6 +165,22 @@ Global
 		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x64.Build.0 = Release|x64
 		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x86.ActiveCfg = Release|Win32
 		{013CC645-F0A5-480C-8C8F-271683B6341B}.Release|x86.Build.0 = Release|Win32
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x64.ActiveCfg = Debug|x64
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x64.Build.0 = Debug|x64
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x86.ActiveCfg = Debug|Win32
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Debug|x86.Build.0 = Debug|Win32
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x64.ActiveCfg = Release|x64
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x64.Build.0 = Release|x64
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x86.ActiveCfg = Release|Win32
+		{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}.Release|x86.Build.0 = Release|Win32
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x64.ActiveCfg = Debug|x64
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x64.Build.0 = Debug|x64
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x86.ActiveCfg = Debug|Win32
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Debug|x86.Build.0 = Debug|Win32
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x64.ActiveCfg = Release|x64
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x64.Build.0 = Release|x64
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.ActiveCfg = Release|Win32
+		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

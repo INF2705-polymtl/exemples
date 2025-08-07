@@ -19,7 +19,7 @@ monBloc.bindToProgram(monProgrammeNuanceur);
 
 ## Modèles d'illumination
 
-Le modèle plat (*flat shading*) fait les calculs dans le nuanceur de géométrie, car on a besoin de toute la primitive. On utilise le centroïde de la primitive pour calculer les vecteurs *L* et *O* et on calcule la normale avec les côtés de la primitive. Ça donne une couleur uniforme sur la primitive.
+Le modèle plat (*flat shading*) fait les calculs dans le nuanceur de géométrie ([flat_vert.glsl](flat_vert.glsl)), car on a besoin de toute la primitive. On utilise le centroïde de la primitive pour calculer les vecteurs *L* et *O* et on calcule la normale avec les côtés de la primitive. Ça donne une couleur uniforme sur la primitive.
 
 <img src="doc/flat.png"/>
 

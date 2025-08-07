@@ -183,14 +183,14 @@ struct App : public OpenGLApplication
 		lightModel.setup();
 
 		// Lier chacun des blocs uniformes aux variables uniformes des nuanceurs.
-		for (auto&& prog : programs) {
+		for (auto* prog : programs) {
 			material.bindToProgram(*prog);
 			light.bindToProgram(*prog);
 			lightModel.bindToProgram(*prog);
 		}
 
 		// Caméra et projection habituelles.
-		for (auto&& prog : programs)
+		for (auto* prog : programs)
 			camera.updateProgram(*prog, view);
 		applyPerspective();
 	}
@@ -200,9 +200,35 @@ struct App : public OpenGLApplication
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		switch (drawMode) {
+		// Démo visuelles des normales.
 		case 1:
-			drawUnlitShapeWithNormalLines();
+			currentProg->use();
+			model.pushIdentity();
+			currentProg->setMat(model);
+			model.pop();
+
+			// Dessiner la sphère avec une couleur uniforme (rouge).
+			globalColor = {1, 0.2, 0.2, 1};
+			currentProg->setUniform(globalColor);
+			shapeSmooth.draw(GL_TRIANGLES);
+
+			// Dessiner les arêtes des primitives en noir en dessinant la sphère en wireframe.
+			globalColor = {0, 0, 0, 1};
+			currentProg->setUniform(globalColor);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			shapeSmooth.draw(GL_TRIANGLES);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+			// Dessiner les droites de normales selon le type voulu.
+			globalColor = {0.2, 1, 0.2, 1};
+			currentProg->setUniform(globalColor);
+			if (*usingSmoothNormals)
+				normalsSmooth.draw(GL_LINES);
+			else
+				normalsFlat.draw(GL_LINES);
+
 			break;
+		// Éclairage selon flat, Gouraud, Phong
 		case 2:
 		case 3:
 		case 4:
@@ -275,7 +301,7 @@ struct App : public OpenGLApplication
 		// U : Augmenter le nombre de bande de cel-shading
 		// I : Diminuer le nombre de bande de cel-shading (0 = pas de cel-shading)
 
-		camera.handleKeyEvent(key, 5, 0.5f, {10, 90, 180, 0});
+		camera.handleKeyEvent(key, 5, 0.5f, {10, 30, 30, 0});
 		
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
@@ -410,33 +436,6 @@ struct App : public OpenGLApplication
 		phongProg.link();
 	}
 
-	void drawUnlitShapeWithNormalLines() {
-		currentProg->use();
-		model.pushIdentity();
-		currentProg->setMat(model);
-		model.pop();
-
-		// Dessiner la sphère avec une couleur uniforme (rouge).
-		globalColor = {1, 0.2, 0.2, 1};
-		currentProg->setUniform(globalColor);
-		shapeSmooth.draw(GL_TRIANGLES);
-
-		// Dessiner les arêtes des primitives en noir en dessinant la sphère en wireframe.
-		globalColor = {0, 0, 0, 1};
-		currentProg->setUniform(globalColor);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		shapeSmooth.draw(GL_TRIANGLES);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		// Dessiner les droites de normales selon le type voulu.
-		globalColor = {0.2, 1, 0.2, 1};
-		currentProg->setUniform(globalColor);
-		if (*usingSmoothNormals)
-			normalsSmooth.draw(GL_LINES);
-		else
-			normalsFlat.draw(GL_LINES);
-	}
-
 	void applyPerspective(float fovy = 50) {
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
 		projection.perspective(fovy, getWindowAspect(), 0.01f, 100.0f);
@@ -475,5 +474,5 @@ int main(int argc, char* argv[]) {
 	settings.context.antiAliasingLevel = 4;
 
 	App app;
-	app.run(argc, argv, "Exemple Semaine 7: Illumination", settings);
+	app.run(argc, argv, "Exemple Semaine 6: Illumination de base", settings);
 }

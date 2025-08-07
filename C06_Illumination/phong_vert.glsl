@@ -69,6 +69,6 @@ void main() {
 	// Calculer la position de la lumière en coords de visualisation (light.position est en coordonnées de scène).
 	lightDir = (view * light.position).xyz - pos;
 
-	// Calculer le vecteur de direction de l'observateur. On peut optimiser en prenant z = 1 plutôt que de faire l'opposée de la coords de visualisation. C'est n'est pas l'optimisation la plus importante considérant tous les calculs qui sont faits autour. On se laisse cette option pour des raisons historiques (c'est dans le vieux modèle d'OpenGL) même si ce sont des économies de bouts de chandelle.
+	// Calculer le vecteur de direction de l'observateur. On peut optimiser en prenant z = 1 plutôt que de faire l'opposée de la coords de visualisation. Ce n'est pas l'optimisation la plus importante considérant tous les calculs qui sont faits autour. On se laisse cette option pour des raisons historiques (c'est dans le vieux modèle d'OpenGL) même si ce sont des économies de bouts de chandelle.
 	observerDir = (lightModel.localViewer) ? -pos : vec3(0, 0, 1);
 }

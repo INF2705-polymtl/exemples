@@ -153,7 +153,7 @@ public:
 		printf("Stencil bits   %i\n", sfmlSettings.stencilBits);
 	}
 
-	sf::Image captureCurrentFrame() {
+	sf::Image captureCurrentFrame(GLenum buffer = GL_FRONT) {
 		// Les dimensions de la fenêtre.
 		auto windowSize = window_.getSize();
 		size_t numPixels = windowSize.x * windowSize.y;
@@ -161,8 +161,8 @@ public:
 		// Obtenir la source actuelle de glReadBuffer.
 		GLint readBufferSrc;
 		glGetIntegerv(GL_READ_BUFFER, &readBufferSrc);
-		// Lire du front buffer (le tampon d'affichage, donc ce qui est à l'écran). On remarque qu'on n'a pas besoin de faire glFinish(), vu que le tampon d'affichage est complet après le buffer swap.
-		glReadBuffer(GL_FRONT);
+		// Par défaut, lire du front buffer (le tampon d'affichage, donc ce qui est à l'écran). On remarque qu'on n'a pas besoin de faire glFinish(), vu que le tampon d'affichage est complet après le buffer swap.
+		glReadBuffer(buffer);
 		std::vector<uint8_t> pixels(numPixels * sizeof(sf::Color), 0);
 		glReadPixels(0, 0, windowSize.x, windowSize.y, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
 		// Restaurer la source de glReadBuffer.

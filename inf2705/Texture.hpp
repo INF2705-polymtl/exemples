@@ -142,7 +142,7 @@ struct Texture
 		// Spécifier (optionnellement) le niveau de détail correspondant à la définition de base. Par défaut c'est 0 et donc pas nécessaire de le modifier.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		// ATTENTION: Ce n'est pas super clair dans la documentation officielle, mais il faut configurer le GL_TEXTURE_MAX_LEVEL quand on fait des mipmap manuellement. Le défaut est 1000, il s'attend donc à recevoir 1000 tableaux de pixels.
-		// Dans notre cas on a 6 niveaux, donc 0 à 5, alors on passe 5.
+		// Par exemple, si on a 6 niveaux, donc 0 à 5, alors on passe 5.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numLevels - 1);
 		result.numLevels = numLevels;
 
