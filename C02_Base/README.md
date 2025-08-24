@@ -1,4 +1,4 @@
-# Exemple Ex02_Base
+# Base du pipeline programmable
 
 Dans cet exemple, on affiche simplement un triangle coloré à l'écran.
 

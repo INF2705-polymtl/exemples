@@ -24,7 +24,7 @@
     <ProjectGuid>{5fb16b60-179f-4b38-9078-7e3d4a2c573e}</ProjectGuid>
     <RootNamespace>Ex09_Retroaction</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>C09_Retroaction_VBO</ProjectName>
+    <ProjectName>C09_Retroaction_TFO</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

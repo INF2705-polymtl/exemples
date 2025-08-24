@@ -23,8 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C08_Tessellation", "C08_Tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C09_Retroaction_TexRendu", "C09_Retroaction_TexRendu\C09_Retroaction_TexRendu.vcxproj", "{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C09_Retroaction_VBO", "C09_Retroaction_VBO\C09_Retroaction_VBO.vcxproj", "{5FB16B60-179F-4B38-9078-7E3D4A2C573E}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_SelectionCouleur", "Extra_SelectionCouleur\Extra_SelectionCouleur.vcxproj", "{88CA3032-7F92-4420-BAFC-D33B3847D7F8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_Illumination_Calculs", "Extra_Illumination_Calculs\C07_Illumination_Calculs.vcxproj", "{7FD07506-25EC-4E69-8301-D4A6954C304A}"
@@ -36,6 +34,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C06_Illumination", "C06_Illumination\C06_Illumination.vcxproj", "{EFE1483F-4D44-4DD3-99B3-F7591CF4E7B1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extra_AlgosTramage", "Extra_AlgosTramage\Extra_AlgosTramage.vcxproj", "{621DFDF2-8E73-41EA-8323-CE16F491E1DC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C09_Retroaction_TFO", "C09_Retroaction_TFO\C09_Retroaction_TFO.vcxproj", "{5FB16B60-179F-4B38-9078-7E3D4A2C573E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,14 +125,6 @@ Global
 		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Release|x64.Build.0 = Release|x64
 		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Release|x86.ActiveCfg = Release|Win32
 		{B7B33B2E-9287-46C4-9FEC-E12E0276EA3A}.Release|x86.Build.0 = Release|Win32
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x64.ActiveCfg = Debug|x64
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x64.Build.0 = Debug|x64
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x86.ActiveCfg = Debug|Win32
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x86.Build.0 = Debug|Win32
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x64.ActiveCfg = Release|x64
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x64.Build.0 = Release|x64
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x86.ActiveCfg = Release|Win32
-		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x86.Build.0 = Release|Win32
 		{88CA3032-7F92-4420-BAFC-D33B3847D7F8}.Debug|x64.ActiveCfg = Debug|x64
 		{88CA3032-7F92-4420-BAFC-D33B3847D7F8}.Debug|x64.Build.0 = Debug|x64
 		{88CA3032-7F92-4420-BAFC-D33B3847D7F8}.Debug|x86.ActiveCfg = Debug|Win32
@@ -181,6 +173,14 @@ Global
 		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x64.Build.0 = Release|x64
 		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.ActiveCfg = Release|Win32
 		{621DFDF2-8E73-41EA-8323-CE16F491E1DC}.Release|x86.Build.0 = Release|Win32
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x64.ActiveCfg = Debug|x64
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x64.Build.0 = Debug|x64
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x86.ActiveCfg = Debug|Win32
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Debug|x86.Build.0 = Debug|Win32
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x64.ActiveCfg = Release|x64
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x64.Build.0 = Release|x64
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x86.ActiveCfg = Release|Win32
+		{5FB16B60-179F-4B38-9078-7E3D4A2C573E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
