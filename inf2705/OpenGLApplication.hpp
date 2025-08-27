@@ -18,6 +18,8 @@
 
 #ifdef _WIN32
 	#include <Windows.h>
+	#undef near
+	#undef far
 #endif
 
 #include <glbinding/Binding.h>

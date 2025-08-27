@@ -50,14 +50,14 @@ void initShaders() {
 
 
 int main(int argc, char* argv[]) {
-		// Créer la fenêtre et initialiser le contexte OpenGL.
+	// Créer la fenêtre et initialiser le contexte OpenGL.
 	sf::Window window;
 	window.create(
 		sf::VideoMode({800, 800}), // Dimensions de la fenêtre
 		"Exemple Semaine 2: Base", // Titre
 		sf::Style::Default,        // Style de fenêtre (avec barre de titre et boutons).
 		sf::State::Windowed,       // État de la fenêtre au démarrage.
-		sf::ContextSettings(24)    // Taille du tampon de profondeur. 24 bit est pas mal le standard.
+		sf::ContextSettings{24}    // Taille du tampon de profondeur. 24 bit est pas mal le standard.
 	);
 	window.setFramerateLimit(30); // Le FPS d'affichage.
 	window.setActive(true);
