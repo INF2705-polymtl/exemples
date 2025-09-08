@@ -293,24 +293,24 @@ struct App : public OpenGLApplication
 		else
 			glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidAllVertices), pyramidAllVertices, GL_STATIC_DRAW);
 
-		// Configurer l'attribut 0 (la position) avec l'index 0 avec 3 float (vec3), un stride de sizeof(VertexData) et un offset de 0.
+		// Configurer l'attribut 0 (la position) à l'indice 0 avec 3 float (vec3), un stride de sizeof(VertexData) et un offset de 0.
 		glVertexAttribPointer(
 			0,
 			3,
 			GL_FLOAT,
 			GL_FALSE,
 			sizeof(VertexData),
-			0
+			0 // Ou offsetof(VertexData, position)
 		);
 		glEnableVertexAttribArray(0);
-		// Configurer l'attribut 1 (la couleur) avec l'index 0 avec 4 float (vec4), un stride de sizeof(VertexData) et un offset de 3*4=12.
+		// Configurer l'attribut 1 (la couleur) à l'indice 0 avec 4 float (vec4), un stride de sizeof(VertexData) et un offset de 3*4=12.
 		glVertexAttribPointer(
 			1,
 			4,
 			GL_FLOAT,
 			GL_FALSE,
 			sizeof(VertexData),
-			(void*)(3 * sizeof(float))
+			(void*)(3 * sizeof(float)) // Ou offsetof(VertexData, color)
 		);
 		glEnableVertexAttribArray(1);
 	}

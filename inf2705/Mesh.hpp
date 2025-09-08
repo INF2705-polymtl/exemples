@@ -26,7 +26,7 @@ using namespace glm;
 	glVertexAttribPointer(													\
 		(GLuint)index,														\
 		1,																	\
-		getTypeGLenum_v<decltype(elemType::member)>,						\
+		getTypeGLenum<decltype(elemType::member)>(),						\
 		GL_FALSE,															\
 		(GLint)sizeof(elemType),											\
 		(const void*)offsetof(elemType, member)								\
@@ -40,7 +40,7 @@ using namespace glm;
 	glVertexAttribPointer(												\
 		(GLuint)index,													\
 		(GLint)decltype(elemType::member)::length(),					\
-		getTypeGLenum_v<decltype(elemType::member)::value_type>,		\
+		getTypeGLenum<decltype(elemType::member)::value_type>(),		\
 		GL_FALSE,														\
 		(GLint)sizeof(elemType),										\
 		(const void*)offsetof(elemType, member)							\
@@ -55,6 +55,7 @@ struct VertexData
 	vec3 position;  // layout(location = 0)
 	vec3 normal;    // layout(location = 1)
 	vec2 texCoords; // layout(location = 2)
+	vec4 color;     // layout(location = 3)
 };
 
 // Un mesh (ou maillage) représente la géométrie d'un objet d'une façon traçable par OpenGL.
@@ -128,10 +129,11 @@ struct Mesh
 		bindVao();
 		bindVbo();
 
-		// Les données des sommets (positions, normales, coords de textures) sont placées ensembles dans le même tampon, de façon contigües. Les attributs sont configurés pour accéder à un membre de VertexData dans chaque élément.
+		// Les données des sommets (positions, normales, coords de textures, couleurs) sont placées ensembles dans le même tampon, de façon contigües. Les attributs sont configurés pour accéder à un membre de VertexData dans chaque élément.
 		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(0, VertexData, position);
 		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(1, VertexData, normal);
 		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(2, VertexData, texCoords);
+		SET_VEC_VERTEX_ATTRIB_FROM_STRUCT_MEM(3, VertexData, color);
 
 		unbindVao();
 	}

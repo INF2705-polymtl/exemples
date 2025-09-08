@@ -365,9 +365,10 @@ inline void printGLError(std::string_view sourceFile = "", int sourceLine = -1) 
 		{GL_TEXTURE_TOO_LARGE_EXT, "GL_TEXTURE_TOO_LARGE_EXT"},
 	};
 
+	std::string sourceFileStr = "";
 	if (not sourceFile.empty()) {
-		auto filename = std::filesystem::path(sourceFile).filename().string();
-		std::cerr << std::format(
+		std::string filename = std::filesystem::path(sourceFile).filename().string();
+		sourceFileStr = std::format(
 			"{}({}): ",
 			filename, sourceLine
 		);
@@ -379,10 +380,11 @@ inline void printGLError(std::string_view sourceFile = "", int sourceLine = -1) 
 			break;
 
 		auto& errorName = codeToName.at(errorCode);
-		std::cerr << std::format(
-			"OpenGL Error 0x{:04X}: {}\n",
+		std::string errorLine = sourceFileStr + std::format(
+			"OpenGL Error 0x{:04X}: {}",
 			(int)errorCode, errorName.data()
 		);
+		std::cerr << errorLine << std::endl;
 	}
 }
 

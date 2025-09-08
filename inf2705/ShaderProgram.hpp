@@ -62,7 +62,13 @@ public:
 			return 0;
 
 		// Charger la source et compiler.
-		std::string source = readFile(filename);
+		std::string source;
+		try {
+			source = readFile(filename);
+		} catch (std::ios_base::failure&) {
+			std::cerr << "Could not open shader file " << filename << std::endl;
+			return 0;
+		}
 		auto src = source.c_str();
 		glShaderSource(shaderObject, 1, &src, nullptr);
 		glCompileShader(shaderObject);

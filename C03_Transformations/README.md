@@ -50,7 +50,7 @@ prog.setMat(matr); // S'occupe de charger l'index de la matrice
 
 ## Encapsulation des VAO, VBO et EBO
 
-Pour le reste de la session, on va encapsuler la gestion des objets comme les VAO, VBO et EBO dans la classe `Mesh` ([Mesh.hpp](../inf2705/Mesh.hpp)). Ça va nous éviter la répétition de code pour le dessin de formes. Un maillage (*mesh*) représente les sommets d'une forme à afficher. Chaque sommet (structure `VertexData`) a une position (référentiel de l'objet), un vecteur normal et des coordonnées de texture. Dans le présent exemple, on va seulement utiliser la position, mais les deux autres sont des informations assez fondamentales.
+Pour le reste de la session, on va encapsuler la gestion des objets comme les VAO, VBO et EBO dans la classe `Mesh` ([Mesh.hpp](../inf2705/Mesh.hpp)). Ça va nous éviter la répétition de code pour le dessin de formes. Un maillage (*mesh*) représente les sommets d'une forme à afficher. Chaque sommet (structure `VertexData`) a une position (référentiel de l'objet), un vecteur normal, des coordonnées de texture et une couleur de sommet (pas toujours utilisée). Dans le présent exemple, on va seulement utiliser la position et la couleur, mais les deux autres sont des informations assez fondamentales.
 
 On utilise la classe `Mesh` en donnant des valeurs à ses sommets (`Mesh::vertices`) et optionnellement à son tableau de connectivité (`Mesh::indices`). On appelle ensuite `setup` qui fait la création du VAO, du VBO et du EBO, remplit les tampons en mémoire et configure les trois attributs.
 

@@ -47,7 +47,7 @@ struct Particle
 
 struct App : public OpenGLApplication
 {
-	const size_t numParticles = 1'000'000;
+	size_t numParticles = 1'000'000;
 	std::vector<Particle> particles;
 	GLuint vaoComputation = 0;
 	GLuint vaoDrawing = 0;
@@ -358,9 +358,10 @@ struct App : public OpenGLApplication
 	}
 
 	void queryParticleData() {
-		GLuint numResults = 0;
 		// Obtenir le nombre de résultats capturés par la requête.
+		GLuint numResults = 0;
 		glGetQueryObjectuiv(reqParticles, GL_QUERY_RESULT, &numResults);
+		particles.resize(numResults);
 		// Si ce nombre est non-nul, on a des résultats.
 		if (numResults != 0) {
 			// Lire le contenu du tampon de rétroaction dans le tableau de particules original (donc le mettre à jour).

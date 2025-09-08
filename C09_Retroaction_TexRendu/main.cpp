@@ -111,7 +111,11 @@ struct App : public OpenGLApplication
 		glGenFramebuffers(1, &camFrameBuffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, camFrameBuffer);
 		// Formatter les données de la texture de rendu en RGBA (RGB aurait aussi été suffisant). Comme avec les VBO de sortie, on peut passer nullptr comme données ou passer une image de départ pour le débogage.
-		texRender.setPixelData(GL_RGBA, nullptr);
+		glTexImage2D(
+			GL_TEXTURE_2D, 0, GL_RGBA,
+			texRender.size.x, texRender.size.y, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, nullptr
+		);
 		// Configurer la texture pour les filtres usuels et pas de répétition.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

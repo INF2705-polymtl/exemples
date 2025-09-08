@@ -40,8 +40,6 @@ struct App : public OpenGLApplication
 	Mesh pyramid;
 	Mesh cubeBox;
 	Mesh cubeWire;
-	// On se fait un autre VBO pour les couleurs par sommet de la pyramide (les cubes ont des couleurs uniformes, pas par sommet).
-	GLuint pyramidColorVbo = 0;
 
 	// Les deux programmes : un pour les couleurs par sommet (pyramide), un pour les couleurs uniformes (cubes).
 	ShaderProgram coloredVertexShaders;
@@ -117,7 +115,6 @@ struct App : public OpenGLApplication
 		pyramid.deleteObjects();
 		cubeBox.deleteObjects();
 		cubeWire.deleteObjects();
-		glDeleteBuffers(1, &pyramidColorVbo);
 		coloredVertexShaders.deleteShaders();
 		coloredVertexShaders.deleteProgram();
 		solidColorShaders.deleteShaders();
@@ -215,10 +212,10 @@ struct App : public OpenGLApplication
 		vec3 bottomL = { 0.3f, -0.1f, -0.1f};
 		vec3 bottomF = { 0.0f, -0.1f,  0.7f};
 		pyramid.vertices = {
-			{top,     {}, {}},
-			{bottomR, {}, {}},
-			{bottomL, {}, {}},
-			{bottomF, {}, {}},
+			{top,     {}, {}, brightYellow},
+			{bottomR, {}, {}, brightGreen},
+			{bottomL, {}, {}, brightRed},
+			{bottomF, {}, {}, brightBlue},
 		};
 		pyramid.indices = {
 			// Dessous
@@ -231,24 +228,6 @@ struct App : public OpenGLApplication
 			2, 1, 0,
 		};
 		pyramid.setup();
-
-		// La classe Mesh configure les attributs de position, de normale et de coordonnées de texture pour chaque sommet. Ce sont les informations de base nécessaires pour afficher des formes. Dans notre cas, on veut de la couleur, donc un vec4 (RGBA) de plus pour chaque sommet. On peut ajouter un autre VBO qui passera les couleurs de sommets dans l'attribut de sommet à l'index 3.
-		vec4 pyramidVertexColors[4] = {
-			brightYellow,
-			brightGreen,
-			brightRed,
-			brightBlue,
-		};
-		// Activer le contexte du VAO de la pyramide.
-		pyramid.bindVao();
-		// Créer et passer les données au VBO des couleurs.
-		glGenBuffers(1, &pyramidColorVbo);
-		glBindBuffer(GL_ARRAY_BUFFER, pyramidColorVbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidVertexColors), pyramidVertexColors, GL_STATIC_DRAW);
-		// Configurer l'attribut 3 avec des vec4.
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(3);
-		pyramid.unbindVao();
 	}
 
 	void drawRotatingPyramid() {
@@ -281,14 +260,14 @@ struct App : public OpenGLApplication
 		vec3 frontTopL =    { 1,  1,  1};
 
 		cubeBox.vertices = {
-			{backBottomR, {}, {}},
-			{backTopR, {}, {}},
-			{backBottomL, {}, {}},
-			{backTopL, {}, {}},
-			{frontBottomR, {}, {}},
-			{frontTopR, {}, {}},
-			{frontBottomL, {}, {}},
-			{frontTopL, {}, {}},
+			{backBottomR, {}, {}, {}},
+			{backTopR, {}, {}, {}},
+			{backBottomL, {}, {}, {}},
+			{backTopL, {}, {}, {}},
+			{frontBottomR, {}, {}, {}},
+			{frontTopR, {}, {}, {}},
+			{frontBottomL, {}, {}, {}},
+			{frontTopL, {}, {}, {}},
 		};
 		cubeBox.indices = {
 			// Faces arrière
@@ -360,7 +339,6 @@ struct App : public OpenGLApplication
 	}
 
 	void drawCube(vec4 cubeColor) {
-		auto& prog = solidColorShaders;
 		// Choisir le nuanceur à couleur globale.
 		solidColorShaders.use();
 		// Mettre à jour les variables uniformes de matrice de modélisation et de couleur.

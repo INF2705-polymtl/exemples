@@ -17,24 +17,19 @@
 inline std::string readFile(std::string_view filename) {
 	// Ouvrir le fichier
 	std::ifstream file(filename.data());
+	file.exceptions(std::ios::failbit);
 	// Lire et retourner le contenu du fichier
 	return (std::stringstream() << file.rdbuf()).str();
 }
 
 inline std::string ltrim(std::string_view str) {
-	if (str.empty())
-		return "";
-	size_t i;
-	for (i = 0; i < str.size() and iswspace(str[i]); i++) { }
-	return std::string(str.begin() + i, str.end());
+	auto it = std::find_if(str.begin(), str.end(), [](char c) { return not iswspace(c); });
+	return (it == str.end()) ? "" : std::string(it, str.end());
 }
 
 inline std::string rtrim(std::string_view str) {
-	if (str.empty())
-		return "";
-	size_t i;
-	for (i = str.size() - 1; i >= 0 and iswspace(str[i]); i--) { }
-	return std::string(str.begin(), str.begin() + i + 1);
+	auto it = std::find_if(str.rbegin(), str.rend(), [](char c) { return not iswspace(c); });
+	return (it == str.rend()) ? "" : std::string(str.begin(), it.base());
 }
 
 inline std::string trim(std::string_view str) {
