@@ -9,7 +9,7 @@ Méthodes principales de cette classe :
 * `top()` : Obtenir la matrice sur le dessus de la pile.
 * `push()` : Duppliquer le dessus de la pile.
 * `push(m)` : Empiler la matrice *m*.
-* `pushIdentity()` et `loadIdentity()` : Empiler ou charger une matrice identité.
+* `pushIdentity()` et `identity()` : Empiler ou charger une matrice identité.
 * `pop()` : Dépiler le dessus de la pile.
 * `scale(v)`, `translate(v)`, `rotate(a, v)` : Les transformations usuelles. Notez que les angles sont en degrés.
 * `lookAt(oeil, cible, up)` : Même appel qu'avec *glm*.

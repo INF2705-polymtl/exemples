@@ -224,7 +224,7 @@ struct App : public OpenGLApplication
 		using enum sf::Keyboard::Key;
 		switch (key.code) {
 		case R:
-			view.loadIdentity();
+			view.identity();
 			orthoHeight = 50;
 			break;
 		case Up:

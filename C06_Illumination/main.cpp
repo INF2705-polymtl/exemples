@@ -320,7 +320,7 @@ struct App : public OpenGLApplication
 			light.updateBuffer();
 			break;
 		case R:
-			model.loadIdentity();
+			model.identity();
 			light->position.z = 5;
 			light.updateBuffer();
 			break;

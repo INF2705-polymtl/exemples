@@ -26,8 +26,8 @@ struct ProjectionBox
 	float farDist;
 };
 
-// Une pile de matrices de transformations (hérite de `std::stack`). Les tranformations (rotation, translation, etc.) s'opère sur le dessus de la pile. C'est un peu comme la classe `MatricePipeline` des notes de cours. On peut aussi la convertir implicitement en mat4 (ça prend le dessus de la pile) et faire des multiplication directement avec * et *=.
-// Les objets de cette classe seront souvent passées à des nuanceurs. Un TransformStack possède un nom correspondant à la variable uniforme qu'il représente. setName() et getName() manipule le nom et getLoc() permet d'obtenir la « localisation » de cette variable uniforme pour un programme OpenGL donné. La recherche de cet objet est fait une fois par programme et celui-ci est conservé par la suite pour éviter les appels répétés à glGetUniformLocation.
+// Une pile de matrices de transformations (hérite de `std::stack`). Les transformations (rotation, translation, etc.) s'opèrent sur le dessus de la pile. On peut aussi la convertir implicitement en mat4 (ça prend le dessus de la pile) et faire des multiplication directement avec * et *=.
+// Les objets de cette classe seront souvent passées à des nuanceurs. Un TransformStack possède un nom correspondant à la variable uniforme qu'il représente. setName() et getName() manipule le nom et getLoc() permet d'obtenir la « localisation » de cette variable uniforme pour un programme OpenGL donné. La recherche de cet objet est faite une fois par programme et celui-ci est conservé par la suite pour éviter les appels répétés à glGetUniformLocation.
 class TransformStack : public std::stack<mat4>
 {
 public:
@@ -47,7 +47,7 @@ public:
 		return *this;
 	}
 
-	void loadIdentity() {
+	void identity() {
 		top() = mat4(1.0f);
 	}
 	void scale(const vec3& v) {

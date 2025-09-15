@@ -309,7 +309,7 @@ struct App : public OpenGLApplication
 		// Choisir quel lutin (sprite) utiliser selon la trame actuelle.
 		spriteLink.bindToTextureUnit(swingAnimFrame % numSwingAnimFrames, 1);
 
-		modelSprite.loadIdentity();
+		modelSprite.identity();
 		// Positionner le point.
 		modelSprite.translate({-0.6, 0, 0});
 		// Mettre à l'échelle en appliquant les proportions de la texture.
@@ -333,7 +333,7 @@ struct App : public OpenGLApplication
 		// Choisir quel lutin (sprite) utiliser selon la trame actuelle.
 		spriteSword.bindToTextureUnit(swordAnimFrame / 2 % numSwordAnimFrames, 1);
 
-		modelSprite.loadIdentity();
+		modelSprite.identity();
 		// Positionner le point en fonction de la trame actuelle (donc mouvement vers la droite).
 		modelSprite.translate({-0.49 + swordAnimFrame * 0.05, -0.011, 0});
 		// Mettre à l'échelle en appliquant les proportions de la texture.

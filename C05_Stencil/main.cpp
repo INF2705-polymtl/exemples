@@ -351,7 +351,7 @@ struct App : public OpenGLApplication
 	}
 
 	void applyCamera() {
-		view.loadIdentity();
+		view.identity();
 		camera.applyToView(view);
 		basicProg.use();
 		basicProg.setMat(view);
@@ -359,7 +359,7 @@ struct App : public OpenGLApplication
 
 	void applyPerspective(float vfov = 50) {
 		// Appliquer la perspective avec un champs de vision (FOV) vertical donné et avec un aspect correspondant à celui de la fenêtre.
-		projection.loadIdentity();
+		projection.identity();
 		projection.perspective(vfov, getWindowAspect(), 0.01f, 100.0f);
 		basicProg.use();
 		basicProg.setMat(projection);

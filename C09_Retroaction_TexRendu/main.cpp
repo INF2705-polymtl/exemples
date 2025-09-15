@@ -255,7 +255,7 @@ struct App : public OpenGLApplication
 
 		basicProg.use();
 
-		model.loadIdentity();
+		model.identity();
 		basicProg.setMat(model);
 
 		// Le plancher en ciment.

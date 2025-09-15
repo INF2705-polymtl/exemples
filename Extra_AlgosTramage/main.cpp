@@ -351,7 +351,7 @@ struct App : public OpenGLApplication
 		globalColorProg.use();
 		globalColor = lineColor;
 		globalColorProg.setUniform(globalColor);
-		model.loadIdentity();
+		model.identity();
 		globalColorProg.setUniform(model);
 		referenceLines.draw(GL_LINES);
 	}
@@ -363,7 +363,7 @@ struct App : public OpenGLApplication
 		glPointSize(4);
 
 		globalColorProg.use();
-		model.loadIdentity();
+		model.identity();
 		globalColorProg.setUniform(model);
 
 		// Dessiner les lignes séparant les fragments.
@@ -382,7 +382,7 @@ struct App : public OpenGLApplication
 		float xlim = gridSize;
 		// Centrer la grille et les faux fragments au milieu de la fenêtre (plus convenant).
 		float xmargin = (getWindowAspect() - 1) * ylim * 0.5f;
-		projection.loadIdentity();
+		projection.identity();
 		projection.ortho2D(-xmargin, xlim + xmargin, 0, ylim);
 
 		globalColorProg.use();
